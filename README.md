@@ -14,7 +14,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
 1. Clone this repo.
 
    ```bash
-   git clone [https://github.com/ameer00/Building-Reliable-Platforms-on-GCP-with-Google-SRE.git](https://github.com/ameer00/Building-Reliable-Platforms-on-GCP-with-Google-SRE.git)
+   git clone https://github.com/ameer00/Building-Reliable-Platforms-on-GCP-with-Google-SRE.git
    cd Building-Reliable-Platforms-on-GCP-with-Google-SRE
    ```
 

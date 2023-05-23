@@ -1,0 +1,36 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-gke-dev-confirm
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# Confirm GKE dev clusters are ready
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-gke-dev-confirm"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud anthos config controller get-credentials config-controller --location=$${KCC_REGION} --project=${_PROJECT_ID}
+      kubectl -n config-control wait containercluster $${GKE_DEV1_NAME} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster $${GKE_DEV2_NAME} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster $${GKE_DEV3_NAME} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster $${GKE_DEV4_NAME} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster $${GKE_DEV5_NAME} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster $${GKE_DEV6_NAME} --for=condition=Ready --timeout=30m

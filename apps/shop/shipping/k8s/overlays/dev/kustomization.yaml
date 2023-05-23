@@ -1,0 +1,4 @@
+commonLabels:
+  app: shipping
+bases:
+- ../../base

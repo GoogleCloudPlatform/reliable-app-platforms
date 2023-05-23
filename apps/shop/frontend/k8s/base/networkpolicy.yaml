@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: networkpolicy-allowed-namespaces
+spec:
+  egress:
+    - {}
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 10.0.0.0/8 # Needed for multi-cluster mesh traffic
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: shop-loadgenerator
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: asm-gateways
+      ports:
+        - protocol: TCP
+          port: 8080
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

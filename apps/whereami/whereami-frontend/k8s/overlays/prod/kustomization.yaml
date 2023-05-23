@@ -1,0 +1,12 @@
+nameSuffix: "-frontend"
+namespace: "whereami-frontend"
+commonLabels:
+  app: whereami-frontend
+  env: prod
+  org: whereami
+bases:
+- ../../base
+- ./destrule.yaml
+- ./virtualservice.yaml
+patches:
+- cm-flag.yaml

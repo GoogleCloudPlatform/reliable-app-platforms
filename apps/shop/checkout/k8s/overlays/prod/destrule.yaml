@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: shop-checkout-prod
+spec:
+  host: shop-checkout.shop-checkout.svc.cluster.local
+  subsets:
+  - name: shop-checkout-prod
+    labels:
+      app: shop-checkout
+      env: prod
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN
+  - name: shop-checkout-prod-p1a
+    labels:
+      app: shop-checkout
+      env: prod
+      deploy.cloud.google.com/target-id: p1a
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN

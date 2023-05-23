@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: shop-currency-prod
+spec:
+  hosts:
+  - shop-currency
+  http:
+  - match:
+    - sourceLabels:
+        app: shop-currency
+        env: prod
+    route:
+    - destination:
+        host: shop-currency
+        subset: shop-currency-prod

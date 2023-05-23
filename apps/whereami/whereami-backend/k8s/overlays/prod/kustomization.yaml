@@ -1,0 +1,13 @@
+nameSuffix: "-backend"
+namespace: "whereami-backend"
+commonLabels:
+  app: whereami-backend
+  env: prod
+  org: whereami
+bases:
+- ../../base
+- destrule.yaml
+- virtualservice.yaml
+patches:
+- cm-flag.yaml
+- service-type.yaml

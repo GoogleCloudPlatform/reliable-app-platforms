@@ -1,0 +1,5 @@
+namespace: "shop-cart"
+commonLabels:
+  app: cart
+bases:
+- ../../base

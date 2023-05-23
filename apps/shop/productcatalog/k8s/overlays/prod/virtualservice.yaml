@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: shop-productcatalog-prod
+spec:
+  hosts:
+  - shop-productcatalog
+  http:
+  - match:
+    - sourceLabels:
+        app: shop-productcatalog
+        env: prod
+    route:
+    - destination:
+        host: shop-productcatalog
+        subset: shop-productcatalog-prod

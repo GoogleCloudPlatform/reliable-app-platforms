@@ -1,0 +1,38 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+metadata:
+  name: pop-stats
+build:
+  ## Uncheck the following 2 lines if you're using minikube locally and do not want to push this to artifact repo
+  # local:
+  #   push: false
+  artifacts:
+    - image: pop-stats
+      context: app
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  kustomize:
+    paths:
+      - k8s/overlays/dev
+portForward:
+  - resourceType: deployment
+    resourceName: pop-stats
+    port: 8080
+    localPort: 8080
+profiles:
+  - name: test
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/test
+  - name: staging
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/staging
+  - name: prod
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/prod

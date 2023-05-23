@@ -1,0 +1,26 @@
+      sed -e "s/GKE_DEV1_NAME/${GKE_DEV1_NAME}/" \
+              -e "s/GKE_DEV1_LOCATION/${GKE_DEV1_LOCATION}/"  \
+              -e "s/GKE_DEV2_NAME/${GKE_DEV2_NAME}/" \
+              -e "s/GKE_DEV2_LOCATION/${GKE_DEV2_LOCATION}/"  \
+              -e "s/GKE_DEV3_NAME/${GKE_DEV3_NAME}/" \
+              -e "s/GKE_DEV3_LOCATION/${GKE_DEV3_LOCATION}/"  \
+              -e "s/GKE_DEV4_NAME/${GKE_DEV4_NAME}/" \
+              -e "s/GKE_DEV4_LOCATION/${GKE_DEV4_LOCATION}/"  \
+              -e "s/GKE_DEV5_NAME/${GKE_DEV5_NAME}/" \
+              -e "s/GKE_DEV5_LOCATION/${GKE_DEV5_LOCATION}/"  \
+              -e "s/GKE_DEV6_NAME/${GKE_DEV6_NAME}/" \
+              -e "s/GKE_DEV6_LOCATION/${GKE_DEV6_LOCATION}/"  \
+              -e "s/GKE_PROD1_NAME/${GKE_PROD1_NAME}/" \
+              -e "s/GKE_PROD1_LOCATION/${GKE_PROD1_LOCATION}/"  \
+              -e "s/GKE_PROD2_NAME/${GKE_PROD2_NAME}/" \
+              -e "s/GKE_PROD2_LOCATION/${GKE_PROD2_LOCATION}/"  \
+              -e "s/GKE_PROD3_NAME/${GKE_PROD3_NAME}/" \
+              -e "s/GKE_PROD3_LOCATION/${GKE_PROD3_LOCATION}/"  \
+              -e "s/GKE_PROD4_NAME/${GKE_PROD4_NAME}/" \
+              -e "s/GKE_PROD4_LOCATION/${GKE_PROD4_LOCATION}/"  \
+              -e "s/GKE_PROD5_NAME/${GKE_PROD5_NAME}/" \
+              -e "s/GKE_PROD5_LOCATION/${GKE_PROD5_LOCATION}/"  \
+              -e "s/GKE_PROD6_NAME/${GKE_PROD6_NAME}/" \
+              -e "s/GKE_PROD6_LOCATION/${GKE_PROD6_LOCATION}/"  \
+              -e "s/PROJECT_ID/${PROJECT_ID}/" \
+cd.yaml_tmpl > cd.yaml

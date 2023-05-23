@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: shop-frontend
+spec:
+  workloadSelector:
+    labels:
+      app: shop-frontend
+  ingress:
+  - port:
+      number: 8080
+      protocol: HTTP
+  egress:
+  - hosts:
+    - "istio-system/*"
+    - "asm-gateways/*"
+    - "shop-ad/*"
+    - "shop-checkout/*"
+    - "shop-currency/*"
+    - "shop-cart/*"
+    - "shop-productcatalog/*"
+    - "shop-recommendation/*"
+    - "shop-shipping/*"
+

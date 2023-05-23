@@ -1,0 +1,8 @@
+apiVersion: storage.cnrm.cloud.google.com/v1beta1
+kind: StorageBucket
+metadata:
+  name: PROJECT_ID
+  namespace: config-control
+spec:
+  versioning:
+    enabled: true

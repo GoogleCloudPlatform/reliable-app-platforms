@@ -1,0 +1,43 @@
+apiVersion: deploy.cloud.google.com/v1beta1
+kind: DeliveryPipeline
+metadata:
+  name: SERVICE-g-pipeline
+description: SERVICE service delivery pipeline for global (g) model
+serialPipeline:
+  stages:
+    - targetId: GKE_DEV1_NAME
+      profiles:
+        - non-prod
+    - targetId: GKE_DEV2_NAME
+      profiles:
+        - non-prod
+    - targetId: GKE_DEV3_NAME
+      profiles:
+        - non-prod
+    - targetId: GKE_DEV4_NAME
+      profiles:
+        - non-prod
+    - targetId: GKE_DEV5_NAME
+      profiles:
+        - non-prod
+    - targetId: GKE_DEV6_NAME
+      profiles:
+        - non-prod
+    - targetId: GKE_PROD1_NAME
+      profiles:
+        - prod
+    - targetId: GKE_PROD2_NAME
+      profiles:
+        - prod
+    - targetId: GKE_PROD3_NAME
+      profiles:
+        - prod
+    - targetId: GKE_PROD4_NAME
+      profiles:
+        - prod
+    - targetId: GKE_PROD5_NAME
+      profiles:
+        - prod
+    - targetId: GKE_PROD6_NAME
+      profiles:
+        - prod

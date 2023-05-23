@@ -1,0 +1,6 @@
+resources:
+- namespace.yaml
+- ksa.yaml
+- statefulset.yaml
+- config.yaml
+- service.yaml

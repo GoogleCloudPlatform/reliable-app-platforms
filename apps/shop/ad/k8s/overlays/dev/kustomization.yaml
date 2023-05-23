@@ -1,0 +1,4 @@
+commonLabels:
+  app: ad
+bases:
+- ../../base

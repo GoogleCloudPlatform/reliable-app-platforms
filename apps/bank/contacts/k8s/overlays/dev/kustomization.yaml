@@ -1,0 +1,4 @@
+commonLabels:
+  app: contacts
+bases:
+- ../../base

@@ -1,0 +1,50 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-features-gke-config-gateway-apis
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# Enable Gateway APIs
+# Docs:
+# 1. Enabling multi-cluster Gateways -> https://cloud.google.com/kubernetes-engine/docs/how-to/enabling-multi-cluster-gateways
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-config-gateway-apis"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud projects add-iam-policy-binding ${_PROJECT_ID} \
+        --member "serviceAccount:${_PROJECT_ID}.svc.id.goog[gke-mcs/gke-mcs-importer]" \
+        --role "roles/compute.networkViewer" \
+        --project=${_PROJECT_ID}
+      while [[ $(gcloud container clusters describe $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
+        echo "Waiting for $${GKE_CONFIG_NAME} cluster to be RUNNING."
+        sleep 5
+      done
+      gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID}
+      kubectl apply -k "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.5.0"
+      kubectl wait --for=condition=established crd gatewayclasses.gateway.networking.k8s.io --timeout=5m
+      export GATEWAYCLASS_RESOURES="No resources found"
+      until [[ $$GATEWAYCLASS_RESOURES != "No resources found" ]]
+      do
+          export GATEWAYCLASS_RESOURES=$(kubectl get gatewayclasses)
+          sleep 5
+          echo -e "GATEWAYCLASS_RESOURES is $$GATEWAYCLASS_RESOURES"
+      done
+      kubectl get gatewayclasses

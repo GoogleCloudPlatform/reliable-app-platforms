@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+metadata:
+  name: ledger-db
+build:
+  artifacts:
+    - image: ledger-db
+      context: src
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  kustomize:
+    paths:
+      - k8s/overlays/dev
+portForward:
+  - resourceType: statefulset
+    resourceName: ledger-db
+    port: 5432
+    localPort: 5432
+profiles:
+  - name: non-prod
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/non-prod
+  - name: prod
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/prod

@@ -1,0 +1,4 @@
+commonLabels:
+  app: balancereader
+bases:
+- ../../base

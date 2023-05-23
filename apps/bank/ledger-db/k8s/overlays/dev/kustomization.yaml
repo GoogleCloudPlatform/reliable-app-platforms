@@ -1,0 +1,4 @@
+commonLabels:
+  app: ledger-db
+bases:
+- ../../base

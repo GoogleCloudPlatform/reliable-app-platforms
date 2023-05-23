@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: shop-productcatalog-prod
+spec:
+  host: shop-productcatalog.shop-productcatalog.svc.cluster.local
+  subsets:
+  - name: shop-productcatalog-prod
+    labels:
+      app: shop-productcatalog
+      env: prod
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN
+  - name: shop-productcatalog-prod-p1a
+    labels:
+      app: shop-productcatalog
+      env: prod
+      deploy.cloud.google.com/target-id: p1a
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN

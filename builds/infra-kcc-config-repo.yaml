@@ -1,0 +1,116 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-kcc-config-repo
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# Create CSR Repo for infrastructure
+# Docs:
+# 1. Set up Config Controller -> https://cloud.google.com/anthos-config-management/docs/how-to/config-controller-setup
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-repo-create"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud anthos config controller get-credentials config-controller --location=$${KCC_REGION} --project=${_PROJECT_ID}
+      kubectl apply -f - <<EOF
+      apiVersion: sourcerepo.cnrm.cloud.google.com/v1beta1
+      kind: SourceRepoRepository
+      metadata:
+        name: infrastructure
+        namespace: config-control
+      EOF
+      kubectl -n config-control wait sourcereporepository infrastructure --for=condition=Ready --timeout=10m
+# Configure GitOps for Infrastructure deployment
+# Docs:
+# 1. Set up Config Controller -> https://cloud.google.com/anthos-config-management/docs/how-to/config-controller-setup
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-repo-gitops"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud anthos config controller get-credentials config-controller --location=$${KCC_REGION} --project=${_PROJECT_ID}
+      kubectl apply -f - <<EOF
+      apiVersion: iam.cnrm.cloud.google.com/v1beta1
+      kind: IAMServiceAccount
+      metadata:
+        name: config-sync-sa
+        namespace: config-control
+      spec:
+        displayName: ConfigSync
+      ---
+      apiVersion: iam.cnrm.cloud.google.com/v1beta1
+      kind: IAMPolicyMember
+      metadata:
+        name: config-sync-wi
+        namespace: config-control
+      spec:
+        member: serviceAccount:${_PROJECT_ID}.svc.id.goog[config-management-system/root-reconciler]
+        role: roles/iam.workloadIdentityUser
+        resourceRef:
+          apiVersion: iam.cnrm.cloud.google.com/v1beta1
+          kind: IAMServiceAccount
+          name: config-sync-sa
+      ---
+      apiVersion: iam.cnrm.cloud.google.com/v1beta1
+      kind: IAMPolicyMember
+      metadata:
+        name: allow-configsync-sa-read-csr
+        namespace: config-control
+      spec:
+        member: serviceAccount:config-sync-sa@${_PROJECT_ID}.iam.gserviceaccount.com
+        role: roles/source.reader
+        resourceRef:
+          apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+          kind: Project
+          external: projects/${_PROJECT_ID}
+      EOF
+      kubectl -n config-control wait iamserviceaccount config-sync-sa --for=condition=Ready --timeout=10m
+      kubectl -n config-control wait iampolicymember config-sync-wi --for=condition=Ready --timeout=10m
+      kubectl -n config-control wait iampolicymember allow-configsync-sa-read-csr --for=condition=Ready --timeout=10m
+# Configure repo sync
+# Docs:
+# 1. Set up Config Controller -> https://cloud.google.com/anthos-config-management/docs/how-to/config-controller-setup
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-repo-sync"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud anthos config controller get-credentials config-controller --location=$${KCC_REGION} --project=${_PROJECT_ID}
+      kubectl apply -f - <<EOF
+      apiVersion: configsync.gke.io/v1beta1
+      kind: RootSync
+      metadata:
+        name: root-sync
+        namespace: config-management-system
+      spec:
+        sourceFormat: unstructured
+        git:
+          repo: https://source.developers.google.com/p/${_PROJECT_ID}/r/infrastructure
+          auth: gcpserviceaccount
+          gcpServiceAccountEmail: config-sync-sa@${_PROJECT_ID}.iam.gserviceaccount.com
+      EOF
+      kubectl wait crd/rootsyncs.configsync.gke.io --for=condition=established --timeout=10m

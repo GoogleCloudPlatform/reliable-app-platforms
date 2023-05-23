@@ -1,0 +1,110 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-features-gke-dev-mesh
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# Install ASM on GKE Dev1
+# Docs:
+# 1. Configure managed Anthos Service Mesh with fleet API -> https://cloud.google.com/service-mesh/docs/managed/auto-control-plane-with-fleet
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-dev1-mesh"
+  entrypoint: bash
+  dir: "infra"
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships $${GKE_DEV1_NAME} \
+        --project ${_PROJECT_ID}
+# Install ASM on GKE Dev2
+# Docs:
+# 1. Configure managed Anthos Service Mesh with fleet API -> https://cloud.google.com/service-mesh/docs/managed/auto-control-plane-with-fleet
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-dev2-mesh"
+  entrypoint: bash
+  dir: "infra"
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships $${GKE_DEV2_NAME} \
+        --project ${_PROJECT_ID}
+# Install ASM on GKE Dev3
+# Docs:
+# 1. Configure managed Anthos Service Mesh with fleet API -> https://cloud.google.com/service-mesh/docs/managed/auto-control-plane-with-fleet
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-dev3-mesh"
+  entrypoint: bash
+  dir: "infra"
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships $${GKE_DEV3_NAME} \
+        --project ${_PROJECT_ID}
+# Install ASM on GKE Dev4
+# Docs:
+# 1. Configure managed Anthos Service Mesh with fleet API -> https://cloud.google.com/service-mesh/docs/managed/auto-control-plane-with-fleet
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-dev4-mesh"
+  entrypoint: bash
+  dir: "infra"
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships $${GKE_DEV4_NAME} \
+        --project ${_PROJECT_ID}
+# Install ASM on GKE Dev5
+# Docs:
+# 1. Configure managed Anthos Service Mesh with fleet API -> https://cloud.google.com/service-mesh/docs/managed/auto-control-plane-with-fleet
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-dev5-mesh"
+  entrypoint: bash
+  dir: "infra"
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships $${GKE_DEV5_NAME} \
+        --project ${_PROJECT_ID}
+# Install ASM on GKE Dev6
+# Docs:
+# 1. Configure managed Anthos Service Mesh with fleet API -> https://cloud.google.com/service-mesh/docs/managed/auto-control-plane-with-fleet
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-dev6-mesh"
+  entrypoint: bash
+  dir: "infra"
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships $${GKE_DEV6_NAME} \
+        --project ${_PROJECT_ID}

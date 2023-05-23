@@ -1,0 +1,4 @@
+commonLabels:
+  app: productcatalog
+bases:
+- ../../base

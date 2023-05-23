@@ -1,0 +1,4 @@
+commonLabels:
+  app: email
+bases:
+- ../../base

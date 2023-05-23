@@ -1,0 +1,54 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-gke-dev-build
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# Create GKE dev clusters
+# Docs:
+# 1. Config Connector resource -> https://cloud.google.com/config-connector/docs/reference/resource-docs/container/containercluster
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-gke-dev-build"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      source vars.sh
+      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+      echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+      git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
+      git config --global user.name "cloudbuild-ci"
+      mkdir -p infra-hydrated/clusters
+      mkdir -p infra-hydrated/repos
+      sed -e "s/GKE_DEV_NAME/$${GKE_DEV1_NAME}/" -e "s/GKE_DEV_LOCATION/$${GKE_DEV1_LOCATION}/" -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/dev/gke-dev.yaml > infra-hydrated/clusters/gke-dev1.yaml
+      sed -e "s/GKE_DEV_NAME/$${GKE_DEV2_NAME}/" -e "s/GKE_DEV_LOCATION/$${GKE_DEV2_LOCATION}/" -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/dev/gke-dev.yaml > infra-hydrated/clusters/gke-dev2.yaml
+      sed -e "s/GKE_DEV_NAME/$${GKE_DEV3_NAME}/" -e "s/GKE_DEV_LOCATION/$${GKE_DEV3_LOCATION}/" -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/dev/gke-dev.yaml > infra-hydrated/clusters/gke-dev3.yaml
+      sed -e "s/GKE_DEV_NAME/$${GKE_DEV4_NAME}/" -e "s/GKE_DEV_LOCATION/$${GKE_DEV4_LOCATION}/" -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/dev/gke-dev.yaml > infra-hydrated/clusters/gke-dev4.yaml
+      sed -e "s/GKE_DEV_NAME/$${GKE_DEV5_NAME}/" -e "s/GKE_DEV_LOCATION/$${GKE_DEV5_LOCATION}/" -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/dev/gke-dev.yaml > infra-hydrated/clusters/gke-dev5.yaml
+      sed -e "s/GKE_DEV_NAME/$${GKE_DEV6_NAME}/" -e "s/GKE_DEV_LOCATION/$${GKE_DEV6_LOCATION}/" -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/dev/gke-dev.yaml > infra-hydrated/clusters/gke-dev6.yaml
+      gcloud source repos clone infrastructure --project=${_PROJECT_ID}
+      mkdir -p infrastructure/clusters
+      cp -r infra-hydrated/clusters/gke-dev1.yaml infrastructure/clusters
+      cp -r infra-hydrated/clusters/gke-dev2.yaml infrastructure/clusters
+      cp -r infra-hydrated/clusters/gke-dev3.yaml infrastructure/clusters
+      cp -r infra-hydrated/clusters/gke-dev4.yaml infrastructure/clusters
+      cp -r infra-hydrated/clusters/gke-dev5.yaml infrastructure/clusters
+      cp -r infra-hydrated/clusters/gke-dev6.yaml infrastructure/clusters
+      cd infrastructure
+      git add . && git commit -am "Create GKE dev clusters"
+      git push

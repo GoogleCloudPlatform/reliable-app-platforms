@@ -1,0 +1,86 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-features-gke-prod-mcs
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# Enable MCS
+# Docs:
+# 1. Enabling multi-cluster Gateways -> https://cloud.google.com/kubernetes-engine/docs/how-to/enabling-multi-cluster-gateways
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-prod-mcs"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      source vars.sh
+      while [[ $(gcloud container clusters describe $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do sleep 5; done
+      gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID}
+      export MCG_GATEWAYS=$(kubectl get crd | grep gatewayclasses && kubectl get gatewayclass | grep gke-l7-gxlb-mc)
+      if [[ ! "$${MCG_GATEWAYS}" ]]; then
+        gcloud container fleet ingress disable --project=${_PROJECT_ID}
+      fi
+      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+      export PROD1_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD1_NAME}"
+      export PROD2_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD2_NAME}"
+      export PROD3_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD3_NAME}"
+      export PROD4_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD4_NAME}"
+      export PROD5_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD5_NAME}"
+      export PROD6_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD6_NAME}"
+      export PROD1_MEMBERSHIP_OK=NOT_OK
+      until [[ $$PROD1_MEMBERSHIP_OK == "OK" ]]
+      do
+          export PROD1_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${PROD1_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "PROD1_MEMBERSHIP_OK is $$PROD1_MEMBERSHIP_OK"
+      done
+      export PROD2_MEMBERSHIP_OK=NOT_OK
+      until [[ $$PROD2_MEMBERSHIP_OK == "OK" ]]
+      do
+          export PROD2_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${PROD2_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "PROD2_MEMBERSHIP_OK is $$PROD2_MEMBERSHIP_OK"
+      done
+      export PROD3_MEMBERSHIP_OK=NOT_OK
+      until [[ $$PROD3_MEMBERSHIP_OK == "OK" ]]
+      do
+          export PROD3_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${PROD3_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "PROD3_MEMBERSHIP_OK is $$PROD3_MEMBERSHIP_OK"
+      done
+      export PROD4_MEMBERSHIP_OK=NOT_OK
+      until [[ $$PROD4_MEMBERSHIP_OK == "OK" ]]
+      do
+          export PROD4_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${PROD4_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "PROD4_MEMBERSHIP_OK is $$PROD4_MEMBERSHIP_OK"
+      done
+      export PROD5_MEMBERSHIP_OK=NOT_OK
+      until [[ $$PROD5_MEMBERSHIP_OK == "OK" ]]
+      do
+          export PROD5_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${PROD5_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "PROD5_MEMBERSHIP_OK is $$PROD5_MEMBERSHIP_OK"
+      done
+      export PROD6_MEMBERSHIP_OK=NOT_OK
+      until [[ $$PROD6_MEMBERSHIP_OK == "OK" ]]
+      do
+          export PROD6_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${PROD6_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "PROD6_MEMBERSHIP_OK is $$PROD6_MEMBERSHIP_OK"
+      done

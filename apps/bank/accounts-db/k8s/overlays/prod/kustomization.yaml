@@ -1,0 +1,5 @@
+namespace: "bank-accounts-db"
+commonLabels:
+  app: accounts-db
+bases:
+- ../../base

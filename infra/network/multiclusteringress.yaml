@@ -1,0 +1,12 @@
+apiVersion: gkehub.cnrm.cloud.google.com/v1beta1
+kind: GKEHubFeature
+metadata:
+  name: gke-hubfeaturemembership-mci
+  namespace: config-control
+spec:
+  resourceID: multiclusteringress
+  location: global
+  spec:
+    multiclusteringress:
+      configMembershipRef:
+        name: gke5-hub-membership

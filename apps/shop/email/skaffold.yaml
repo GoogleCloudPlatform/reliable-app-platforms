@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+metadata:
+  name: email
+build:
+  artifacts:
+    - image: email
+      context: src
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  kustomize:
+    paths:
+      - k8s/overlays/dev
+portForward:
+  - resourceType: deployment
+    resourceName: email
+    port: 5000
+    localPort: 5000
+profiles:
+  - name: non-prod
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/non-prod
+  - name: prod
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/prod

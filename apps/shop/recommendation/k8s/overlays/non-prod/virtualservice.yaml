@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: shop-recommendation-dev
+spec:
+  hosts:
+  - shop-recommendation
+  http:
+  - match:
+    - sourceLabels:
+        app: shop-recommendation
+        env: dev
+    route:
+    - destination:
+        host: shop-recommendation
+        subset: shop-recommendation-dev

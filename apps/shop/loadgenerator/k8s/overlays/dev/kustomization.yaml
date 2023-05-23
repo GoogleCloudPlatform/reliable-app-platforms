@@ -1,0 +1,4 @@
+commonLabels:
+  app: loadgenerator
+bases:
+- ../../base

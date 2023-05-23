@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: whereami-frontend-dev
+spec:
+  host: whereami-frontend.whereami-frontend.svc.cluster.local
+  subsets:
+  - name: whereami-frontend-dev
+    labels:
+      app: whereami-frontend
+      env: dev
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN
+  - name: whereami-frontend-dev-d1a
+    labels:
+      app: whereami-frontend
+      env: dev
+      deploy.cloud.google.com/target-id: d1a
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN

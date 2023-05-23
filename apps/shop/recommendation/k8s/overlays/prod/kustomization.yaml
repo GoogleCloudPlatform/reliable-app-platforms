@@ -1,0 +1,9 @@
+namespace: "shop-recommendation"
+commonLabels:
+  app: recommendation
+  env: prod
+  org: shop
+bases:
+- ../../base
+- destrule.yaml
+- virtualservice.yaml

@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: shop-loadgenerator-dev
+spec:
+  hosts:
+  - shop-loadgenerator
+  http:
+  - match:
+    - sourceLabels:
+        app: shop-loadgenerator
+        env: dev
+    route:
+    - destination:
+        host: shop-loadgenerator
+        subset: shop-loadgenerator-dev

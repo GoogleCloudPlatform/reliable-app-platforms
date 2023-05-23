@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: whereami-frontend
+  labels:
+    istio.io/rev: asm-managed
+  annotations:
+    mesh.cloud.google.com/proxy: '{"managed":"true"}'
+

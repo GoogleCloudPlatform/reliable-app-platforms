@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: shop-payment-prod
+spec:
+  hosts:
+  - shop-payment
+  http:
+  - match:
+    - sourceLabels:
+        app: shop-payment
+        env: prod
+    route:
+    - destination:
+        host: shop-payment
+        subset: shop-payment-prod

@@ -1,0 +1,4 @@
+commonLabels:
+  app: transactionhistory
+bases:
+- ../../base

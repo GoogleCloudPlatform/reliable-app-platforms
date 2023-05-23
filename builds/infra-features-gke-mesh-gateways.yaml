@@ -1,0 +1,42 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-features-gke-mesh-gateways
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# ASM gateways installation
+# Docs:
+# 1. Enabling multi-cluster Gateways -> https://cloud.google.com/kubernetes-engine/docs/how-to/enabling-multi-cluster-gateways
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-mesh-gateways"
+  dir: "infra/asm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+      echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+      gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos
+      chmod +x nomos
+      git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
+      git config --global user.name "cloudbuild-ci"
+      gcloud source repos clone config --project=${_PROJECT_ID}
+      mkdir -p config/asm
+      cp -r asm-gateways.yaml config/asm
+      cd config
+      git add . && git commit -am "Deploy ASM gateways"
+      git push

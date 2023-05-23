@@ -1,0 +1,4 @@
+commonLabels:
+  app: frontend
+bases:
+- ../../base

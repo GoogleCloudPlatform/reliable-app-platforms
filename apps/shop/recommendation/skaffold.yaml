@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+metadata:
+  name: recommendation
+build:
+  artifacts:
+    - image: recommendation
+      context: src
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  kustomize:
+    paths:
+      - k8s/overlays/dev
+portForward:
+  - resourceType: deployment
+    resourceName: recommendation
+    port: 8080
+    localPort: 8080
+profiles:
+  - name: non-prod
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/non-prod
+  - name: prod
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/prod

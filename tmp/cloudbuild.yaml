@@ -1,0 +1,641 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - arch53
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _KCC_REGION: us-central1
+  _GKE1: gke1-r1a-prod
+  _GKE1_LOCATION: us-central1-a
+  _GKE2: gke2-r1b-prod
+  _GKE2_LOCATION: us-central1-b
+  _GKE3: gke3-r2a-prod
+  _GKE3_LOCATION: us-west2-a
+  _GKE4: gke4-r2b-prod
+  _GKE4_LOCATION: us-west2-b
+  _GKE5: gke5-config
+  _GKE5_LOCATION: us-west1-a
+steps:
+# Enable APIs
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "enable-apis"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud services enable \
+      container.googleapis.com \
+      krmapihosting.googleapis.com \
+      cloudresourcemanager.googleapis.com \
+      sourcerepo.googleapis.com \
+      anthos.googleapis.com \
+      gkehub.googleapis.com \
+      multiclusteringress.googleapis.com \
+      multiclusterservicediscovery.googleapis.com \
+      trafficdirector.googleapis.com \
+      mesh.googleapis.com \
+      meshca.googleapis.com \
+      --project=${_PROJECT_ID}
+# Create Config Controller ~15mins
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "config-controller-create"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      [[ $(gcloud anthos config controller list --location=${_KCC_REGION} --format='value(name)') ]] && exit 0
+      gcloud anthos config controller create config-controller \
+      --location=${_KCC_REGION} \
+      --project=${_PROJECT_ID}
+# Config controller permissions
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "config-controller-permissions"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud anthos config controller get-credentials config-controller \
+      --location=${_KCC_REGION} --project=${_PROJECT_ID}
+      gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+      --member "serviceAccount:$(kubectl get ConfigConnectorContext -n config-control -o jsonpath='{.items[0].spec.googleServiceAccount}')" \
+      --role "roles/owner" \
+      --project "${PROJECT_ID}"
+# Create CSR Repo for infra
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-repo-create"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud anthos config controller get-credentials config-controller \
+      --location=${_KCC_REGION} --project=${_PROJECT_ID}
+      kubectl apply -f - <<EOF
+      apiVersion: sourcerepo.cnrm.cloud.google.com/v1beta1
+      kind: SourceRepoRepository
+      metadata:
+        name: infrastructure
+        namespace: config-control
+      EOF
+      kubectl -n config-control wait sourcereporepository infrastructure --for=condition=Ready
+# Configure GitOps for Infrastructure deployment
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-repo-gitops"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud anthos config controller get-credentials config-controller \
+      --location=${_KCC_REGION} --project=${_PROJECT_ID}
+      kubectl apply -f - <<EOF
+      apiVersion: iam.cnrm.cloud.google.com/v1beta1
+      kind: IAMServiceAccount
+      metadata:
+        name: config-sync-sa
+        namespace: config-control
+      spec:
+        displayName: ConfigSync
+      ---
+      apiVersion: iam.cnrm.cloud.google.com/v1beta1
+      kind: IAMPolicyMember
+      metadata:
+        name: config-sync-wi
+        namespace: config-control
+      spec:
+        member: serviceAccount:${_PROJECT_ID}.svc.id.goog[config-management-system/root-reconciler]
+        role: roles/iam.workloadIdentityUser
+        resourceRef:
+          apiVersion: iam.cnrm.cloud.google.com/v1beta1
+          kind: IAMServiceAccount
+          name: config-sync-sa
+      ---
+      apiVersion: iam.cnrm.cloud.google.com/v1beta1
+      kind: IAMPolicyMember
+      metadata:
+        name: allow-configsync-sa-read-csr
+        namespace: config-control
+      spec:
+        member: serviceAccount:config-sync-sa@${_PROJECT_ID}.iam.gserviceaccount.com
+        role: roles/source.reader
+        resourceRef:
+          apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+          kind: Project
+          external: projects/${_PROJECT_ID}
+      EOF
+      kubectl -n config-control wait iamserviceaccount config-sync-sa --for=condition=Ready
+      kubectl -n config-control wait iampolicymember config-sync-wi --for=condition=Ready
+      kubectl -n config-control wait iampolicymember allow-configsync-sa-read-csr --for=condition=Ready
+# Configure repo sync
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-repo-sync"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud anthos config controller get-credentials config-controller \
+      --location=${_KCC_REGION} --project=${_PROJECT_ID}
+      kubectl apply -f - <<EOF
+      apiVersion: configsync.gke.io/v1beta1
+      kind: RootSync
+      metadata:
+        name: root-sync
+        namespace: config-management-system
+      spec:
+        sourceFormat: unstructured
+        git:
+          repo: https://source.developers.google.com/p/${_PROJECT_ID}/r/infrastructure
+          auth: gcpserviceaccount
+          gcpServiceAccountEmail: config-sync-sa@${_PROJECT_ID}.iam.gserviceaccount.com
+      EOF
+      kubectl wait crd/rootsyncs.configsync.gke.io --for=condition=established
+# Create 10/8 firewall rule
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-create-all-10-firewall-rule"
+  dir: "infra/network"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud anthos config controller get-credentials config-controller \
+      --location=${_KCC_REGION} --project=${_PROJECT_ID}
+      kubectl apply -f firewall-all-10.yaml
+      kubectl -n config-control wait computefirewall allow-all-10 --for=condition=Ready
+# Create clusters and ACM repo
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-create-clusters-and-acm-repo"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+      echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+      git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
+      git config --global user.name "cloudbuild-ci"
+      mkdir -p infra-hydrated/clusters
+      mkdir -p infra-hydrated/repos
+      sed -e 's/GKE1_NAME/${_GKE1}/' -e 's/GKE1_LOCATION/${_GKE1_LOCATION}/' -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/gke1.yaml > infra-hydrated/clusters/gke1.yaml
+      sed -e 's/GKE2_NAME/${_GKE2}/' -e 's/GKE2_LOCATION/${_GKE2_LOCATION}/' -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/gke2.yaml > infra-hydrated/clusters/gke2.yaml
+      sed -e 's/GKE3_NAME/${_GKE3}/' -e 's/GKE3_LOCATION/${_GKE3_LOCATION}/' -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/gke3.yaml > infra-hydrated/clusters/gke3.yaml
+      sed -e 's/GKE4_NAME/${_GKE4}/' -e 's/GKE4_LOCATION/${_GKE4_LOCATION}/' -e 's/PROJECT_ID/${_PROJECT_ID}/' -e "s/PROJECT_NUMBER/$${PROJECT_NUMBER}/" clusters/gke4.yaml > infra-hydrated/clusters/gke4.yaml
+      sed -e 's/GKE5_NAME/${_GKE5}/' -e 's/GKE5_LOCATION/${_GKE5_LOCATION}/' -e 's/PROJECT_ID/${_PROJECT_ID}/' clusters/gke5-config.yaml > infra-hydrated/clusters/gke5-config.yaml
+      gcloud source repos clone infrastructure --project=${_PROJECT_ID}
+      rm -rf infrastructure/clusters
+      cp -r infra-hydrated/clusters infrastructure
+      cp -r repos infrastructure
+      cd infrastructure
+      git add . && git commit -am "Create clusters and ACM repo"
+      git push
+      sleep 5
+      export SYNCED=0
+      until [[ $$SYNCED -eq 1 ]]
+      do
+          export SYNCED=$(gcloud --project=${_PROJECT_ID} alpha anthos config sync repo list --targets config-controller --format='value(SYNCED)')
+          sleep 5
+          echo -e "SYNCED is $$SYNCED"
+      done
+# Confirm clusters and ACM repo resources
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-confirm-clusters-and-acm-repo"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud anthos config controller get-credentials config-controller \
+      --location=${_KCC_REGION} --project=${_PROJECT_ID}
+      kubectl -n config-control wait containercluster ${_GKE1} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster ${_GKE2} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster ${_GKE3} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster ${_GKE4} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait containercluster ${_GKE5} --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait gkehubmembership gke1-hub-membership --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait gkehubmembership gke2-hub-membership --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait gkehubmembership gke3-hub-membership --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait gkehubmembership gke4-hub-membership --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait gkehubmembership gke5-hub-membership --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait gkehubfeature gke-hubfeaturemembership-configmanagement --for=condition=Ready --timeout=30m
+      kubectl -n config-control wait gkehubfeature gke-hubfeaturemembership-mcs --for=condition=Ready --timeout=30m
+# Install Gateway APIs and Multicluster Ingress
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-gateway-api-multicluster-ingress"
+  dir: "infra/network"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud container fleet ingress disable --project=${_PROJECT_ID}
+      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+      echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+      export GKE1_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke1-hub-membership"
+      export GKE2_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke2-hub-membership"
+      export GKE3_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke3-hub-membership"
+      export GKE4_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke4-hub-membership"
+      export GKE5_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke5-hub-membership"
+      export GKE1_MEMBERSHIP_OK=NOT_OK
+      until [[ $$GKE1_MEMBERSHIP_OK == "OK" ]]
+      do
+          export GKE1_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE1_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "GKE1_MEMBERSHIP_OK is $$GKE1_MEMBERSHIP_OK"
+      done
+      export GKE2_MEMBERSHIP_OK=NOT_OK
+      until [[ $$GKE2_MEMBERSHIP_OK == "OK" ]]
+      do
+          export GKE2_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE2_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "GKE2_MEMBERSHIP_OK is $$GKE2_MEMBERSHIP_OK"
+      done
+      export GKE3_MEMBERSHIP_OK=NOT_OK
+      until [[ $$GKE3_MEMBERSHIP_OK == "OK" ]]
+      do
+          export GKE3_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE3_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "GKE3_MEMBERSHIP_OK is $$GKE3_MEMBERSHIP_OK"
+      done
+      export GKE4_MEMBERSHIP_OK=NOT_OK
+      until [[ $$GKE4_MEMBERSHIP_OK == "OK" ]]
+      do
+          export GKE4_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE4_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "GKE4_MEMBERSHIP_OK is $$GKE4_MEMBERSHIP_OK"
+      done
+      export GKE5_MEMBERSHIP_OK=NOT_OK
+      until [[ $$GKE5_MEMBERSHIP_OK == "OK" ]]
+      do
+          export GKE5_MEMBERSHIP_OK=$(gcloud container fleet multi-cluster-services describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE5_MEMBERSHIP}].state.code)")
+          sleep 5
+          echo -e "GKE5_MEMBERSHIP_OK is $$GKE5_MEMBERSHIP_OK"
+      done
+      gcloud container fleet multi-cluster-services describe --project=${_PROJECT_ID}
+      gcloud projects add-iam-policy-binding ${_PROJECT_ID} \
+      --member "serviceAccount:${_PROJECT_ID}.svc.id.goog[gke-mcs/gke-mcs-importer]" \
+      --role "roles/compute.networkViewer" \
+      --project=${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE5} --zone ${_GKE5_LOCATION} --project ${_PROJECT_ID}
+      kubectl apply -k "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.3"
+      kubectl wait --for=condition=established crd gatewayclasses.gateway.networking.k8s.io --timeout=5m
+      kubectl get gatewayclasses
+      gcloud container fleet ingress enable \
+      --config-membership=/projects/${_PROJECT_ID}/locations/global/memberships/gke5-hub-membership \
+      --project=${_PROJECT_ID}
+      gcloud container fleet ingress describe --project=${_PROJECT_ID}
+      gcloud projects add-iam-policy-binding ${_PROJECT_ID} \
+      --member "serviceAccount:service-$${PROJECT_NUMBER}@gcp-sa-multiclusteringress.iam.gserviceaccount.com" \
+      --role "roles/container.admin" \
+      --project=${_PROJECT_ID}
+      gcloud projects add-iam-policy-binding ${_PROJECT_ID} \
+      --member "serviceAccount:service-$${PROJECT_NUMBER}@gcp-sa-multiclusteringress.iam.gserviceaccount.com" \
+      --role "roles/serviceusage.serviceUsageConsumer" \
+      --project=${_PROJECT_ID}
+      kubectl get gatewayclasses
+# Install ACM ConfigSync GKE1
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "gke1-install-config-sync"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      sed -e 's/PROJECT_ID/${_PROJECT_ID}/' acm/apply-spec.yaml_tmpl > acm/apply-spec.yaml
+      gcloud beta container hub config-management apply \
+        --membership=gke1-hub-membership \
+        --config=acm/apply-spec.yaml \
+        --project=${_PROJECT_ID}
+# Install ACM ConfigSync GKE2
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "gke2-install-config-sync"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      sed -e 's/PROJECT_ID/${_PROJECT_ID}/' acm/apply-spec.yaml_tmpl > acm/apply-spec.yaml
+      gcloud beta container hub config-management apply \
+        --membership=gke2-hub-membership \
+        --config=acm/apply-spec.yaml \
+        --project=${_PROJECT_ID}
+# Install ACM ConfigSync GKE3
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "gke3-install-config-sync"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      sed -e 's/PROJECT_ID/${_PROJECT_ID}/' acm/apply-spec.yaml_tmpl > acm/apply-spec.yaml
+      gcloud beta container hub config-management apply \
+        --membership=gke3-hub-membership \
+        --config=acm/apply-spec.yaml \
+        --project=${_PROJECT_ID}
+# Install ACM ConfigSync GKE4
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "gke4-install-config-sync"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      sed -e 's/PROJECT_ID/${_PROJECT_ID}/' acm/apply-spec.yaml_tmpl > acm/apply-spec.yaml
+      gcloud beta container hub config-management apply \
+        --membership=gke4-hub-membership \
+        --config=acm/apply-spec.yaml \
+        --project=${_PROJECT_ID}
+# Enable Mesh feature
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-enable-mesh"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud container fleet mesh enable --project ${_PROJECT_ID}
+# Install ASM GKE1
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "gke1-install-asm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships gke1-hub-membership \
+        --project ${_PROJECT_ID}
+# Install ASM GKE2
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "gke2-install-asm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships gke2-hub-membership \
+        --project ${_PROJECT_ID}
+# Install ASM GKE3
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "gke3-install-asm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships gke3-hub-membership \
+        --project ${_PROJECT_ID}
+# Install ASM GKE4
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "gke4-install-asm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud container fleet mesh update \
+        --control-plane automatic \
+        --memberships gke4-hub-membership \
+        --project ${_PROJECT_ID}
+# Confirm ASM installation
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-confirm-asm-installation"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+      echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+      export GKE1_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke1-hub-membership"
+      export GKE2_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke2-hub-membership"
+      export GKE3_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke3-hub-membership"
+      export GKE4_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/gke4-hub-membership"
+      export GKE1_MEMBERSHIP_ACTIVE=NOT_ACTIVE
+      until [[ $$GKE1_MEMBERSHIP_ACTIVE == "ACTIVE" ]]
+      do
+          export GKE1_MEMBERSHIP_ACTIVE=$(gcloud container fleet mesh describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE1_MEMBERSHIP}].servicemesh.controlPlaneManagement.state)")
+          sleep 5
+          echo -e "GKE1_MEMBERSHIP_ACTIVE is $$GKE1_MEMBERSHIP_ACTIVE"
+      done
+      export GKE2_MEMBERSHIP_ACTIVE=NOT_ACTIVE
+      until [[ $$GKE2_MEMBERSHIP_ACTIVE == "ACTIVE" ]]
+      do
+          export GKE2_MEMBERSHIP_ACTIVE=$(gcloud container fleet mesh describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE2_MEMBERSHIP}].servicemesh.controlPlaneManagement.state)")
+          sleep 5
+          echo -e "GKE2_MEMBERSHIP_ACTIVE is $$GKE2_MEMBERSHIP_ACTIVE"
+      done
+      export GKE3_MEMBERSHIP_ACTIVE=NOT_ACTIVE
+      until [[ $$GKE3_MEMBERSHIP_ACTIVE == "ACTIVE" ]]
+      do
+          export GKE3_MEMBERSHIP_ACTIVE=$(gcloud container fleet mesh describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE3_MEMBERSHIP}].servicemesh.controlPlaneManagement.state)")
+          sleep 5
+          echo -e "GKE3_MEMBERSHIP_ACTIVE is $$GKE3_MEMBERSHIP_ACTIVE"
+      done
+      export GKE4_MEMBERSHIP_ACTIVE=NOT_ACTIVE
+      until [[ $$GKE4_MEMBERSHIP_ACTIVE == "ACTIVE" ]]
+      do
+          export GKE4_MEMBERSHIP_ACTIVE=$(gcloud container fleet mesh describe --project ${_PROJECT_ID} --format "value(membershipStates[$${GKE4_MEMBERSHIP}].servicemesh.controlPlaneManagement.state)")
+          sleep 5
+          echo -e "GKE4_MEMBERSHIP_ACTIVE is $$GKE4_MEMBERSHIP_ACTIVE"
+      done
+      gcloud container clusters get-credentials ${_GKE1} --zone ${_GKE1_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE2} --zone ${_GKE2_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE3} --zone ${_GKE3_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE4} --zone ${_GKE4_LOCATION} --project ${_PROJECT_ID}
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE1_LOCATION}_${_GKE1} wait --for=condition=ProvisioningFinished controlplanerevision asm-managed -n istio-system --timeout 15m
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE2_LOCATION}_${_GKE2} wait --for=condition=ProvisioningFinished controlplanerevision asm-managed -n istio-system --timeout 15m
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE3_LOCATION}_${_GKE3} wait --for=condition=ProvisioningFinished controlplanerevision asm-managed -n istio-system --timeout 15m
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE4_LOCATION}_${_GKE4} wait --for=condition=ProvisioningFinished controlplanerevision asm-managed -n istio-system --timeout 15m
+# Confirm ASM multicluster
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-enable-asm-multicluster-and-telemetry"
+  entrypoint: bash
+  dir: "infra/asm"
+  args:
+    - -c
+    - |
+      gcloud container clusters get-credentials ${_GKE1} --zone ${_GKE1_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE2} --zone ${_GKE2_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE3} --zone ${_GKE3_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE4} --zone ${_GKE4_LOCATION} --project ${_PROJECT_ID}
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE1_LOCATION}_${_GKE1} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE2_LOCATION}_${_GKE2} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE3_LOCATION}_${_GKE3} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE4_LOCATION}_${_GKE4} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE1_LOCATION}_${_GKE1} apply -f asm-telemetry.yaml
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE2_LOCATION}_${_GKE2} apply -f asm-telemetry.yaml
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE3_LOCATION}_${_GKE3} apply -f asm-telemetry.yaml
+      kubectl --context=gke_${_PROJECT_ID}_${_GKE4_LOCATION}_${_GKE4} apply -f asm-telemetry.yaml
+# ASM gateways installation
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-asm-gateways-installation"
+  dir: "infra/asm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+      echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+      gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos
+      chmod +x nomos
+      git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
+      git config --global user.name "cloudbuild-ci"
+      gcloud source repos clone config --project=${_PROJECT_ID}
+      mkdir -p config/asm
+      cp -r asm-gateways.yaml config/asm
+      cd config
+      git add . && git commit -am "Deploy ASM gateways"
+      git push
+      cd ..
+      touch konfig
+      export KUBECONFIG=konfig
+      gcloud container clusters get-credentials ${_GKE1} --zone ${_GKE1_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE2} --zone ${_GKE2_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE3} --zone ${_GKE3_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE4} --zone ${_GKE4_LOCATION} --project ${_PROJECT_ID}
+      export GKE1_NOMOS_STATUS=0
+      until [[ $$GKE1_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export GKE1_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_${_GKE1_LOCATION}_${_GKE1} | sed -n 6p | awk '{print $1;}')
+        echo -e "GKE1_NOMOS_STATUS is $$GKE1_NOMOS_STATUS"
+        sleep 5
+      done
+      export GKE2_NOMOS_STATUS=0
+      until [[ $$GKE2_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export GKE2_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_${_GKE2_LOCATION}_${_GKE2} | sed -n 6p | awk '{print $1;}')
+        echo -e "GKE2_NOMOS_STATUS is $$GKE2_NOMOS_STATUS"
+        sleep 5
+      done
+      export GKE3_NOMOS_STATUS=0
+      until [[ $$GKE3_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export GKE3_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_${_GKE3_LOCATION}_${_GKE3} | sed -n 6p | awk '{print $1;}')
+        echo -e "GKE3_NOMOS_STATUS is $$GKE3_NOMOS_STATUS"
+        sleep 5
+      done
+      export GKE4_NOMOS_STATUS=0
+      until [[ $$GKE4_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export GKE4_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_${_GKE4_LOCATION}_${_GKE4} | sed -n 6p | awk '{print $1;}')
+        echo -e "GKE4_NOMOS_STATUS is $$GKE4_NOMOS_STATUS"
+        sleep 5
+      done
+      for CTX in gke_${_PROJECT_ID}_${_GKE1_LOCATION}_${_GKE1} gke_${_PROJECT_ID}_${_GKE2_LOCATION}_${_GKE2} gke_${_PROJECT_ID}_${_GKE3_LOCATION}_${_GKE3} gke_${_PROJECT_ID}_${_GKE4_LOCATION}_${_GKE4}
+      do
+        echo -e "Checking ASM gateways status for $$CTX..."
+        kubectl --context=$$CTX wait --for=condition=Available deployment asm-ingressgateway -n asm-gateways --timeout 5m
+        kubectl --context=$$CTX wait --for=condition=Available deployment asm-egressgateway -n asm-gateways --timeout 5m
+        kubectl --context=$$CTX wait --for=condition=Available deployment asm-eastwestgateway -n asm-gateways --timeout 5m
+      done
+# ASM install whereami
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "app-asm-whereami-installation"
+  dir: "app/whereami"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+      echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+      gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos
+      chmod +x nomos
+      git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
+      git config --global user.name "cloudbuild-ci"
+      gcloud source repos clone config --project=${_PROJECT_ID}
+      mkdir -p config/app/whereami
+      cp -r whereami.yaml config/app/whereami
+      cd config
+      git add . && git commit -am "Deploy whereami"
+      git push
+      cd ..
+      touch konfig
+      export KUBECONFIG=konfig
+      gcloud container clusters get-credentials ${_GKE1} --zone ${_GKE1_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE2} --zone ${_GKE2_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE3} --zone ${_GKE3_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE4} --zone ${_GKE4_LOCATION} --project ${_PROJECT_ID}
+      sleep 10
+      export GKE1_NOMOS_STATUS=0
+      until [[ $$GKE1_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export GKE1_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_${_GKE1_LOCATION}_${_GKE1} | sed -n 6p | awk '{print $1;}')
+        echo -e "GKE1_NOMOS_STATUS is $$GKE1_NOMOS_STATUS"
+        sleep 5
+      done
+      export GKE2_NOMOS_STATUS=0
+      until [[ $$GKE2_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export GKE2_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_${_GKE2_LOCATION}_${_GKE2} | sed -n 6p | awk '{print $1;}')
+        echo -e "GKE2_NOMOS_STATUS is $$GKE2_NOMOS_STATUS"
+        sleep 5
+      done
+      export GKE3_NOMOS_STATUS=0
+      until [[ $$GKE3_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export GKE3_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_${_GKE3_LOCATION}_${_GKE3} | sed -n 6p | awk '{print $1;}')
+        echo -e "GKE3_NOMOS_STATUS is $$GKE3_NOMOS_STATUS"
+        sleep 5
+      done
+      export GKE4_NOMOS_STATUS=0
+      until [[ $$GKE4_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export GKE4_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_${_GKE4_LOCATION}_${_GKE4} | sed -n 6p | awk '{print $1;}')
+        echo -e "GKE4_NOMOS_STATUS is $$GKE4_NOMOS_STATUS"
+        sleep 5
+      done
+      for CTX in gke_${_PROJECT_ID}_${_GKE1_LOCATION}_${_GKE1} gke_${_PROJECT_ID}_${_GKE2_LOCATION}_${_GKE2} gke_${_PROJECT_ID}_${_GKE3_LOCATION}_${_GKE3} gke_${_PROJECT_ID}_${_GKE4_LOCATION}_${_GKE4}
+      do
+        echo -e "Checking whereami status for $$CTX..."
+        kubectl --context=$$CTX wait --for=condition=Available deployment whereami-frontend -n whereami --timeout 5m
+        kubectl --context=$$CTX wait --for=condition=Available deployment whereami-backend -n whereami --timeout 5m
+      done
+# ASM test multicluster connectivity
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "app-asm-test-multicluster-connectivity"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o jq
+      chmod +x jq
+      export JQ_CMD=$$PWD/jq
+      $$JQ_CMD --version
+      touch konfig
+      export KUBECONFIG=konfig
+      gcloud container clusters get-credentials ${_GKE1} --zone ${_GKE1_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE2} --zone ${_GKE2_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE3} --zone ${_GKE3_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials ${_GKE4} --zone ${_GKE4_LOCATION} --project ${_PROJECT_ID}
+      export CLUSTER_1=gke_${_PROJECT_ID}_${_GKE1_LOCATION}_${_GKE1}
+      export CLUSTER_2=gke_${_PROJECT_ID}_${_GKE2_LOCATION}_${_GKE2}
+      export CLUSTER_3=gke_${_PROJECT_ID}_${_GKE3_LOCATION}_${_GKE3}
+      export CLUSTER_4=gke_${_PROJECT_ID}_${_GKE4_LOCATION}_${_GKE4}
+      for CLUSTER in $${CLUSTER_1} $${CLUSTER_2} $${CLUSTER_3} $${CLUSTER_4}
+      do
+        echo -e "\e[1;92mTesting connectivity from $$CLUSTER to all other clusters...\e[0m"
+        echo -e "\e[96mDeploying curl utility in $$CLUSTER cluster...\e[0m"
+        kubectl --context=$${CLUSTER} -n whereami apply -f https://raw.githubusercontent.com/istio/istio/master/samples/sleep/sleep.yaml
+        kubectl --context=$${CLUSTER} -n whereami wait --for=condition=available deployment sleep --timeout=5m
+        for CLUSTER_ZONE in ${_GKE1_LOCATION} ${_GKE2_LOCATION} ${_GKE3_LOCATION} ${_GKE4_LOCATION}
+        do
+          echo -e "\e[92mTesting connectivity from $$CLUSTER to $$CLUSTER_ZONE...\e[0m"
+          SLEEP_POD=`kubectl --context=$${CLUSTER} -n whereami get pod -l app=sleep  -o jsonpath='{.items[0].metadata.name}'`
+          ZONE=location
+          while [ "$$ZONE" != "$$CLUSTER_ZONE" ]
+          do
+            ZONE=`kubectl --context=$${CLUSTER} -n whereami exec -i -n whereami -c sleep $$SLEEP_POD -- curl -s whereami-frontend.whereami:80 | $$JQ_CMD -r '.zone'`
+          done
+          echo -e "\e[96m$$CLUSTER can access $$CLUSTER_ZONE\e[0m"
+        done
+        echo -e "\n"
+      done
+

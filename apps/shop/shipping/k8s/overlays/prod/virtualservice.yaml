@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: shop-shipping-prod
+spec:
+  hosts:
+  - shop-shipping
+  http:
+  - match:
+    - sourceLabels:
+        app: shop-shipping
+        env: prod
+    route:
+    - destination:
+        host: shop-shipping
+        subset: shop-shipping-prod

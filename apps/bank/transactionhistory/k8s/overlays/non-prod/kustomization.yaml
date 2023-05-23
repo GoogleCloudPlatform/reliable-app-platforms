@@ -1,0 +1,5 @@
+namespace: "bank-transactionhistory"
+commonLabels:
+  app: transactionhistory
+bases:
+- ../../base

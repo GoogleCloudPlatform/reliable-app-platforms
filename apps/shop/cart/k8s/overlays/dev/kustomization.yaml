@@ -1,0 +1,4 @@
+commonLabels:
+  app: cart
+bases:
+- ../../base

@@ -1,0 +1,5 @@
+namespace: "bank-ledgerwriter"
+commonLabels:
+  app: ledgerwriter
+bases:
+- ../../base

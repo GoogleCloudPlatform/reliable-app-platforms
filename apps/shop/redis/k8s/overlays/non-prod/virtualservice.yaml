@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: shop-redis-dev
+spec:
+  hosts:
+  - shop-redis
+  http:
+  - match:
+    - sourceLabels:
+        app: shop-redis
+        env: dev
+    route:
+    - destination:
+        host: shop-redis
+        subset: shop-redis-dev

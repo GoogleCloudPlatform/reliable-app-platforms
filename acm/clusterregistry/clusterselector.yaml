@@ -1,0 +1,7 @@
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: NAME
+spec:
+  selector:
+MATCH

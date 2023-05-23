@@ -1,0 +1,5 @@
+namespace: "bank-frontend"
+commonLabels:
+  app: frontend
+bases:
+- ../../base

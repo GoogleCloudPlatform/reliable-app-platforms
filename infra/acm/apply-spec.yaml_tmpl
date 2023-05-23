@@ -1,0 +1,19 @@
+applySpecVersion: 1
+spec:
+  configSync:
+    # Set to true to install and enable Config Sync
+    enabled: true
+    # If you don't have a Git repository, omit the following fields. You
+    # can configure them later.
+    sourceFormat: unstructured
+    syncRepo: https://source.developers.google.com/p/PROJECT_ID/r/config
+    syncBranch: master
+    secretType: gcpserviceaccount
+    gcpServiceAccountEmail: config-sync-sa@PROJECT_ID.iam.gserviceaccount.com
+    # the `preventDrift` field is supported in Anthos Config Management version 1.10.0 and later.
+    preventDrift: true
+  policyController:
+    enabled: true
+    referentialRulesEnabled: true
+    auditIntervalSeconds: 15
+    logDeniesEnabled: true

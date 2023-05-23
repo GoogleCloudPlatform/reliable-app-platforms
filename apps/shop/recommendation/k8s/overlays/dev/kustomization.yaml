@@ -1,0 +1,4 @@
+commonLabels:
+  app: recommendation
+bases:
+- ../../base

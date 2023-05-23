@@ -1,0 +1,485 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# NOTE: currently requires SCM triggering due to dependency on the COMMIT_SHA variable
+
+timeout: 7200s # 2hr
+tags:
+  - app-cicd-shop-shipping-g
+substitutions:
+  _PROJECT_ID: ${_PROJECT_ID}
+  _PIPELINE_LOCATION: ${_PIPELINE_LOCATION}
+  _COMMIT_SHA: ${_COMMIT_SHA}
+  _SHORT_SHA: ${_SHORT_SHA}
+  _BUILD: ${_BUILD}
+  _DEPLOY_G: "true"
+  _SLO: "true"
+  _ARTIFACT_REGISTRY: "shop"
+  _SERVICE: "shipping"
+  _AUTO_APPROVE_TO_PROD: "true"
+steps:
+  # Build and tag using commit sha
+  - name: "gcr.io/cloud-builders/docker"
+    id: "00-docker-build"
+    entrypoint: bash
+    dir: src
+    args:
+      - -c
+      - |
+        [[ "${_BUILD}" == "false" ]] && exit 0
+        echo -e "_COMMIT_SHA is ${_COMMIT_SHA}"
+        echo -e "_SHORT_SHA is ${_SHORT_SHA}"
+        echo -e "_PIPELINE_LOCATION is ${_PIPELINE_LOCATION}"
+        docker build . \
+          -t ${_PIPELINE_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REGISTRY}/${_SERVICE}:latest \
+          -t ${_PIPELINE_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REGISTRY}/${_SERVICE}:${_COMMIT_SHA} -f Dockerfile
+  # Push the container image to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    id: "01-docker-push"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_BUILD}" == "false" ]] && exit 0
+        docker push -a ${_PIPELINE_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REGISTRY}/${_SERVICE}
+  # Create release in Google Cloud Deploy
+  - name: gcr.io/cloud-builders/gcloud
+    id: "02-deploy-g-d1a"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_BUILD}" == "true" ]] && export IMAGE=${_PIPELINE_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REGISTRY}/${_SERVICE}:${_COMMIT_SHA}
+        [[ "${_BUILD}" == "false" ]] && export IMAGE=${_PIPELINE_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/${_ARTIFACT_REGISTRY}/${_SERVICE}
+        echo -e "IMAGE is set to $${IMAGE}"
+        gcloud deploy releases create rel-${_SHORT_SHA} \
+        --delivery-pipeline ${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline \
+        --region ${_PIPELINE_LOCATION} \
+        --annotations commitId=${REVISION_ID} \
+        --images ${_SERVICE}=$${IMAGE}
+  # Auto promote to d1b
+  - name: gcr.io/cloud-builders/gcloud
+    id: "03-deploy-g-promote-d1b"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 1 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=d1b
+  # Auto promote to d1c
+  - name: gcr.io/cloud-builders/gcloud
+    id: "04-deploy-g-promote-d1c"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 2 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=d1c
+  # Auto promote to d2a
+  - name: gcr.io/cloud-builders/gcloud
+    id: "05-deploy-g-promote-d2a"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 3 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=d2a
+  # Auto promote to d2b
+  - name: gcr.io/cloud-builders/gcloud
+    id: "06-deploy-g-promote-d2b"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 4 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=d2b
+  # Auto promote to d2c
+  - name: gcr.io/cloud-builders/gcloud
+    id: "07-deploy-g-promote-d2c"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 5 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=d2c
+  # Auto promote to p1a
+  - name: gcr.io/cloud-builders/gcloud
+    id: "08-deploy-g-promote-p1a"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_AUTO_APPROVE_TO_PROD}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 6 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=p1a
+  # Auto Approve to p1a
+  - name: gcr.io/cloud-builders/gcloud
+    id: "09-deploy-g-approve-p1a"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_AUTO_APPROVE_TO_PROD}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=rel-${_SHORT_SHA} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~p1a") ]]; do
+          sleep 2
+        done
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=rel-${_SHORT_SHA} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(state)' --filter="name~p1a") == "PENDING_APPROVAL" ]]; do
+          sleep 2
+        done
+        gcloud --project=${_PROJECT_ID} deploy rollouts approve rel-${_SHORT_SHA}-to-p1a-0001 --release=rel-${_SHORT_SHA} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION}
+  # Auto Promote to p1b
+  - name: gcr.io/cloud-builders/gcloud
+    id: "10-deploy-g-promote-p1b"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_AUTO_APPROVE_TO_PROD}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 7 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=p1b
+  # Auto Promote to p1c
+  - name: gcr.io/cloud-builders/gcloud
+    id: "11-deploy-g-promote-p1c"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_AUTO_APPROVE_TO_PROD}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 8 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=p1c
+  # Auto Promote to p2a
+  - name: gcr.io/cloud-builders/gcloud
+    id: "12-deploy-g-promote-p2a"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_AUTO_APPROVE_TO_PROD}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 9 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=p2a
+  # Auto Promote to p2b
+  - name: gcr.io/cloud-builders/gcloud
+    id: "13-deploy-g-promote-p2b"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_AUTO_APPROVE_TO_PROD}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 10 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=p2b
+  # Auto Promote to p2c
+  - name: gcr.io/cloud-builders/gcloud
+    id: "14-deploy-g-promote-p2c"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_AUTO_APPROVE_TO_PROD}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 11 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        gcloud --project=${_PROJECT_ID} deploy releases promote --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --to-target=p2c
+  # Confirm pipeline success
+  - name: gcr.io/cloud-builders/gcloud
+    id: "15-deploy-g-confirm-release-success"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_G}" == "false" ]] && exit 0
+        [[ "${_AUTO_APPROVE_TO_PROD}" == "false" ]] && exit 0
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}") ]]; do
+          sleep 3
+        done
+        export RELEASE_NAME=$(gcloud --project=${_PROJECT_ID} deploy releases list --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='value(name)' --filter="name~${_SHORT_SHA}")
+        until [[ $(gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --filter="name~${_SHORT_SHA}" --format='value(state)' | wc -l) == 12 ]]; do
+          echo -e "Stage states..."
+          gcloud --project=${_PROJECT_ID} deploy rollouts list --release=$${RELEASE_NAME} --delivery-pipeline=${_ARTIFACT_REGISTRY}-${_SERVICE}-g-pipeline --region=${_PIPELINE_LOCATION} --format='table(name,state)'
+          sleep 5
+        done
+        echo -e "The release has been successfully rolled out."
+  # Create/Update SLOs and alerts
+  - name: gcr.io/cloud-builders/gcloud
+    id: "17-deploy-g-delete-existing-slos-and-alerts"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_SLO}" == "false" ]] && exit 0
+        source vars.sh
+        curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o jq
+        chmod +x jq
+        export JQ_CMD=$${PWD}/jq
+        $${JQ_CMD} --version
+        OAUTH_TOKEN=$(gcloud auth print-access-token)
+        FQ_SERVICE_ID=$(curl -s -H "Authorization: Bearer $${OAUTH_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://monitoring.googleapis.com/v3/projects/${_PROJECT_ID}/services" | \
+            $${JQ_CMD} -r ".services[] | \
+            select (.istioCanonicalService.canonicalServiceNamespace == \"${_ARTIFACT_REGISTRY}-${_SERVICE}\" \
+            and .istioCanonicalService.canonicalService == \"${_SERVICE}\") | .name")
+        echo -e "FQ_SERVICE_ID is $${FQ_SERVICE_ID}"
+        SERVICE_ID=$(echo $${FQ_SERVICE_ID} | cut -d "/" -f4)
+        echo -e "SERVICE_ID is $${SERVICE_ID}"
+        SLO_LIST=$(curl -s -H "Authorization: Bearer $${OAUTH_TOKEN}" -H "Content-Type: application/json" \
+            "https://monitoring.googleapis.com/v3/projects/${_PROJECT_ID}/services/$${SERVICE_ID}/serviceLevelObjectives")
+        [[ ! "$${SLO_LIST}" == "{}" ]] && SLO_LIST_NAMES=$(echo $${SLO_LIST} | $${JQ_CMD} -r '.serviceLevelObjectives[].name')
+        [[ ! "$${SLO_LIST}" == "{}" ]] && echo -e "SLO_LIST_NAMES: \n$${SLO_LIST_NAMES}"
+        ## Delete all SLOs if they exist
+        if [[ "$${SLO_LIST_NAMES}" ]]; then
+            for SLO in $${SLO_LIST_NAMES[@]}
+            do
+                echo -e "Deleting SLO $${SLO}..."
+                curl -s -X DELETE -H "Authorization: Bearer $${OAUTH_TOKEN}" -H "Content-Type: application/json" \
+                    "https://monitoring.googleapis.com/v3/$${SLO}"
+            done
+        else
+            echo -e "No existing SLOs."
+        fi
+        ALERT_LIST_NAMES=$(gcloud --project=${_PROJECT_ID} alpha monitoring policies list --filter="displayName~${_SERVICE}" --format='value(name)')
+        [[ ! "$${ALERT_LIST_NAMES}" == "{}" ]] && echo -e "ALERT_LIST_NAMES: \n$${ALERT_LIST_NAMES}"
+        ## Delete all Alerts if they exist
+        if [[ "$${ALERT_LIST_NAMES}" ]]; then
+            for ALERT in $${ALERT_LIST_NAMES[@]}
+            do
+                echo -e "Deleting Alert $${ALERT}..."
+                curl -s -X DELETE -H "Authorization: Bearer $${OAUTH_TOKEN}" -H "Content-Type: application/json" \
+                    "https://monitoring.googleapis.com/v3/$${ALERT}"
+            done
+        else
+            echo -e "No existing Alerts."
+        fi
+  # Latency SLO and alert
+  - name: gcr.io/cloud-builders/gcloud
+    id: "18-deploy-g-create-latency-slo-and-alert"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_SLO}" == "false" ]] && exit 0
+        source vars.sh
+        curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o jq
+        chmod +x jq
+        export JQ_CMD=$${PWD}/jq
+        $${JQ_CMD} --version
+        OAUTH_TOKEN=$(gcloud auth print-access-token)
+        FQ_SERVICE_ID=$(curl -s -H "Authorization: Bearer $${OAUTH_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://monitoring.googleapis.com/v3/projects/${_PROJECT_ID}/services" | \
+            $${JQ_CMD} -r ".services[] | \
+            select (.istioCanonicalService.canonicalServiceNamespace == \"${_ARTIFACT_REGISTRY}-${_SERVICE}\" \
+            and .istioCanonicalService.canonicalService == \"${_SERVICE}\") | .name")
+        echo -e "FQ_SERVICE_ID is $${FQ_SERVICE_ID}"
+        SERVICE_ID=$(echo $${FQ_SERVICE_ID} | cut -d "/" -f4)
+        echo -e "SERVICE_ID is $${SERVICE_ID}"
+        cat <<EOF > slo-latency.json
+        {
+        "serviceLevelIndicator": {
+            "basicSli": {
+            "latency": {
+                "threshold": "$${SLO_LATENCY_THRESHOLD}"
+            }
+            }
+        },
+        "goal": $${SLO_LATENCY_GOAL},
+        "rollingPeriod": "86400s",
+        "displayName": "Latency - $${SLO_LATENCY_THRESHOLD} - $${SLO_LATENCY_GOAL} - Calendar Day"
+        }
+        EOF
+        LATENCY_SLO_POST=$(cat slo-latency.json)
+        echo -e "LATENCY_SLO_POST is $${LATENCY_SLO_POST}"
+        LATENCY_POST_OUTPUT=$(curl -s -X POST -H "Authorization: Bearer $${OAUTH_TOKEN}" -H "Content-Type: application/json" \
+          "https://monitoring.googleapis.com/v3/projects/${_PROJECT_ID}/services/$${SERVICE_ID}/serviceLevelObjectives" \
+          -d "$${LATENCY_SLO_POST}")
+        LATENCY_SLO_NAME=$(echo $${LATENCY_POST_OUTPUT} | $${JQ_CMD} -r .name)
+        echo -e "LATENCY_SLO_NAME is $${LATENCY_SLO_NAME}"
+        cat <<EOF > latency-alert.yaml
+        combiner: OR
+        conditions:
+        - conditionThreshold:
+            comparison: COMPARISON_GT
+            duration: 0s
+            filter: select_slo_burn_rate("$${LATENCY_SLO_NAME}","$${ALERT_LATENCY_LOOKBACK_DURATION}")
+            thresholdValue: $${ALERT_LATENCY_THRESHOLD}
+            trigger:
+              count: 1
+          displayName: Burn rate for ${_SERVICE} Latency with $${ALERT_LATENCY_THRESHOLD} for $${ALERT_LATENCY_LOOKBACK_DURATION} lookback period
+        displayName: Burn rate for ${_SERVICE} Latency with $${ALERT_LATENCY_THRESHOLD} for $${ALERT_LATENCY_LOOKBACK_DURATION} lookback period
+        EOF
+        until gcloud alpha --project=${_PROJECT_ID} monitoring policies create --policy-from-file="latency-alert.yaml"; do
+          echo Error, retrying in 5 seconds...
+          sleep 5
+        done
+        # gcloud alpha --project=${_PROJECT_ID} monitoring policies create --policy-from-file="latency-alert.yaml"
+  # Availability SLO and alert
+  - name: gcr.io/cloud-builders/gcloud
+    id: "19-deploy-g-create-availability-slo-and-alert"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_SLO}" == "false" ]] && exit 0
+        source vars.sh
+        curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o jq
+        chmod +x jq
+        export JQ_CMD=$${PWD}/jq
+        $${JQ_CMD} --version
+        OAUTH_TOKEN=$(gcloud auth print-access-token)
+        FQ_SERVICE_ID=$(curl -s -H "Authorization: Bearer $${OAUTH_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://monitoring.googleapis.com/v3/projects/${_PROJECT_ID}/services" | \
+            $${JQ_CMD} -r ".services[] | \
+            select (.istioCanonicalService.canonicalServiceNamespace == \"${_ARTIFACT_REGISTRY}-${_SERVICE}\" \
+            and .istioCanonicalService.canonicalService == \"${_SERVICE}\") | .name")
+        echo -e "FQ_SERVICE_ID is $${FQ_SERVICE_ID}"
+        SERVICE_ID=$(echo $${FQ_SERVICE_ID} | cut -d "/" -f4)
+        echo -e "SERVICE_ID is $${SERVICE_ID}"
+        cat <<EOF > slo-availability.json
+        {
+          "displayName": "$${SLO_AVAILABILITY_GOAL} - Availability - Calendar Day",
+          "goal": $${SLO_AVAILABILITY_GOAL},
+          "rollingPeriod": "86400s",
+          "serviceLevelIndicator": {
+            "basicSli": {
+              "availability": {}
+            }
+          }
+        }
+        EOF
+        AVAILABILITY_SLO_POST=$(cat slo-availability.json)
+        echo -e "AVAILABILITY_SLO_POST is $${AVAILABILITY_SLO_POST}"
+        AVAILABILITY_POST_OUTPUT=$(curl -s -X POST -H "Authorization: Bearer $${OAUTH_TOKEN}" -H "Content-Type: application/json" \
+          "https://monitoring.googleapis.com/v3/projects/${_PROJECT_ID}/services/$${SERVICE_ID}/serviceLevelObjectives" \
+          -d "$${AVAILABILITY_SLO_POST}")
+        AVAILABILITY_SLO_NAME=$(echo $${AVAILABILITY_POST_OUTPUT} | $${JQ_CMD} -r .name)
+        echo -e "AVAILABILITY_SLO_NAME is $${AVAILABILITY_SLO_NAME}"
+        cat <<EOF > availability-alert.yaml
+        combiner: OR
+        conditions:
+        - conditionThreshold:
+            comparison: COMPARISON_GT
+            duration: 0s
+            filter: select_slo_burn_rate("$${AVAILABILITY_SLO_NAME}","$${ALERT_AVAILABILITY_LOOKBACK_DURATION}")
+            thresholdValue: $${ALERT_AVAILABILITY_THRESHOLD}
+            trigger:
+              count: 1
+          displayName: Burn rate for ${_SERVICE} Availability with $${ALERT_AVAILABILITY_THRESHOLD} for $${ALERT_AVAILABILITY_LOOKBACK_DURATION} lookback period
+        displayName: Burn rate for ${_SERVICE} Availability with $${ALERT_AVAILABILITY_THRESHOLD} for $${ALERT_AVAILABILITY_LOOKBACK_DURATION} lookback period
+        EOF
+        until gcloud alpha --project=${_PROJECT_ID} monitoring policies create --policy-from-file="availability-alert.yaml"; do
+          echo Error, retrying in 5 seconds...
+          sleep 5
+        done
+        # gcloud alpha --project=${_PROJECT_ID} monitoring policies create --policy-from-file="latency-alert.yaml"

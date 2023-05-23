@@ -1,0 +1,9 @@
+namespace: "shop-cart"
+commonLabels:
+  app: cart
+  env: prod
+  org: shop
+bases:
+- ../../base
+- destrule.yaml
+- virtualservice.yaml

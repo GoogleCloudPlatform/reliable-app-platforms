@@ -1,0 +1,6 @@
+resources:
+- namespace.yaml
+- ksa.yaml
+- deployment.yaml
+- service.yaml
+- config.yaml

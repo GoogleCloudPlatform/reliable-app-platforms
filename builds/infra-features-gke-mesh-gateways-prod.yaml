@@ -1,0 +1,93 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-features-gke-mesh-gateways-prod
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# ASM gateways installation
+# Docs:
+# 1. Enabling multi-cluster Gateways -> https://cloud.google.com/kubernetes-engine/docs/how-to/enabling-multi-cluster-gateways
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-mesh-gateways-prod"
+  dir: "infra"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      source vars.sh
+      gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos
+      chmod +x nomos
+      touch konfig && export KUBECONFIG=konfig
+      while [[ $(gcloud container clusters list --project ${_PROJECT_ID} --filter "STATUS=RUNNING AND resourceLabels.env:prod" --format="value(name)"| wc -l | awk '{print $1}') != "6" ]]; do
+        echo "Waiting for all dev the cluster to be RUNNING."
+        sleep 5
+      done
+      gcloud container clusters get-credentials $${GKE_PROD1_NAME} --zone $${GKE_PROD1_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD2_NAME} --zone $${GKE_PROD2_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD3_NAME} --zone $${GKE_PROD3_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD4_NAME} --zone $${GKE_PROD4_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD5_NAME} --zone $${GKE_PROD5_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD6_NAME} --zone $${GKE_PROD6_LOCATION} --project ${_PROJECT_ID}
+      export PROD1_NOMOS_STATUS=0
+      until [[ $$PROD1_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export PROD1_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD1_LOCATION}_$${GKE_PROD1_NAME} | sed -n 6p | awk '{print $1;}')
+        echo -e "PROD1_NOMOS_STATUS is $$PROD1_NOMOS_STATUS"
+        sleep 5
+      done
+      export PROD2_NOMOS_STATUS=0
+      until [[ $$PROD2_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export PROD2_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD2_LOCATION}_$${GKE_PROD2_NAME} | sed -n 6p | awk '{print $1;}')
+        echo -e "PROD2_NOMOS_STATUS is $$PROD2_NOMOS_STATUS"
+        sleep 5
+      done
+      export PROD3_NOMOS_STATUS=0
+      until [[ $$PROD3_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export PROD3_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD3_LOCATION}_$${GKE_PROD3_NAME} | sed -n 6p | awk '{print $1;}')
+        echo -e "PROD3_NOMOS_STATUS is $$PROD3_NOMOS_STATUS"
+        sleep 5
+      done
+      export PROD4_NOMOS_STATUS=0
+      until [[ $$PROD4_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export PROD4_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD4_LOCATION}_$${GKE_PROD4_NAME} | sed -n 6p | awk '{print $1;}')
+        echo -e "PROD4_NOMOS_STATUS is $$PROD4_NOMOS_STATUS"
+        sleep 5
+      done
+      export PROD5_NOMOS_STATUS=0
+      until [[ $$PROD5_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export PROD5_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD5_LOCATION}_$${GKE_PROD5_NAME} | sed -n 6p | awk '{print $1;}')
+        echo -e "PROD5_NOMOS_STATUS is $$PROD5_NOMOS_STATUS"
+        sleep 5
+      done
+      export PROD6_NOMOS_STATUS=0
+      until [[ $$PROD6_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export PROD6_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD6_LOCATION}_$${GKE_PROD6_NAME} | sed -n 6p | awk '{print $1;}')
+        echo -e "PROD6_NOMOS_STATUS is $$PROD6_NOMOS_STATUS"
+        sleep 5
+      done
+      for CTX in gke_${_PROJECT_ID}_$${GKE_PROD1_LOCATION}_$${GKE_PROD1_NAME} gke_${_PROJECT_ID}_$${GKE_PROD2_LOCATION}_$${GKE_PROD2_NAME} gke_${_PROJECT_ID}_$${GKE_PROD3_LOCATION}_$${GKE_PROD3_NAME} gke_${_PROJECT_ID}_$${GKE_PROD4_LOCATION}_$${GKE_PROD4_NAME} gke_${_PROJECT_ID}_$${GKE_PROD5_LOCATION}_$${GKE_PROD5_NAME} gke_${_PROJECT_ID}_$${GKE_PROD6_LOCATION}_$${GKE_PROD6_NAME}
+      do
+        echo -e "Checking ASM gateways status for $$CTX..."
+        kubectl --context=$$CTX wait --for=condition=Available deployment asm-ingressgateway -n asm-gateways --timeout 5m
+        kubectl --context=$$CTX wait --for=condition=Available deployment asm-egressgateway -n asm-gateways --timeout 5m
+        kubectl --context=$$CTX wait --for=condition=Available deployment asm-eastwestgateway -n asm-gateways --timeout 5m
+      done

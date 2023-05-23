@@ -1,0 +1,37 @@
+apiVersion: sourcerepo.cnrm.cloud.google.com/v1beta1
+kind: SourceRepoRepository
+metadata:
+  name: whereami
+  namespace: config-control
+---
+apiVersion: cloudbuild.cnrm.cloud.google.com/v1beta1
+kind: CloudBuildTrigger
+metadata:
+  name: whereami-backend-trigger
+  namespace: config-control
+spec:
+  disabled: false
+  triggerTemplate:
+    repoRef:
+      name: whereami
+    branchName: main
+  includedFiles:
+    - "whereami-backend/**"
+  filename: "whereami-backend/ci.yaml"
+---
+apiVersion: cloudbuild.cnrm.cloud.google.com/v1beta1
+kind: CloudBuildTrigger
+metadata:
+  name: whereami-frontend-trigger
+  namespace: config-control
+spec:
+  disabled: false
+  triggerTemplate:
+    repoRef:
+      name: whereami
+    branchName: main
+  includedFiles:
+    - "whereami-frontend/**"
+  filename: "whereami-frontend/ci.yaml"
+
+

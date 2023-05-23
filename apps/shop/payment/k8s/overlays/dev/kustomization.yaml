@@ -1,0 +1,4 @@
+commonLabels:
+  app: payment
+bases:
+- ../../base

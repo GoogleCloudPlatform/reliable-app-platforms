@@ -1,0 +1,53 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-features-gke-dev-mesh-config
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+steps:
+# Enable ASM Config - multicluster, access logs and tracing
+# Docs:
+# 1. Enable optional features on managed Anthos Service Mesh -> https://cloud.google.com/service-mesh/docs/managed/enable-managed-anthos-service-mesh-optional-features
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-dev-mesh-config"
+  entrypoint: bash
+  dir: "infra"
+  args:
+    - -c
+    - |
+      source vars.sh
+      while [[ $(gcloud container clusters list --project ${_PROJECT_ID} --filter "STATUS=RUNNING AND resourceLabels.env:dev" --format="value(name)"| wc -l | awk '{print $1}') != "6" ]]; do
+        echo "Waiting for all dev the cluster to be RUNNING."
+        sleep 5
+      done
+      gcloud container clusters get-credentials $${GKE_DEV1_NAME} --zone $${GKE_DEV1_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_DEV2_NAME} --zone $${GKE_DEV2_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_DEV3_NAME} --zone $${GKE_DEV3_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_DEV4_NAME} --zone $${GKE_DEV4_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_DEV5_NAME} --zone $${GKE_DEV5_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_DEV6_NAME} --zone $${GKE_DEV6_LOCATION} --project ${_PROJECT_ID}
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV1_LOCATION}_$${GKE_DEV1_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV2_LOCATION}_$${GKE_DEV2_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV3_LOCATION}_$${GKE_DEV3_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV4_LOCATION}_$${GKE_DEV4_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV5_LOCATION}_$${GKE_DEV5_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV6_LOCATION}_$${GKE_DEV6_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV1_LOCATION}_$${GKE_DEV1_NAME} apply -f asm/asm-telemetry.yaml
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV2_LOCATION}_$${GKE_DEV2_NAME} apply -f asm/asm-telemetry.yaml
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV3_LOCATION}_$${GKE_DEV3_NAME} apply -f asm/asm-telemetry.yaml
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV4_LOCATION}_$${GKE_DEV4_NAME} apply -f asm/asm-telemetry.yaml
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV5_LOCATION}_$${GKE_DEV5_NAME} apply -f asm/asm-telemetry.yaml
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_DEV6_LOCATION}_$${GKE_DEV6_NAME} apply -f asm/asm-telemetry.yaml

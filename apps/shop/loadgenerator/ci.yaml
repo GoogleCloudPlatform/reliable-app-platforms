@@ -1,0 +1,57 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# NOTE: currently requires SCM triggering due to dependency on the COMMIT_SHA variable
+
+timeout: 7200s # 2hr
+tags:
+  - app-cicd-shop-loadgenerator
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _PIPELINE_LOCATION: "us-central1"
+  _REPO: "shop"
+steps:
+  # Create release in Google Cloud Deploy
+  # DEPLOYMENT_STRATEGY var is defined in vars.sh file in the root folder
+  - name: gcr.io/cloud-builders/gcloud
+    id: "00-shop-loadgenerator-deploy-release"
+    dir: loadgenerator
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud source repos clone ${_REPO} --project=${_PROJECT_ID}
+        cd ${_REPO}
+        git checkout main
+        export FIRST_COMMIT=$(git log --pretty=oneline --reverse | head -2 | wc -l)
+        if [[ "$${FIRST_COMMIT}" == 1 ]]; then
+          echo -e "First commit detected. Setting BUILD var to true"
+          export BUILD="true"
+        else
+          echo -e "First commit not detected. Checking what changed..."
+          git diff --name-only HEAD^ HEAD
+          export SRC_CHANGED=$(git diff --name-only HEAD^ HEAD | grep "src/")
+          export K8S_CHANGED=$(git diff --name-only HEAD^ HEAD | grep "k8s/")
+          export CI_CHANGED=$(git diff --name-only HEAD^ HEAD | grep -E "ci.*")
+          export BUILD="false"
+        fi
+        cd ..
+        [[ "$${SRC_CHANGED}" ]] && echo -e "src files changed. Setting BUILD to true..." && export BUILD="true"
+        [[ "$${CI_CHANGED}" ]] && echo -e "ci files changed. Setting BUILD to true..." && export BUILD="true"
+        echo -e "BUILD is $${BUILD}"
+        gsutil cp -r gs://${_PROJECT_ID}/vars.sh infra-vars.sh
+        cat infra-vars.sh
+        source infra-vars.sh
+        source vars.sh
+        [[ "$${DEPLOYMENT_STRATEGY}" == "g" ]] && \
+        exec gcloud builds submit --config ci_g.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_PIPELINE_LOCATION=${_PIPELINE_LOCATION},_COMMIT_SHA=${COMMIT_SHA},_SHORT_SHA=${SHORT_SHA},_BUILD=$${BUILD} --async

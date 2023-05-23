@@ -1,0 +1,9 @@
+namespace: "shop-email"
+commonLabels:
+  app: email
+  env: prod
+  org: shop
+bases:
+- ../../base
+- destrule.yaml
+- virtualservice.yaml

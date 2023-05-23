@@ -1,0 +1,5 @@
+namespace: "bank-balancereader"
+commonLabels:
+  app: balancereader
+bases:
+- ../../base

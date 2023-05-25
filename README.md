@@ -2,15 +2,6 @@
 
 _Last tested on 9/27/2022 by @ameer00_
 
-```mermaid
-  graph TD;
-      A-->B;
-      A-->C;
-      B-->D;
-      C-->D;
-```
-
-
 <!-- ![image.png](./image.png) -->
 <img src="/img/arch52.png" width=70% height=70%>
 

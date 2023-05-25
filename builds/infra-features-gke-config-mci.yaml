@@ -32,7 +32,7 @@ steps:
       export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
       echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
       gcloud container fleet ingress enable \
-        --config-membership=projects/${_PROJECT_ID}/locations/global/memberships/$${GKE_CONFIG_NAME} \
+        --config-membership=projects/${_PROJECT_ID}/locations/$${GKE_CONFIG_REGION}/memberships/$${GKE_CONFIG_NAME} \
         --project=${_PROJECT_ID}
       gcloud container fleet ingress describe --project=${_PROJECT_ID}
       gcloud projects add-iam-policy-binding ${_PROJECT_ID} \

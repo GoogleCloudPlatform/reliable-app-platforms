@@ -30,12 +30,12 @@ steps:
     - |
       source vars.sh
       export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
-      export DEV1_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_DEV1_NAME}"
-      export DEV2_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_DEV2_NAME}"
-      export DEV3_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_DEV3_NAME}"
-      export DEV4_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_DEV4_NAME}"
-      export DEV5_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_DEV5_NAME}"
-      export DEV6_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_DEV6_NAME}"
+      export DEV1_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_DEV_REGION_1}/memberships/$${GKE_DEV1_NAME}"
+      export DEV2_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_DEV_REGION_1}/memberships/$${GKE_DEV2_NAME}"
+      export DEV3_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_DEV_REGION_1}/memberships/$${GKE_DEV3_NAME}"
+      export DEV4_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_DEV_REGION_2}/memberships/$${GKE_DEV4_NAME}"
+      export DEV5_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_DEV_REGION_2}/memberships/$${GKE_DEV5_NAME}"
+      export DEV6_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_DEV_REGION_2}/memberships/$${GKE_DEV6_NAME}"
       export DEV1_MEMBERSHIP_ACTIVE=NOT_ACTIVE
       until [[ $$DEV1_MEMBERSHIP_ACTIVE == "ACTIVE" ]]
       do

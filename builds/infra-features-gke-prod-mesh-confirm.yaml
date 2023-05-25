@@ -30,12 +30,12 @@ steps:
     - |
       source vars.sh
       export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
-      export PROD1_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD1_NAME}"
-      export PROD2_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD2_NAME}"
-      export PROD3_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD3_NAME}"
-      export PROD4_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD4_NAME}"
-      export PROD5_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD5_NAME}"
-      export PROD6_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD6_NAME}"
+      export PROD1_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_PROD_REGION_1}/memberships/$${GKE_PROD1_NAME}"
+      export PROD2_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_PROD_REGION_1}/memberships/$${GKE_PROD2_NAME}"
+      export PROD3_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_PROD_REGION_1}/memberships/$${GKE_PROD3_NAME}"
+      export PROD4_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_PROD_REGION_2}/memberships/$${GKE_PROD4_NAME}"
+      export PROD5_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_PROD_REGION_2}/memberships/$${GKE_PROD5_NAME}"
+      export PROD6_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_PROD_REGION_2}/memberships/$${GKE_PROD6_NAME}"
       export PROD1_MEMBERSHIP_ACTIVE=NOT_ACTIVE
       until [[ $$PROD1_MEMBERSHIP_ACTIVE == "ACTIVE" ]]
       do

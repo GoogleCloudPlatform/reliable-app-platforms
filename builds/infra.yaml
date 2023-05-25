@@ -243,66 +243,66 @@ steps:
     args:
       - -c
       - exec gcloud builds submit --config builds/infra-features-fleet-acm-mcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # 17 Confirm MCS is enabled on GKE - dev
-  # This step ensures that the multi-cluster services (MCS) feature is enabled on the dev GKE clusters.
-  # This is required for multi-cluster ingress.
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "17-infra-features-gke-dev-mcs"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        [[ "${_DEV}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/infra-features-gke-dev-mcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # 18 Confirm MCS is enabled on GKE - prod
-  # This step ensures that the multi-cluster services (MCS) feature is enabled on the prod GKE clusters.
-  # This is required for multi-cluster ingress.
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "18-infra-features-gke-prod-mcs"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        [[ "${_PROD}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/infra-features-gke-prod-mcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # 19 Confirm MCS is enabled on GKE - config
-  # This step ensures that the multi-cluster services (MCS) feature is enabled on the config/mci GKE cluster.
-  # This is required for multi-cluster ingress.
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "19-infra-features-gke-config-mcs"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        [[ "${_CONFIG}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/infra-features-gke-config-mcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # 20 Create Gateway APIs on GKE config
-  # This step creates Gateway API CRDs on the config GKE cluster.
-  # This step creates the following resources:
-  #   1. Network viewer rols on the gke-mcs-importer GCP SA.
-  #   2. Gateway API CRDs on the config GKE cluster. This results in two GatewayClasses: gke-l7-gxlb and gke-l7-rilb
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "20-infra-features-gke-config-gateway-apis"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        [[ "${_CONFIG}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/infra-features-gke-config-gateway-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # 21 Enable Multi-cluster Ingress (MCI) on GKE config
+  # 17 Enable Multi-cluster Ingress (MCI) on GKE config
   # This step creates multi-cluster Gateway API CRDs on the config GKE cluster.
   # This step creates the following resources:
   #   1. Enables the Fleet ingress feature on the project. NOTE: This must be done AFTER installing the Gateway API CRDs in the previous step.
   #   2. Assign container.admin and ServiceUsageConsumer roles on the SA multiclusteringress importer GCP SA.
   #   2. This results in four GatewayClasses: gke-l7-gxlb, gke-l7-gxlb-mc and gke-l7-rilb, gke-l7-rilb-mc
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "21-infra-features-gke-config-mci"
+    id: "17-infra-features-gke-config-mci"
     entrypoint: bash
     args:
       - -c
       - |
         [[ "${_CONFIG}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/infra-features-gke-config-mci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  # 18 Confirm MCS is enabled on GKE - dev
+  # This step ensures that the multi-cluster services (MCS) feature is enabled on the dev GKE clusters.
+  # This is required for multi-cluster ingress.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "18-infra-features-gke-dev-mcs"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEV}" == "false" ]] && exit 0
+        exec gcloud builds submit --config builds/infra-features-gke-dev-mcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  # 19 Confirm MCS is enabled on GKE - prod
+  # This step ensures that the multi-cluster services (MCS) feature is enabled on the prod GKE clusters.
+  # This is required for multi-cluster ingress.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "19-infra-features-gke-prod-mcs"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_PROD}" == "false" ]] && exit 0
+        exec gcloud builds submit --config builds/infra-features-gke-prod-mcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  # 20 Confirm MCS is enabled on GKE - config
+  # This step ensures that the multi-cluster services (MCS) feature is enabled on the config/mci GKE cluster.
+  # This is required for multi-cluster ingress.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "20-infra-features-gke-config-mcs"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CONFIG}" == "false" ]] && exit 0
+        exec gcloud builds submit --config builds/infra-features-gke-config-mcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  # 21 Create Gateway APIs on GKE config
+  # This step creates Gateway API CRDs on the config GKE cluster.
+  # This step creates the following resources:
+  #   1. Network viewer rols on the gke-mcs-importer GCP SA.
+  #   2. Gateway API CRDs on the config GKE cluster. This results in two GatewayClasses: gke-l7-gxlb and gke-l7-rilb
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "21-infra-features-gke-config-gateway-apis"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CONFIG}" == "false" ]] && exit 0
+        exec gcloud builds submit --config builds/infra-features-gke-config-gateway-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   # 22 Install ACM on GKE - dev
   # This step install ACM ConfigSync and Policy Controller on dev GKE clusters.
   # This step creates the following resources:

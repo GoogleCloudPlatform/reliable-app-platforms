@@ -36,7 +36,7 @@ steps:
         gcloud container fleet ingress disable --project=${_PROJECT_ID}
       fi
       export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
-      export CONFIG_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_CONFIG_NAME}"
+      export CONFIG_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/$${GKE_CONFIG_REGION}/memberships/$${GKE_CONFIG_NAME}"
       export CONFIG_MEMBERSHIP_OK=NOT_OK
       until [[ $$CONFIG_MEMBERSHIP_OK == "OK" ]]
       do

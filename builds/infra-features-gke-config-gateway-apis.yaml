@@ -38,13 +38,13 @@ steps:
         sleep 5
       done
       gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID}
-      kubectl apply -k "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.5.0"
-      kubectl wait --for=condition=established crd gatewayclasses.gateway.networking.k8s.io --timeout=5m
-      export GATEWAYCLASS_RESOURES="No resources found"
-      until [[ $$GATEWAYCLASS_RESOURES != "No resources found" ]]
-      do
-          export GATEWAYCLASS_RESOURES=$(kubectl get gatewayclasses)
-          sleep 5
-          echo -e "GATEWAYCLASS_RESOURES is $$GATEWAYCLASS_RESOURES"
-      done
+      # kubectl apply -k "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.5.0"
+      # kubectl wait --for=condition=established crd gatewayclasses.gateway.networking.k8s.io --timeout=5m
+      # export GATEWAYCLASS_RESOURES="No resources found"
+      # until [[ $$GATEWAYCLASS_RESOURES != "No resources found" ]]
+      # do
+      #     export GATEWAYCLASS_RESOURES=$(kubectl get gatewayclasses)
+      #     sleep 5
+      #     echo -e "GATEWAYCLASS_RESOURES is $$GATEWAYCLASS_RESOURES"
+      # done
       kubectl get gatewayclasses

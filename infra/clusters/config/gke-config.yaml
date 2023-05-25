@@ -37,6 +37,8 @@ spec:
   networkPolicy:
     enabled: false
   enableBinaryAuthorization: true
+  gatewayApiConfig:
+    channel: "CHANNEL_STANDARD"
 # ---
 # apiVersion: gkehub.cnrm.cloud.google.com/v1beta1
 # kind: GKEHubMembership

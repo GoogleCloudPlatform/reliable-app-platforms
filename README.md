@@ -82,7 +82,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    gcloud source repos clone ops --project=${PROJECT_ID}
    cd $HOME/ops
    git checkout -b main # Branch must be named main for Cloud Build to trigger
-   cp -r ../arch52/ops/. .
+   cp -r ../Building-Reliable-Platforms-on-GCP-with-Google-SRE/ops/. .
    git add .
    git commit -am "Initial commit"
    git push --set-upstream origin main
@@ -95,7 +95,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    gcloud source repos clone whereami --project=${PROJECT_ID}
    cd $HOME/whereami
    git checkout -b main # Branch must be named main for Cloud Build to trigger
-   cp -r ../arch52/apps/whereami/. .
+   cp -r ../Building-Reliable-Platforms-on-GCP-with-Google-SRE/apps/whereami/. .
    git add .
    git commit -am "Initial commit"
    git push --set-upstream origin main
@@ -111,7 +111,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    gcloud source repos clone shop --project=${PROJECT_ID}
    cd $HOME/shop
    git checkout -b main # Branch must be named main for Cloud Build to trigger
-   cp -r ../arch52/apps/shop/. .
+   cp -r ../Building-Reliable-Platforms-on-GCP-with-Google-SRE/apps/shop/. .
    git add .
    git commit -am "Initial commit"
    git push --set-upstream origin main
@@ -127,7 +127,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    gcloud source repos clone bank --project=${PROJECT_ID}
    cd $HOME/bank
    git checkout -b main # Branch must be named main for Cloud Build to trigger
-   cp -r ../arch52/apps/bank/. .
+   cp -r ../Building-Reliable-Platforms-on-GCP-with-Google-SRE/apps/bank/. .
    git add .
    git commit -am "Initial commit"
    git push --set-upstream origin main

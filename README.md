@@ -1,6 +1,6 @@
 # Building Reliable Platforms on GCP with Google SRE
 
-_Last tested on 9/27/2022 by @ameer00_
+_Last tested on 06/05/2023 by @ameer00_
 
 <!-- ![image.png](./image.png) -->
 <img src="/img/arch52.png" width=70% height=70%>

@@ -264,8 +264,8 @@ commonLabels:
 bases:
 - ../k8s
 patches:
-- cm-flag.yaml
-- service-type.yaml
+  - path: cm-flag.yaml
+  - path: service-type.yaml
 ```
 
 #### Step 2 - Deploy the whereami frontend

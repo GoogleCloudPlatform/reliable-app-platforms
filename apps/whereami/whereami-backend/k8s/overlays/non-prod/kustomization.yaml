@@ -9,5 +9,5 @@ bases:
 - destrule.yaml
 - virtualservice.yaml
 patches:
-- cm-flag.yaml
-- service-type.yaml
+  - path: cm-flag.yaml
+  - path: service-type.yaml

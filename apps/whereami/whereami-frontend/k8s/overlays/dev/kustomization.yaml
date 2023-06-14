@@ -4,4 +4,4 @@ commonLabels:
 bases:
 - ../../base
 patches:
-- cm-flag.yaml
+  - path: cm-flag.yaml

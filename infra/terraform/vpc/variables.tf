@@ -8,7 +8,7 @@ variable "network_name" {
 }
 
 variable "fleets" {
-  description = "List of networking configurations for multiple anthos fleets"
+  description = "List of networking configurations per cluster-group"
   type = list(object({
     region       = string
     env          = string

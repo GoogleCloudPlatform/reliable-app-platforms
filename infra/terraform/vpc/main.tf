@@ -22,16 +22,18 @@ module "vpc" {
   
 
 # TODO: Take subnets from the "vpc" module and make this more specific
-  # firewall_rules = [{
-  #   name        = "allow-all-10"
-  #   description = "Allow Pod to Pod connectivity for multi-cluster GKE"
-  #   direction   = "INGRESS"
-  #   ranges      = ["10.0.0.0/8"]
-  #   allow = [{
-  #     protocol = "tcp"
-  #     ports    = ["0-65535"]
-  #   }]
-  # }]
+  firewall_rules = [{
+    name        = "allow-all-10"
+    description = "Allow Pod to Pod connectivity for multi-cluster GKE"
+    direction   = "INGRESS"
+    ranges      = concat([
+    for item in flatten([for fleet in var.fleets: local.secondary_ranges[fleet.subnet.name]]): item.ip_cidr_range
+  ])
+    allow = [{
+      protocol = "tcp"
+      ports    = ["0-65535"]
+    }]
+  }]
 }
 
 locals {
@@ -48,9 +50,9 @@ locals {
           range_name    = "${fleet.subnet.name}-svc-cidr-${num}"
           ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 7, num + 96)
       }],
-      [{
-        range_name    = "${fleet.subnet.name}-pod-cidr"
-        ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 1, 0)
+      [for num in range(fleet.num_clusters) : {
+        range_name    = "${fleet.subnet.name}-pod-cidr-${num}"
+        ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 2, num+1)
       }]
     )}, 
     {

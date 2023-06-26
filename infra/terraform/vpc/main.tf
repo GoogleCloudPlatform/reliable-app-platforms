@@ -8,7 +8,7 @@ module "vpc" {
   subnets = concat([
     for fleet in var.fleets : {
       subnet_name   = fleet.subnet.name
-      subnet_ip     = cidrsubnet(fleet.subnet.cidr, 2, 2)
+      subnet_ip     = cidrsubnet(fleet.subnet.cidr, 1, 2)
       subnet_region = fleet.region
     }
     ], [
@@ -25,16 +25,16 @@ module "vpc" {
       [
         for num in range(fleet.num_clusters) : {
           range_name    = "${fleet.subnet.name}-private-ipv4cidr-${num}"
-          ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 11, num + 2000)
+          ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 12, num + 2000)
       }],
       [
         for num in range(fleet.num_clusters) : {
           range_name    = "${fleet.subnet.name}-svc-cidr-${num}"
-          ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 7, num + 96)
+          ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 8, num + 96)
       }],
       [{
         range_name    = "${fleet.subnet.name}-pod-cidr"
-        ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 1, 0)
+        ip_cidr_range = cidrsubnet(fleet.subnet.cidr, 2, 0)
       }]
     )}, 
     {

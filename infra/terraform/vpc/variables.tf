@@ -25,7 +25,7 @@ variable "fleets" {
       num_clusters = 3
       subnet = {
         name = "us-west2"
-        cidr = "10.1.0.0/17"
+        cidr = "10.1.0.0/16"
       }
     },
     {
@@ -34,7 +34,7 @@ variable "fleets" {
       num_clusters = 3
       subnet = {
         name = "us-central1"
-        cidr = "10.2.0.0/17"
+        cidr = "10.2.0.0/16"
       }
     },
   ]
@@ -65,7 +65,7 @@ variable "gke_config" {
     network = "vpc-prod" #TODO: This one is unused. 
     subnet = {
       name               = "us-central1-config"
-      ip_range           = "10.10.0.0/20"
+      ip_range           = "10.10.0.0/20" 
       ip_range_pods_name = "us-central1-config-pods"
       ip_range_pods      = "10.11.0.0/18"
       ip_range_svcs_name = "us-central1-config-svcs"

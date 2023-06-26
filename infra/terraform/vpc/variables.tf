@@ -20,6 +20,15 @@ variable "fleets" {
   }))
   default = [
     {
+      region       = "us-west2"
+      env          = "prod"
+      num_clusters = 3
+      subnet = {
+        name = "us-west2"
+        cidr = "10.1.0.0/17"
+      }
+    },
+    {
       region       = "us-central1"
       env          = "prod"
       num_clusters = 3

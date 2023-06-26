@@ -7,3 +7,4 @@ output "subnets_names" { value = module.vpc.subnets_names }
 output "subnets_regions" { value = module.vpc.subnets_regions }
 output "subnets_secondary" { value = local.secondary_subnets }
 
+

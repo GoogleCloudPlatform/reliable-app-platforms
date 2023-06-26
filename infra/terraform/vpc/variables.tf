@@ -8,6 +8,7 @@ variable "network_name" {
 }
 
 variable "fleets" {
+  description = "List of networking configurations for multiple anthos fleets"
   type = list(object({
     region       = string
     env          = string
@@ -30,8 +31,8 @@ variable "fleets" {
   ]
 }
 
-# GKE Config (config cluster for ingress etc.)
 variable "gke_config" {
+  description = "Networking configuration for the config cluster in the anthos fleet"
   type = object({
     name    = string
     region  = string

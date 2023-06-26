@@ -25,7 +25,7 @@ variable "fleets" {
       num_clusters = 3
       subnet = {
         name = "us-west2"
-        cidr = "10.1.0.0/16"
+        cidr = "10.1.0.0/17"
       }
     },
     {
@@ -34,7 +34,7 @@ variable "fleets" {
       num_clusters = 3
       subnet = {
         name = "us-central1"
-        cidr = "10.2.0.0/16"
+        cidr = "10.2.0.0/17"
       }
     },
   ]

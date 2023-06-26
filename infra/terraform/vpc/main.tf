@@ -51,15 +51,14 @@ module "vpc" {
   })
 
 # TODO: Take subnets from the "vpc" module and make this more specific
-  firewall_rules = [{
-    name        = "allow-all-10"
-    description = "Allow Pod to Pod connectivity for multi-cluster GKE"
-    direction   = "INGRESS"
-    ranges      = ["10.0.0.0/8"]
-    allow = [{
-      protocol = "tcp"
-      ports    = ["0-65535"]
-    }]
-  }]
-
-}
+#   firewall_rules = [{
+#     name        = "allow-all-10"
+#     description = "Allow Pod to Pod connectivity for multi-cluster GKE"
+#     direction   = "INGRESS"
+#     ranges      = ["10.0.0.0/8"]
+#     allow = [{
+#       protocol = "tcp"
+#       ports    = ["0-65535"]
+#     }]
+#   }]
+# }

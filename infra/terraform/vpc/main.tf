@@ -12,9 +12,7 @@ module "vpc" {
     name        = "allow-all-10"
     description = "Allow Pod to Pod connectivity for multi-cluster GKE"
     direction   = "INGRESS"
-    ranges      = concat([
-    for item in flatten([for fleet in var.fleets: local.secondary_subnets[fleet.subnet.name]]): item.ip_cidr_range
-  ], local.flattened_primary_subnets)
+    ranges      = concat(local.flattened_list_primary_subnets, local.flattened_list_secondary_subnets)
     allow = [{
       protocol = "tcp"
       ports    = ["0-65535"]
@@ -68,11 +66,11 @@ locals {
     }
   ])
 
-  flattened_primary_subnets = concat([
+  flattened_list_primary_subnets = concat([
     for item in local.primary_subnets: item.subnet_ip
   ])
 
-  flattened_secondary_subnets = concat([
+  flattened_list_secondary_subnets = concat([
     for item in flatten([for fleet in var.fleets: local.secondary_subnets[fleet.subnet.name]]): item.ip_cidr_range
   ])
 

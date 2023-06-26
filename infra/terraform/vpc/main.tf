@@ -1,25 +1,3 @@
-module "vpc" {
-  source       = "terraform-google-modules/network/google"
-#   version =
-  project_id   = var.project_id
-  network_name = var.network_name
-  routing_mode = "GLOBAL"
-
-  subnets = local.primary_subnets
-
-# TODO: Take subnets from the "vpc" module and make this more specific
-  firewall_rules = [{
-    name        = "allow-all-10"
-    description = "Allow Pod to Pod connectivity for multi-cluster GKE"
-    direction   = "INGRESS"
-    ranges      = concat(local.flattened_list_primary_subnets, local.flattened_list_secondary_subnets)
-    allow = [{
-      protocol = "tcp"
-      ports    = ["0-65535"]
-    }]
-  }]
-}
-
 locals {
   secondary_subnets = merge({
     for fleet in var.fleets :
@@ -73,6 +51,27 @@ locals {
   flattened_list_secondary_subnets = concat([
     for item in flatten([for fleet in var.fleets: local.secondary_subnets[fleet.subnet.name]]): item.ip_cidr_range
   ])
-
 }
+
+module "vpc" {
+  source       = "terraform-google-modules/network/google"
+#   version =
+  project_id   = var.project_id
+  network_name = var.network_name
+  routing_mode = "GLOBAL"
+
+  subnets = local.primary_subnets
+
+  firewall_rules = [{
+    name        = "allow-all-10"
+    description = "Allow Pod to Pod connectivity for multi-cluster GKE"
+    direction   = "INGRESS"
+    ranges      = concat(local.flattened_list_primary_subnets, local.flattened_list_secondary_subnets)
+    allow = [{
+      protocol = "tcp"
+      ports    = ["0-65535"]
+    }]
+  }]
+}
+
 

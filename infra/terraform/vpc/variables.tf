@@ -19,15 +19,6 @@ variable "fleets" {
   }))
   default = [
     {
-      region       = "us-west2"
-      env          = "prod"
-      num_clusters = 3
-      subnet = {
-        name = "us-west2"
-        cidr = "10.1.0.0/17"
-      }
-    },
-    {
       region       = "us-central1"
       env          = "prod"
       num_clusters = 3
@@ -59,9 +50,9 @@ variable "gke_config" {
   default = {
     name    = "gke-config"
     region  = "us-central1"
-    zone    = "us-central1-f"
-    env     = "config"
-    network = "vpc-prod"
+    zone    = "us-central1-f" #TODO: This one is unused. 
+    env     = "config" #TODO: This one is unused. 
+    network = "vpc-prod" #TODO: This one is unused. 
     subnet = {
       name               = "us-central1-config"
       ip_range           = "10.10.0.0/20"

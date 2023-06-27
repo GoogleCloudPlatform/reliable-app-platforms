@@ -1,3 +1,6 @@
+# TODO: 
+# 1: Should they be regional with a single zone (1 cluster per zone per region)?
+
 data "terraform_remote_state" "vpc" {
   backend = "gcs"
   config = {
@@ -18,8 +21,6 @@ locals {
         ]
     ])
     zone_suffix = ["a", "b", "c"]
-    single_zone = ["a"]
-
 }
 
 # module "gke" {
@@ -27,7 +28,8 @@ locals {
 #   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-autopilot-public-cluster"
 #   project_id                 = var.project_id
 #   name                       = "${each.value.env}-${each.value.region}-${each.value.cluster_index}"
-#   regional                   = false
+#   regional                   = true 
+#   region                     = each.value.region
 #   zones                      = ["${each.value.region}-${local.zone_suffix[each.value.cluster_index]}"]
 #   network                    = "vpc"
 #   subnetwork                 = each.value.subnet_name
@@ -37,24 +39,20 @@ locals {
 # }
 
 module "gke" {
-  for_each =  {for i,v in local.single_zone: i=>v}
   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-autopilot-public-cluster"
   project_id                 = var.project_id
-  name                       = "cluster-${each.value}"
-  regional                   = false
-  zones                      = ["us-central1-${each.value}"]
+  name                       = "test-us-central1-0"
+  regional                   = true 
+  region                     = "us-central1"
+  zones                      = ["us-central1-a"]
   network                    = "vpc"
-  subnetwork                 = each.value
-  ip_range_pods              = "pod-cidr-${each.value}"
-  ip_range_services          = "svc-cidr-${each.value}"
+  subnetwork                 = "us-central1"
+  ip_range_pods              = "us-central1-pod-cidr-0"
+  ip_range_services          = "us-central1-svc-cidr-0"
   horizontal_pod_autoscaling = true
 }
 
-# data "google_client_config" "default" {}
 
-# # provider "kubernetes" {
-# #   for_each =  {for i,v in local.single_zone: i=>v}
-# #   host                   = "https://${module.gke[each.value].endpoint}"
-# #   token                  = data.google_client_config.default.access_token
-# #   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
-# # }
+data "google_client_config" "default" {}
+
+

@@ -1,5 +1,9 @@
+#TODO:
+# 1: Which subnets do we need to include in the firewall rule. Currently using all subnets
+# 2: Giving all pod cidrs unique values. This is necessary for pod-pod communication across all clusters in fleet.
+  
+}
 locals {
-
   primary_subnets = concat([
     for fleet in var.fleets : {
       subnet_name   = fleet.subnet.name

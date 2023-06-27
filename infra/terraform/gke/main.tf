@@ -22,6 +22,7 @@ locals {
                 cluster_name = "${item.env}-${item.region}-${index}"
                 pod_cidr_name = "${item.region}-pod-cidr-${index}"
                 svc_cidr_name = "${item.region}-svc-cidr-${index}"
+                network = data.terraform_remote_state.vpc.outputs.network.network_name
             }
         ]
     ])
@@ -33,6 +34,8 @@ locals {
                 cluster_name = "config-${data.terraform_remote_state.vpc.outputs.config_cluster_info.region}"
                 pod_cidr_name = "${data.terraform_remote_state.vpc.outputs.config_cluster_info.subnet.name}-pods"
                 svc_cidr_name = "${data.terraform_remote_state.vpc.outputs.config_cluster_info.subnet.name}-svcs"
+                network = data.terraform_remote_state.vpc.outputs.network.network_name
+
         }
 
     zone_suffix = ["a", "b", "c"]
@@ -46,7 +49,7 @@ module "gke" {
   regional                   = true 
   region                     = each.value.region
   zones                      = [each.value.cluster_zone]
-  network                    = "vpc"
+  network                    = each.value.network
   subnetwork                 = each.value.subnet_name
   ip_range_pods              = each.value.pod_cidr_name
   ip_range_services          = each.value.svc_cidr_name
@@ -59,7 +62,7 @@ module "gke-config-cluster" {
   name                       = local.config_cluster_info.cluster_name
   regional                   = true 
   region                     = local.config_cluster_info.region
-  network                    = "vpc"
+  network                    = local.config_cluster_info.network
   subnetwork                 = local.config_cluster_info.subnet_name
   ip_range_pods              = local.config_cluster_info.pod_cidr_name
   ip_range_services          = local.config_cluster_info.svc_cidr_name

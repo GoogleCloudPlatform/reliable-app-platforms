@@ -17,7 +17,7 @@ locals {
                 env = item.env
                 region = item.region
                 subnet_name = item.subnet.name
-                cluster_index = index
+                cluster_zone = "${item.region}-${local.zone_suffix[index]}"
                 cluster_name = "${item.env}-${item.region}-${index}"
                 pod_cidr_name = "${item.region}-pod-cidr-${index}"
                 svc_cidr_name = "${item.region}-svc-cidr-${index}"
@@ -44,7 +44,7 @@ module "gke" {
   name                       = each.value.cluster_name
   regional                   = true 
   region                     = each.value.region
-  zones                      = ["${each.value.region}-${local.zone_suffix[each.value.cluster_index]}"]
+  zones                      = [each.value.cluster_zone]
   network                    = "vpc"
   subnetwork                 = each.value.subnet_name
   ip_range_pods              = each.value.pod_cidr_name

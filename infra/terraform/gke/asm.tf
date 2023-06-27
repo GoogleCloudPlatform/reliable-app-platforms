@@ -1,24 +1,21 @@
-# locals {
-#     hub-membership-feature = concat([
-#         for membership in google_gke_hub_membership.fleet-membership: {
-#             google_gke_hub_feature.asm-feature.membership.name = membership.membership_id
-#         }
-#     ])
-# }
-# resource "google_gke_hub_feature" "asm-feature" {
-#   for_each = google_gke_hub_membership.fleet-membership
-#   name = "servicemesh-${each.value.name}"
-#   location = "global" # Should this be global?
-#   provider = google-beta
+
+# TODO: Not working. using local providers in modules prevents the use of for_each. Need to find a way to dynamically generate providers 
+# module "fleet-asm" {
+#   for_each          =  module.gke
+#   source            = "./k8s_provider"
+#   project_id        = var.project_id
+#   ca_certificate    = each.value.ca_certificate
+#   endpoint          = each.value.endpoint
+#   cluster_name      = each.value.name
+#   cluster_location  = each.value.location
+#   enable_cni        = true
 # }
 
-# resource "google_gke_hub_feature_membership" "feature_member" {
-#   for_each = google_gke_hub_membership.fleet-membership
-#   location = "global"
-#   feature = each.key
-#   membership = each.value
-#   mesh {
-#     management = "MANAGEMENT_AUTOMATIC"
-#   }
-#   provider = google-beta
+# module "config-asm" {
+#   source            = "./k8s_provider"
+#   project_id        = var.project_id
+#   ca_certificate    = module.gke-config-cluster.ca_certificate
+#   endpoint          = module.gke-config-cluster.endpoint
+#   cluster_name      = module.gke-config-cluster.name
+#   cluster_location  = module.gke-config-cluster.location
 # }

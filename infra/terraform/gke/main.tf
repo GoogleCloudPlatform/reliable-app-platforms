@@ -2,6 +2,20 @@
 # 1: Should they be regional with a single zone (1 cluster per zone per region)?
 # 2: Should they be public or private clusters?
 # 3: Lookup gke.random_shuffle.available_zones, see whether zones can be setup from there.
+# 4: ASM and ACM require the k8s provider be created for each cluster. Need to figure out how to do this dynamically.
+#    This is a known limitation of creating configs in GKE clusters read here: https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/issues/673
+
+
+provider "google" {
+}
+
+terraform {
+  required_providers {
+    google = {
+      version = "<= 4.64"
+    }
+  }
+}
 
 data "terraform_remote_state" "vpc" {
   backend = "gcs"
@@ -41,7 +55,5 @@ locals {
     zone_suffix = ["a", "b", "c"]
 }
 
-# WIP: Will remove later if not needed
-data "google_client_config" "default" {}
 
 

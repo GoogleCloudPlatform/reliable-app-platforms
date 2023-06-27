@@ -5,6 +5,14 @@ variable "ca_certificate" {
     type = string
 }
 
-variable "access_token" {
-    type = string
+variable "project_id" {
+  
+}
+
+variable "cluster_name" {
+  
+}
+
+variable "cluster_location" {
+  
 }

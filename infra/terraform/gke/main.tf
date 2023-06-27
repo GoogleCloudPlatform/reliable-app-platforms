@@ -17,22 +17,44 @@ locals {
             }
         ]
     ])
+    zone_suffix = ["a", "b", "c"]
+    single_zone = ["a"]
+
 }
 
 # module "gke" {
-#   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-autopilot-private-cluster"
+#   for_each = {for i,v in local.cluster_info: i=>v}
+#   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-autopilot-public-cluster"
 #   project_id                 = var.project_id
-#   name                       = "gke-test-1"
-#   region                     = "us-central1"
-#   zones                      = ["us-central1-a", "us-central1-b", "us-central1-f"]
-#   network                    = "vpc-01"
-#   subnetwork                 = "us-central1-01"
-#   ip_range_pods              = "us-central1-01-gke-01-pods"
-#   ip_range_services          = "us-central1-01-gke-01-services"
+#   name                       = "${each.value.env}-${each.value.region}-${each.value.cluster_index}"
+#   regional                   = false
+#   zones                      = ["${each.value.region}-${local.zone_suffix[each.value.cluster_index]}"]
+#   network                    = "vpc"
+#   subnetwork                 = each.value.subnet_name
+#   ip_range_pods              = "${each.value.region}-pod-cidr-${each.value.cluster_index}"
+#   ip_range_services          = "${each.value.region}-svc-cidr-${each.value.cluster_index}"
 #   horizontal_pod_autoscaling = true
-#   filestore_csi_driver       = false
-#   enable_private_endpoint    = true
-#   enable_private_nodes       = true
-#   master_ipv4_cidr_block     = "10.0.0.0/28"
-
 # }
+
+module "gke" {
+  for_each =  {for i,v in local.single_zone: i=>v}
+  source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-autopilot-public-cluster"
+  project_id                 = var.project_id
+  name                       = "cluster-${each.value}"
+  regional                   = false
+  zones                      = ["us-central1-${each.value}"]
+  network                    = "vpc"
+  subnetwork                 = each.value
+  ip_range_pods              = "pod-cidr-${each.value}"
+  ip_range_services          = "svc-cidr-${each.value}"
+  horizontal_pod_autoscaling = true
+}
+
+# data "google_client_config" "default" {}
+
+# # provider "kubernetes" {
+# #   for_each =  {for i,v in local.single_zone: i=>v}
+# #   host                   = "https://${module.gke[each.value].endpoint}"
+# #   token                  = data.google_client_config.default.access_token
+# #   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
+# # }

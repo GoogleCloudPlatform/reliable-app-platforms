@@ -1,6 +1,7 @@
 # TODO: 
 # 1: Should they be regional with a single zone (1 cluster per zone per region)?
 # 2: Should they be public or private clusters?
+# 3: Lookup gke.random_shuffle.available_zones, see whether zones can be setup from there.
 
 data "terraform_remote_state" "vpc" {
   backend = "gcs"

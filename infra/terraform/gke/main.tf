@@ -5,18 +5,6 @@
 # 4: ASM and ACM require the k8s provider be created for each cluster. Need to figure out how to do this dynamically.
 #    This is a known limitation of creating configs in GKE clusters read here: https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/issues/673
 
-
-provider "google" {
-}
-
-terraform {
-  required_providers {
-    google = {
-      version = "<= 4.64"
-    }
-  }
-}
-
 data "terraform_remote_state" "vpc" {
   backend = "gcs"
   config = {

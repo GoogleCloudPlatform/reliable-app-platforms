@@ -31,4 +31,19 @@ steps:
       [[ "${_BUILD}" == "false" ]] && exit 0
       terraform init -backend-config="bucket=${_PROJECT_ID}"
       terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve
-
+- name: "hashicorp/terraform:1.4.6"
+  id: "install-gke-packages"
+  entrypoint: "sh"
+  dir: "infra/terraform/gke_packages"
+  args:
+    - "-xe"
+    - "-c"
+    - |
+      [[ "${_BUILD}" == "false" ]] && exit 0
+      NUM_CLUSTERS=6 
+      for ((i=1;i<=NUM_CLUSTERS;i++)); do
+          echo Installing for cluster: $i
+					terraform init -backend-config="bucket=${_PROJECT_ID} -backend-config="prefix=tfstate/gke-install-${i}"
+      		terraform apply -var="project_id=${_PROJECT_ID}" -var="cluster_index=${i}" --auto-approve
+      done
+      

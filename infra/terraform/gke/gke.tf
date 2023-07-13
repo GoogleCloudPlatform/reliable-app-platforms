@@ -1,9 +1,10 @@
 module "gke" {
-  for_each = {for i,v in local.fleet_clusters_info: i=>v}
+  for_each                   = { for i, v in local.fleet_clusters_info : i => v }
   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-autopilot-public-cluster"
+  version                    = "27.0.0"
   project_id                 = var.project_id
   name                       = each.value.cluster_name
-  regional                   = true 
+  regional                   = true
   region                     = each.value.region
   zones                      = [each.value.cluster_zone]
   network                    = each.value.network
@@ -15,9 +16,10 @@ module "gke" {
 
 module "gke-config-cluster" {
   source                     = "terraform-google-modules/kubernetes-engine/google//modules/beta-autopilot-public-cluster"
+  version                    = "27.0.0"
   project_id                 = var.project_id
   name                       = local.config_cluster_info.cluster_name
-  regional                   = true 
+  regional                   = true
   region                     = local.config_cluster_info.region
   network                    = local.config_cluster_info.network
   subnetwork                 = local.config_cluster_info.subnet_name

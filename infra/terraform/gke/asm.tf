@@ -1,21 +1,31 @@
 
-# TODO: Not working. using local providers in modules prevents the use of for_each. Need to find a way to dynamically generate providers 
-# module "fleet-asm" {
-#   for_each          =  module.gke
-#   source            = "./k8s_provider"
-#   project_id        = var.project_id
-#   ca_certificate    = each.value.ca_certificate
-#   endpoint          = each.value.endpoint
-#   cluster_name      = each.value.name
-#   cluster_location  = each.value.location
-#   enable_cni        = true
-# }
+resource "google_gke_hub_feature" "asm_feature" {
+  name     = "servicemesh"
+  location = "global"
+  project  = var.project_id
+  provider = google-beta
+}
 
-# module "config-asm" {
-#   source            = "./k8s_provider"
-#   project_id        = var.project_id
-#   ca_certificate    = module.gke-config-cluster.ca_certificate
-#   endpoint          = module.gke-config-cluster.endpoint
-#   cluster_name      = module.gke-config-cluster.name
-#   cluster_location  = module.gke-config-cluster.location
-# }
+resource "google_gke_hub_feature_membership" "asm_feature_member" {
+  for_each   = module.fleet-hub
+  location   = "global"
+  feature    = google_gke_hub_feature.asm_feature.name
+  membership = each.value.cluster_membership_id
+  project    = var.project_id
+  mesh {
+    management = "MANAGEMENT_AUTOMATIC"
+  }
+  provider = google-beta
+}
+
+
+resource "google_gke_hub_feature_membership" "asm_config_feature_member" {
+  location   = "global"
+  feature    = google_gke_hub_feature.asm_feature.name
+  membership = module.config-hub.cluster_membership_id
+  project    = var.project_id
+  mesh {
+    management = "MANAGEMENT_AUTOMATIC"
+  }
+  provider = google-beta
+}

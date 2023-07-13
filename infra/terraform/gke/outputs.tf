@@ -17,8 +17,3 @@ output "config-clusters" {
     zones  = module.gke-config-cluster.zones
   }
 }
-
-output "num-fleet-clusters" {
-  value = length(module.gke)
-}
-

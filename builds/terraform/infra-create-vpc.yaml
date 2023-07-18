@@ -19,7 +19,7 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
 steps:
-# Enable APIs
+# Create VPC infrastructure
 - name: "hashicorp/terraform:1.4.6"
   id: "create-vpc"
   entrypoint: "sh"

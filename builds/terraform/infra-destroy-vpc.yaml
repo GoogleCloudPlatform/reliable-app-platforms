@@ -14,20 +14,19 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-create-gke
+  - infra-destroy-vpc
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _BUILD: "true"
 steps:
-# Create GKE infrastructure
+# Destroy VPC infrastructure
 - name: "hashicorp/terraform:1.4.6"
-  id: "create-gke"
+  id: "destroy-vpc"
   entrypoint: "sh"
-  dir: "infra/terraform/gke"
+  dir: "infra/terraform/vpc"
   args:
     - "-xe"
     - "-c"
     - |
-      [[ "${_BUILD}" == "false" ]] && exit 0
       terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve
+      terraform destroy -var="project_id=${_PROJECT_ID}" --auto-approve
+

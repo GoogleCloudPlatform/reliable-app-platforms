@@ -20,6 +20,7 @@ module "project-services" {
     "spanner.googleapis.com",
     "sqladmin.googleapis.com",
     "containersecurity.googleapis.com",
-    "binaryauthorization.googleapis.com"
+    "binaryauthorization.googleapis.com",
+    "anthosconfigmanagement.googleapis.com"
   ]
 }

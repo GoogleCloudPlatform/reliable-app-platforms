@@ -60,8 +60,10 @@ export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format 'value(p
 gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/owner
 
 # Start main build
-echo -e "\e[95mStarting Cloudbuild to create infrastructure using ${BUILD}...\e[0m"
-# [[ "${BUILD}" == "kcc" ]] && [[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_kcc.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
+[[ "${DESTROY}" != "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to CREATE infrastructure using ${BUILD}...\e[0m"
+[[ "${DESTROY}" == "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to DELETE infrastructure using ${BUILD}...\e[0m"
+
+[[ "${BUILD}" == "kcc" ]] && [[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_kcc.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 [[ "${BUILD}" == "terraform" ]] && [[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_terraform.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
-# [[ "${BUILD}" == "terraform" ]] && [[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
+[[ "${BUILD}" == "terraform" ]] && [[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

@@ -14,16 +14,16 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-create-vpc
+  - infra-create-gke
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
 steps:
-# Create VPC infrastructure
+# Create GKE infrastructure
 - name: "hashicorp/terraform:1.4.6"
-  id: "create-vpc"
+  id: "create-gke"
   entrypoint: "sh"
-  dir: "infra/terraform/vpc"
+  dir: "infra/terraform/gke"
   args:
     - "-xe"
     - "-c"
@@ -31,4 +31,3 @@ steps:
       [[ "${_BUILD}" == "false" ]] && exit 0
       terraform init -backend-config="bucket=${_PROJECT_ID}"
       terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve
-

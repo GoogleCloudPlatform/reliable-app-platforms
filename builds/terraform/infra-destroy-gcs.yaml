@@ -14,21 +14,17 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-create-vpc
+  - infra-delete-gcs
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _BUILD: "true"
 steps:
-# Create VPC infrastructure
-- name: "hashicorp/terraform:1.4.6"
-  id: "create-vpc"
-  entrypoint: "sh"
-  dir: "infra/terraform/vpc"
+# Delete GCS bucket
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-delete-gcs"
+  entrypoint: bash
   args:
-    - "-xe"
-    - "-c"
+    - -c
     - |
-      [[ "${_BUILD}" == "false" ]] && exit 0
-      terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve
-
+      ([[ $(gsutil ls | grep "gs://${_PROJECT_ID}/") ]] && \
+      gsutil rm -r -f ${_PROJECT_ID} gs://${_PROJECT_ID})
+      

@@ -8,6 +8,7 @@ variable "network_name" {
 }
 
 variable "fleets" {
+  description = "List of networking configurations per cluster-group"
   type = list(object({
     region       = string
     env          = string
@@ -39,8 +40,8 @@ variable "fleets" {
   ]
 }
 
-# GKE Config (config cluster for ingress etc.)
 variable "gke_config" {
+  description = "Networking configuration for the config cluster in the anthos fleet"
   type = object({
     name    = string
     region  = string
@@ -59,12 +60,12 @@ variable "gke_config" {
   default = {
     name    = "gke-config"
     region  = "us-central1"
-    zone    = "us-central1-f"
-    env     = "config"
-    network = "vpc-prod"
+    zone    = "us-central1-f" #TODO: This one is unused. 
+    env     = "config" #TODO: This one is unused. 
+    network = "vpc-prod" #TODO: This one is unused. 
     subnet = {
       name               = "us-central1-config"
-      ip_range           = "10.10.0.0/20"
+      ip_range           = "10.10.0.0/20" 
       ip_range_pods_name = "us-central1-config-pods"
       ip_range_pods      = "10.11.0.0/18"
       ip_range_svcs_name = "us-central1-config-svcs"

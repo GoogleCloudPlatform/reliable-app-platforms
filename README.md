@@ -24,10 +24,16 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    export PROJECT_ID=<YOUR PROJECT ID>
    ```
 
-1. Kick off build.
+1. Kick off build with KCC
 
    ```bash
    ./build.sh
+   ```
+   OR
+1. Kick off build with terraform
+
+   ```bash
+   ./build.sh --build terraform
    ```
 
 1. View build in the Console.

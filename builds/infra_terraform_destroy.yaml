@@ -19,31 +19,40 @@ substitutions:
 tags:
   - infra-destroy-terraform
 steps:
-  # 1 Destroy GKE clusters
+  # Destroy GKE clusters
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "06-infra-destroy-gke"
+    id: "infra-destroy-gke"
     entrypoint: bash
     args:
       - -c
       - |
         exec gcloud builds submit --config builds/terraform/infra-destroy-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # 2 Destroy VPC
+  # Destroy VPC
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "02-infra-destroy-vpc"
+    id: "infra-destroy-vpc"
     entrypoint: bash
     args:
       - -c
       - |
         exec gcloud builds submit --config builds/terraform/infra-destroy-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  
-  # 3 Disable APIs
+  # Disable Pipelines
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "01-infra-disable-apis"
+    id: "infra-destroy-pipelines"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/terraform/infra-destroy-deploy-pipeline.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+
+  # 3 Destory APIs
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-disable-apis"
     entrypoint: bash
     args:
       - -c
       - |
         exec gcloud builds submit --config builds/terraform/infra-disable-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+
 
   # 0 Destroy GCS storage bucket for TF state, project files, vars.sh etc
   # This step deletes the GCS storage bucket in the project with the name of project ID.

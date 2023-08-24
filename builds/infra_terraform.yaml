@@ -64,4 +64,4 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/terraform/infra-app-services-deploy-pipeline.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --config builds/terraform/infra-create-deploy-pipeline.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}

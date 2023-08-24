@@ -15,8 +15,10 @@ resource "google_gke_hub_feature_membership" "acm_feature_member" {
     version = "1.15.1"
     config_sync {
       git {
-        sync_repo   = "https://github.com/hashicorp/terraform"
+        sync_repo   = "https://source.developers.google.com/p/${var.project_id}/r/config"
         secret_type = "none"
+        # secret_type = "gcpserviceaccount"
+        # gcp_service_account_email = "sa@project-id.iam.gserviceaccount.com"
       }
     }
   }
@@ -32,7 +34,7 @@ resource "google_gke_hub_feature_membership" "acm_config_feature_member" {
     version = "1.15.1"
     config_sync {
       git {
-        sync_repo   = "https://github.com/hashicorp/terraform"
+        sync_repo   = "https://source.developers.google.com/p/${var.project_id}/r/config"
         secret_type = "none"
       }
     }

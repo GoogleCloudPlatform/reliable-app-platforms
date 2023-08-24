@@ -2,5 +2,6 @@
 
 terraform {
   backend "gcs" {
+    prefix=tfstate/pipeline
   }
 }

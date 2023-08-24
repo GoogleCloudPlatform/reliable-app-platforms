@@ -15,8 +15,8 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _VPC: "true"
-  _GKE: "true"
+  _VPC: "false"
+  _GKE: "false"
 tags:
   - infra-main-terraform
 steps:
@@ -48,12 +48,20 @@ steps:
       - |
         [[ "${_VPC}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
- # 6 Create GKE clusters
+ # 3 Create GKE clusters
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "06-infra-create-gke"
+    id: "03-infra-create-gke"
     entrypoint: bash
     args:
       - -c
       - |
         [[ "${_GKE}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+ # 4 Create Deployment pipeline whereami
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "04-infra-app-services-deploy-pipeline"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/terraform/infra-app-services-deploy-pipeline.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}

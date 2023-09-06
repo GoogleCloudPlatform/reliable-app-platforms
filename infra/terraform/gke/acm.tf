@@ -1,9 +1,21 @@
+module "service_accounts" {
+  source        = "terraform-google-modules/service-accounts/google"
+  version       = "~> 3.0"
+  project_id    = var.project_id
+  prefix        = "config-sync"
+  names         = ["sa"]
+  project_roles = [
+    "${var.project_id}=>roles/source.reader",
+  ]
+}
+
 resource "google_gke_hub_feature" "acm_feature" {
   name     = "configmanagement"
   location = "global"
   project  = var.project_id
   provider = google-beta
 }
+
 
 resource "google_gke_hub_feature_membership" "acm_feature_member" {
   for_each   = module.fleet-hub
@@ -16,9 +28,8 @@ resource "google_gke_hub_feature_membership" "acm_feature_member" {
     config_sync {
       git {
         sync_repo   = "https://source.developers.google.com/p/${var.project_id}/r/config"
-        secret_type = "none"
-        # secret_type = "gcpserviceaccount"
-        # gcp_service_account_email = "sa@project-id.iam.gserviceaccount.com"
+        secret_type = "gcpserviceaccount"
+        gcp_service_account_email = module.service_accounts.emails_list[0]
       }
     }
   }
@@ -35,7 +46,9 @@ resource "google_gke_hub_feature_membership" "acm_config_feature_member" {
     config_sync {
       git {
         sync_repo   = "https://source.developers.google.com/p/${var.project_id}/r/config"
-        secret_type = "none"
+        secret_type = "gcpserviceaccount"
+        gcp_service_account_email = module.service_accounts.emails_list[0]
+
       }
     }
   }

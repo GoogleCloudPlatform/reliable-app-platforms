@@ -6,7 +6,7 @@ locals {
 
 resource "google_clouddeploy_target" "target" {
   for_each = { for i, v in local.clusters_info : i => v }
-  location = each.value.region
+  location = var.pipeline_location
   name     = "target-${each.value.name}"
 
   gke {

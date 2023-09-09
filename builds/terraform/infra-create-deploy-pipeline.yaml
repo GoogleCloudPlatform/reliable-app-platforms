@@ -17,8 +17,6 @@ tags:
   - app-cicd-deploy-pipelines
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _PIPELINE_LOCATION: "us-central1"
-  _SERVICES: "whereami-frontend,whereami-backend,shop-ad,shop-cart,shop-checkout,shop-currency,shop-email,shop-frontend,shop-loadgenerator,shop-payment,shop-productcatalog,shop-recommendation,shop-shipping,shop-redis,bank-accounts-db,bank-balancereader,bank-contacts,bank-frontend,bank-ledger-db,bank-ledgerwriter,bank-loadgenerator,bank-transactionhistory,bank-user"
 steps:
 - name: "hashicorp/terraform:1.4.6"
   id: '00-deploy-pipelines-all-services'
@@ -29,4 +27,4 @@ steps:
     - "-c"
     - |
         terraform init -backend-config="bucket=${_PROJECT_ID}" -backend-config="prefix=tfstate/pipeline"
-        terraform apply -var="project_id=${_PROJECT_ID}" -var='service_names=${_SERVICES}' -var="pipeline_location=${_PIPELINE_LOCATION}" --auto-approve
+        terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve

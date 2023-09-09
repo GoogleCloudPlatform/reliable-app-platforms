@@ -1,7 +1,6 @@
 
 locals {
   clusters_info = data.terraform_remote_state.gke.outputs.fleet-clusters
-  service_names = toset(split(",", var.service_names))
 }
 
 resource "google_clouddeploy_target" "target" {
@@ -18,7 +17,7 @@ resource "google_clouddeploy_target" "target" {
 }
 
 resource "google_clouddeploy_delivery_pipeline" "primary" {
-  for_each = local.service_names
+  for_each = toset(var.service_names)
   location = var.pipeline_location
   name     = "${each.value}-pipeline"
 

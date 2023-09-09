@@ -47,6 +47,15 @@ steps:
       - |
         exec gcloud builds submit --config builds/terraform/infra-destroy-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  
+ # Destroy Repos
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-destroy-repos"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/terraform/infra-destroy-repos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  
   # Destory APIs
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-disable-apis"

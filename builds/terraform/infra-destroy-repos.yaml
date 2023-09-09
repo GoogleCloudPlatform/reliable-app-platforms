@@ -14,21 +14,17 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-enable-apis
+  - delete-deploy-pipelines
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _BUILD: "true"
 steps:
-# Enable APIs
 - name: "hashicorp/terraform:1.4.6"
-  id: "enable-apis"
-  entrypoint: "sh"
-  dir: "infra/terraform/enable-apis"
+  id: '00-delete-deploy-pipelines'
+  dir: infra/terraform/delivery-pipelines
+  entrypoint: sh
   args:
     - "-xe"
     - "-c"
     - |
-      [[ "${_BUILD}" == "false" ]] && exit 0
-      terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve
-
+        terraform init -backend-config="bucket=${_PROJECT_ID}" 
+        terraform destroy -var="project_id=${_PROJECT_ID}" --auto-approve

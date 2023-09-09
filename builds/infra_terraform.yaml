@@ -15,8 +15,8 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _VPC: "false"
-  _GKE: "false" 
+  _VPC: "true"
+  _GKE: "true" 
 tags:
   - infra-main-terraform
 steps:
@@ -25,7 +25,7 @@ steps:
   # This step creates the following resources:
   #   1. GCS storage bucket (with versioning enabled) named PROJECT_ID.
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "00-infra-create-gcs"
+    id: "infra-create-gcs"
     entrypoint: bash
     args:
       - -c
@@ -33,33 +33,42 @@ steps:
         exec gcloud builds submit --config builds/terraform/infra-create-gcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   # 1 Enable APIs
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "01-infra-enable-apis"
+    id: "infra-enable-apis"
     entrypoint: bash
     args:
       - -c
       - |
         exec gcloud builds submit --config builds/terraform/infra-enable-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # 2 Create VPC
+ # Create CloudSource repos, artifact registries and triggers
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "02-infra-create-vpc"
+    id: "infra-create-repos"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/terraform/infra-create-repos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+
+  # Create VPC
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-create-vpc"
     entrypoint: bash
     args:
       - -c
       - |
         [[ "${_VPC}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
- # 3 Create GKE clusters
+ # Create GKE clusters
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "03-infra-create-gke"
+    id: "infra-create-gke"
     entrypoint: bash
     args:
       - -c
       - |
         [[ "${_GKE}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
- # 4 Create Deployment pipeline whereami
+ # Create Deployment pipelines
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "04-infra-app-services-deploy-pipeline"
+    id: "infra-create-deploy-pipeline"
     entrypoint: bash
     args:
       - -c

@@ -38,14 +38,6 @@ steps:
       spec:
         domains:
         - "$${SHOP_APP_NAME}.endpoints.${_PROJECT_ID}.cloud.goog"
-      ---
-      apiVersion: networking.gke.io/v1beta2
-      kind: ManagedCertificate
-      metadata:
-        name: dev-shop-managed-cert
-      spec:
-        domains:
-        - "$${DEV_SHOP_APP_NAME}.endpoints.${_PROJECT_ID}.cloud.goog"
       EOF
       cat <<EOF > bank-managed-certs.yaml
       apiVersion: networking.gke.io/v1beta2
@@ -55,14 +47,6 @@ steps:
       spec:
         domains:
         - "$${BANK_APP_NAME}.endpoints.${_PROJECT_ID}.cloud.goog"
-      ---
-      apiVersion: networking.gke.io/v1beta2
-      kind: ManagedCertificate
-      metadata:
-        name: dev-bank-managed-cert
-      spec:
-        domains:
-        - "$${DEV_BANK_APP_NAME}.endpoints.${_PROJECT_ID}.cloud.goog"
       EOF
       cat <<EOF > whereami-managed-certs.yaml
       apiVersion: networking.gke.io/v1beta2
@@ -72,16 +56,7 @@ steps:
       spec:
         domains:
         - "$${WHEREAMI_APP_NAME}.endpoints.${_PROJECT_ID}.cloud.goog"
-      ---
-      apiVersion: networking.gke.io/v1beta2
-      kind: ManagedCertificate
-      metadata:
-        name: dev-whereami-managed-cert
-      spec:
-        domains:
-        - "$${DEV_WHEREAMI_APP_NAME}.endpoints.${_PROJECT_ID}.cloud.goog"
       EOF
-      while [[ $(gcloud container clusters describe $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do sleep 5; done
       gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID}
       kubectl apply -f shop-managed-certs.yaml
       kubectl apply -f bank-managed-certs.yaml
@@ -123,107 +98,6 @@ steps:
       cd config
       git add . && git commit -am "Deploy GCLB to ASM ingress gateway certs secret"
       git push
-# Configure multicluster ingress for dev
-- name: gcr.io/cloud-builders/gcloud
-  id: '02-configure-mci-dev'
-  entrypoint: bash
-  dir: "asm"
-  args: 
-    - -c
-    - |
-      gsutil cp -r gs://${_PROJECT_ID}/vars.sh infra-vars.sh
-      cat infra-vars.sh
-      source infra-vars.sh
-      while [[ $(gcloud --project ${_PROJECT_ID} anthos config controller describe config-controller --location=$${KCC_REGION} --format='value(state)') != "RUNNING" ]]; do
-        echo "Waiting for config controller cluster to be RUNNING."
-        sleep 5
-      done
-      gcloud anthos config controller get-credentials config-controller --location=$${KCC_REGION} --project=${_PROJECT_ID}
-      kubectl -n config-control wait computefirewall allow-all-10 --for=condition=Ready
-      kubectl -n config-control wait computeaddress dev-mci --for=condition=Ready
-      export DEV_MCI_GCLB_IP=$(kubectl -n config-control get computeaddress dev-mci -ojsonpath={'.spec.address'})
-      echo -e "DEV_MCI_GCLB_IP is $${DEV_MCI_GCLB_IP}"
-      while [[ $(gcloud container clusters describe $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do sleep 5; done
-      gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID}
-      export DEV_SHOP_MANAGED_CERT=$(kubectl get managedcertificate dev-shop-managed-cert -ojsonpath='{.status.certificateName}')
-      until [[ "$${DEV_SHOP_MANAGED_CERT}" ]]; do
-        sleep 3
-        export DEV_SHOP_MANAGED_CERT=$(kubectl get managedcertificate dev-shop-managed-cert -ojsonpath='{.status.certificateName}')
-      done
-      export DEV_BANK_MANAGED_CERT=$(kubectl get managedcertificate dev-bank-managed-cert -ojsonpath='{.status.certificateName}')
-      until [[ "$${DEV_BANK_MANAGED_CERT}" ]]; do
-        sleep 3
-        export DEV_BANK_MANAGED_CERT=$(kubectl get managedcertificate dev-bank-managed-cert -ojsonpath='{.status.certificateName}')
-      done
-      export DEV_WHEREAMI_MANAGED_CERT=$(kubectl get managedcertificate dev-whereami-managed-cert -ojsonpath='{.status.certificateName}')
-      until [[ "$${DEV_WHEREAMI_MANAGED_CERT}" ]]; do
-        sleep 3
-        export DEV_WHEREAMI_MANAGED_CERT=$(kubectl get managedcertificate dev-whereami-managed-cert -ojsonpath='{.status.certificateName}')
-      done
-      cat <<EOF > namespace-asm-gateways.yaml
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: asm-gateways
-      EOF
-      cat <<EOF > dev-asm-ingressgateway-mci.yaml
-      apiVersion: networking.gke.io/v1
-      kind: MultiClusterIngress
-      metadata:
-        name: dev-asm-ingressgateway-mci
-        namespace: asm-gateways
-        annotations:
-          networking.gke.io/static-ip: "$${DEV_MCI_GCLB_IP}"
-          networking.gke.io/pre-shared-certs: "$${DEV_SHOP_MANAGED_CERT},$${DEV_BANK_MANAGED_CERT},$${DEV_WHEREAMI_MANAGED_CERT}"
-      spec:
-        template:
-          spec:
-            backend:
-              serviceName: dev-asm-ingressgateway-mcs
-              servicePort: 443
-      EOF
-      cat <<EOF > dev-asm-ingressgateway-mcs.yaml
-      apiVersion: networking.gke.io/v1
-      kind: MultiClusterService
-      metadata:
-        name: dev-asm-ingressgateway-mcs
-        namespace: asm-gateways
-        annotations:
-          beta.cloud.google.com/backend-config: '{"ports": {"443":"dev-asm-ingress-mci-config"}}'
-          networking.gke.io/app-protocols: '{"http2":"HTTP2"}'
-      spec:
-        template:
-          spec:
-            selector:
-              asm: ingressgateway
-            ports:
-            - name: http2
-              protocol: TCP
-              port: 443 # Port the Service listens on
-        clusters:
-        - link: "$${GKE_DEV1_LOCATION}/$${GKE_DEV1_NAME}"
-        - link: "$${GKE_DEV2_LOCATION}/$${GKE_DEV2_NAME}"
-        - link: "$${GKE_DEV3_LOCATION}/$${GKE_DEV3_NAME}"
-        - link: "$${GKE_DEV4_LOCATION}/$${GKE_DEV4_NAME}"
-        - link: "$${GKE_DEV5_LOCATION}/$${GKE_DEV5_NAME}"
-        - link: "$${GKE_DEV6_LOCATION}/$${GKE_DEV6_NAME}"
-      EOF
-      cat <<EOF > dev-asm-ingress-mci-config.yaml
-      apiVersion: cloud.google.com/v1
-      kind: BackendConfig
-      metadata:
-        name: dev-asm-ingress-mci-config
-        namespace: asm-gateways
-      spec:
-        healthCheck:
-          type: HTTP
-          port: 15021
-          requestPath: /healthz/ready
-      EOF
-      kubectl apply -f namespace-asm-gateways.yaml
-      kubectl apply -f dev-asm-ingress-mci-config.yaml
-      kubectl apply -f dev-asm-ingressgateway-mcs.yaml
-      kubectl apply -f dev-asm-ingressgateway-mci.yaml
 # Configure multicluster ingress for prod
 - name: gcr.io/cloud-builders/gcloud
   id: '03-configure-mci-prod'
@@ -235,16 +109,7 @@ steps:
       gsutil cp -r gs://${_PROJECT_ID}/vars.sh infra-vars.sh
       cat infra-vars.sh
       source infra-vars.sh
-      while [[ $(gcloud --project ${_PROJECT_ID} anthos config controller describe config-controller --location=$${KCC_REGION} --format='value(state)') != "RUNNING" ]]; do
-        echo "Waiting for config controller cluster to be RUNNING."
-        sleep 5
-      done
       gcloud anthos config controller get-credentials config-controller --location=$${KCC_REGION} --project=${_PROJECT_ID}
-      kubectl -n config-control wait computefirewall allow-all-10 --for=condition=Ready
-      kubectl -n config-control wait computeaddress prod-mci --for=condition=Ready
-      export PROD_MCI_GCLB_IP=$(kubectl -n config-control get computeaddress prod-mci -ojsonpath={'.spec.address'})
-      echo -e "PROD_MCI_GCLB_IP is $${PROD_MCI_GCLB_IP}"
-      while [[ $(gcloud container clusters describe $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do sleep 5; done
       gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_LOCATION} --project ${_PROJECT_ID}
       export SHOP_MANAGED_CERT=$(kubectl get managedcertificate shop-managed-cert -ojsonpath='{.status.certificateName}')
       until [[ "$${SHOP_MANAGED_CERT}" ]]; do
@@ -325,43 +190,6 @@ steps:
       kubectl apply -f asm-ingress-mci-config.yaml
       kubectl apply -f asm-ingressgateway-mcs.yaml
       kubectl apply -f asm-ingressgateway-mci.yaml
-# # Configure ASM Gateway dev
-# - name: gcr.io/cloud-builders/gcloud
-#   id: '04-configure-asm-gateway-dev'
-#   entrypoint: bash
-#   dir: "asm"
-#   args: 
-#     - -c
-#     - |
-#       cat <<EOF > dev-asm-ingress-gateway.yaml
-#       apiVersion: networking.istio.io/v1beta1
-#       kind: Gateway
-#       metadata:
-#         name: dev-asm-ingress-gateway
-#         namespace: asm-gateways
-#       spec:
-#         selector:
-#           asm: ingressgateway # use ASM external ingress gateway
-#         servers:
-#         - port:
-#             number: 443
-#             name: https
-#             protocol: HTTPS
-#           hosts:
-#           - '*' # IMPORTANT: Must use wildcard here when using SSL, see note below
-#           tls:
-#             mode: SIMPLE
-#             credentialName: edge2mesh-credential
-#       EOF
-#       git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
-#       git config --global user.name "cloudbuild-ci"
-#       gcloud source repos clone config --project=${_PROJECT_ID}
-#       mkdir -p config/asm
-#       cp -r dev-asm-ingress-gateway.yaml config/asm
-#       cd config
-#       git add . && git commit -am "Deploy ASM Gateway dev"
-#       git push
-# Configure ASM Gateway prod
 - name: gcr.io/cloud-builders/gcloud
   id: '05-configure-asm-gateway-prod'
   entrypoint: bash

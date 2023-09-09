@@ -1,6 +1,26 @@
 
 locals {
   clusters_info = data.terraform_remote_state.gke.outputs.fleet-clusters
+  config_info   = data.terraform_remote_state.gke.outputs.config-clusters
+  substitutions = merge([{
+    for index, item in local.clusters_info :
+    "GKE_PROD${index + 1}_NAME" => item.name
+    }
+    , {
+      for index, item in local.clusters_info :
+      "GKE_PROD${index + 1}_LOCATION" => item.region
+    }
+    ,
+    {
+      "GKE_CONFIG_NAME"   = local.config_info.name
+      "GKE_CONFIG_LOCATION" = local.config_info.region
+      "GKE_CONFIG_REGION" = local.config_info.region
+      "SPANNER_REGION" = local.config_info.region
+      "CLOUDSQL_REGION" = local.config_info.region
+      "PROD_MCI_GCLB_IP" = data.google_compute_global_address.mci_address.address
+
+    }]
+  ...)
 }
 
 resource "google_clouddeploy_target" "target" {

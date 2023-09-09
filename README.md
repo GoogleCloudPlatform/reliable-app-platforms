@@ -92,6 +92,8 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    git add .
    git commit -am "Initial commit"
    git push --set-upstream origin main
+   cd $HOME 
+   rm -rf ops # clean up directory
    ```
 
 1. Deploy `whereami`.
@@ -105,6 +107,8 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    git add .
    git commit -am "Initial commit"
    git push --set-upstream origin main
+   cd $HOME 
+   rm -rf whereami # clean up directory
    ```
 
    After commiting, you can view the [Cloud Build pipeline](https://console.cloud.google.com/cloud-build).
@@ -121,6 +125,8 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    git add .
    git commit -am "Initial commit"
    git push --set-upstream origin main
+   cd $HOME 
+   rm -rf shop # clean up directory
    ```
 
    After commiting, you can view the [Cloud Build pipeline](https://console.cloud.google.com/cloud-build).
@@ -137,6 +143,8 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    git add .
    git commit -am "Initial commit"
    git push --set-upstream origin main
+   cd $HOME 
+   rm -rf bank # clean up directory
    ```
 
    After commiting, you can view the [Cloud Build pipeline](https://console.cloud.google.com/cloud-build).

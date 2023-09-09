@@ -16,7 +16,7 @@ timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _VPC: "false"
-  _GKE: "false" # Set false for now after first creation: https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/issues/1713
+  _GKE: "false" 
 tags:
   - infra-main-terraform
 steps:

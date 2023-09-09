@@ -1,7 +1,7 @@
-# terraform init -backend-config="bucket=${PROJECT_ID}" -backend-config="prefix=tfstate/pipeline/${SERVICE}"
+# terraform init -backend-config="bucket=${PROJECT_ID}"
 
 terraform {
   backend "gcs" {
-    prefix=tfstate/pipeline
+    prefix="tfstate/pipeline"
   }
 }

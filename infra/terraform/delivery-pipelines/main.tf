@@ -34,8 +34,6 @@ resource "google_clouddeploy_delivery_pipeline" "primary" {
         target_id = stages.value.target_id
       }
     }
-
   }
-
   provider = google-beta
 }

@@ -19,17 +19,28 @@ substitutions:
 tags:
   - infra-destroy-terraform
 steps:
+<<<<<<< HEAD
 
  # Disable Pipelines
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-destroy-pipelines"
+=======
+  #  Destroy Endpoints 
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-destroy-endpoints"
+>>>>>>> tf
     entrypoint: bash
     args:
       - -c
       - |
+<<<<<<< HEAD
         exec gcloud builds submit --config builds/terraform/infra-destroy-deploy-pipeline.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   
   # Destroy GKE clusters
+=======
+        exec gcloud builds submit --config builds/terraform/infra-destroy-endpoints.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+   #  Destroy GKE clusters
+>>>>>>> tf
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-destroy-gke"
     entrypoint: bash
@@ -37,7 +48,10 @@ steps:
       - -c
       - |
         exec gcloud builds submit --config builds/terraform/infra-destroy-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+<<<<<<< HEAD
   
+=======
+>>>>>>> tf
   # Destroy VPC
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-destroy-vpc"
@@ -46,6 +60,7 @@ steps:
       - -c
       - |
         exec gcloud builds submit --config builds/terraform/infra-destroy-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+<<<<<<< HEAD
  
  # Destroy Repos
   - name: "gcr.io/cloud-builders/gcloud"
@@ -58,6 +73,11 @@ steps:
   
   # Destory APIs
   - name: "gcr.io/cloud-builders/gcloud"
+=======
+  
+  # Disable APIs
+  - name: "gcr.io/cloud-builders/gcloud"
+>>>>>>> tf
     id: "infra-disable-apis"
     entrypoint: bash
     args:
@@ -65,11 +85,15 @@ steps:
       - |
         exec gcloud builds submit --config builds/terraform/infra-disable-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
 
+<<<<<<< HEAD
 
   # 0 Destroy GCS storage bucket for TF state, project files, vars.sh etc
+=======
+  # Destroy GCS storage bucket for TF state, project files, vars.sh etc
+>>>>>>> tf
   # This step deletes the GCS storage bucket in the project with the name of project ID.
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "00-infra-delete-gcs"
+    id: "infra-delete-gcs"
     entrypoint: bash
     args:
       - -c

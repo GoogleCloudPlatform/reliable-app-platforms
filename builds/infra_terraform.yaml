@@ -16,7 +16,8 @@ timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _VPC: "true"
-  _GKE: "true" 
+  _GKE: "true"
+  _ENDPOINTS: "true"
 tags:
   - infra-main-terraform
 steps:
@@ -66,11 +67,13 @@ steps:
       - |
         [[ "${_GKE}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
- # Create Deployment pipelines
+ 
+ # 4 Create Service Endpoints
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "infra-create-deploy-pipeline"
+    id: "infra-create-endpoints"
     entrypoint: bash
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/terraform/infra-create-deploy-pipeline.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        [[ "${_ENDPOINTS}" == "false" ]] && exit 0
+        exec gcloud builds submit --config builds/terraform/infra-create-endpoints.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}        

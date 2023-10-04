@@ -75,5 +75,4 @@ steps:
     args:
       - -c
       - |
-        [[ "${_ENDPOINTS}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/terraform/infra-create-endpoints.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}        
+        exec gcloud builds submit --config builds/cloudbuild/infra-create-endpoints.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}        

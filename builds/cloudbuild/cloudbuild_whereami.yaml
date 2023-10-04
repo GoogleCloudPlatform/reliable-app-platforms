@@ -23,9 +23,9 @@ steps:
   args:
     - -c
     - |
-      for i in whereami-frontend whereami-backend;
-      do
-        echo $i 
-        exec gcloud builds submit --config builds/cloudbuild/cloudbuild.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_IMAGE=$i,_APPLICATION="whereami"
-      done       
+        for i in whereami-frontend whereami-backend; do
+          echo $i
+          exec gcloud builds submit --config builds/cloudbuild/cloudbuild.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_IMAGE=$i,_APPLICATION="whereami"
+        done
+
   

@@ -15,9 +15,10 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _VPC: "true"
-  _GKE: "true"
-  _ENDPOINTS: "true"
+  _VPC: "false"
+  _GKE: "false"
+  _ENDPOINTS: "false"
+  _DEPLOY_PIPELINE: "false"
 tags:
   - infra-main-terraform
 steps:
@@ -75,4 +76,39 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/cloudbuild/infra-create-endpoints.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}        
+        [[ "${_ENDPOINTS}" == "false" ]] && exit 0
+        exec gcloud builds submit --config builds/terraform/infra-create-endpoints.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}   
+
+# 5 Create deploy pipelines and targets
+  # This step creates deploy pipelines and makes each cluster a target for deploy
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-create-deploy-pipelines"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_DEPLOY_PIPELINE}" == "false" ]] && exit 0
+        exec gcloud builds submit --config builds/terraform/infra-create-deploy-pipeline.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+
+# Confirm Mesh on GKE
+  # This step confirms that ASM managed control plane (MCP) is successfully Provisioned on prod GKE clusters.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-features-gke-prod-mesh-confirm"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-features-gke-prod-mesh-confirm.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+
+  # Configure Mesh (multicluster and telemetry) on GKE
+  # This step configures multicluster service discovery and access logging/tracing on the GKE clusters.
+  # This step creates the following resources:
+  #   1. Patches the existing asm-options configmap with multicluster_mode: connected.
+  #   2. Updates the istio-asm-managed configmap with access logging and tracing to stackdriver
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-features-gke-prod-mesh-config"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-features-gke-prod-mesh-config.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}

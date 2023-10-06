@@ -12,6 +12,7 @@ module "gke" {
   ip_range_pods              = each.value.pod_cidr_name
   ip_range_services          = each.value.svc_cidr_name
   horizontal_pod_autoscaling = true
+  cluster_resource_labels    = {"env": each.value.env}
 }
 
 module "gke-config-cluster" {

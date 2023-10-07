@@ -112,3 +112,27 @@ steps:
       - -c
       - |
         exec gcloud builds submit --config builds/infra-features-gke-prod-mesh-config.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+# Configure Mesh Gateways via ACM ConfigSync
+  # This step deploys ASM ingress, egress and eastwest gateways on all apps (dev, stage and prod but not config) clusters.
+  # This step creates the following resources:
+  #   1. Ingress gateway Deployment, Service and ServiceExport.
+  #   2. Egress gateway Deployment, Service and ServiceExport.
+  #   3. Eastwest gateway Deployment, Service and ServiceExport.
+  #   4. Required Role and RoleBinding for the KSA for all the gateways.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-features-gke-mesh-gateways"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  
+  # # Confirm Mesh gateways on GKE - prod
+  # # This step confirms that the ASM ingress, egress and eastwest gateways are up and running on the prod GKE clusters.
+  # - name: "gcr.io/cloud-builders/gcloud"
+  #   id: "infra-features-gke-mesh-gateways-prod"
+  #   entrypoint: bash
+  #   args:
+  #     - -c
+  #     - |
+  #       exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}

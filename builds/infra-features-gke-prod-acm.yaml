@@ -36,12 +36,12 @@ steps:
     - |
       source vars.sh
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator-prod1.yaml
-      while [[ $(gcloud container clusters describe $${GKE_PROD1_NAME} --zone $${GKE_PROD1_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
+      while [[ $(gcloud container clusters describe $${GKE_PROD1_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
         echo "Waiting for $${GKE_PROD1_NAME} cluster to be RUNNING."
         sleep 5
       done
       touch gke-prod1-acm-konfig && export KUBECONFIG=gke-prod1-acm-konfig && \
-      gcloud container clusters get-credentials $${GKE_PROD1_NAME} --zone $${GKE_PROD1_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD1_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
       kubectl --kubeconfig=gke-prod1-acm-konfig apply -f config-management-operator-prod1.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD1_NAME}/" acm/config-management-cluster.yaml > acm/config-management-prod1.yaml
       kubectl --kubeconfig=gke-prod1-acm-konfig apply -f acm/config-management-prod1.yaml
@@ -76,12 +76,12 @@ steps:
     - |
       source vars.sh
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator-prod2.yaml
-      while [[ $(gcloud container clusters describe $${GKE_PROD2_NAME} --zone $${GKE_PROD2_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
+      while [[ $(gcloud container clusters describe $${GKE_PROD2_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
         echo "Waiting for $${GKE_PROD2_NAME} cluster to be RUNNING."
         sleep 5
       done
       touch gke-prod2-acm-konfig && export KUBECONFIG=gke-prod2-acm-konfig && \
-      gcloud container clusters get-credentials $${GKE_PROD2_NAME} --zone $${GKE_PROD2_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD2_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
       kubectl --kubeconfig=gke-prod2-acm-konfig apply -f config-management-operator-prod2.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD2_NAME}/" acm/config-management-cluster.yaml > acm/config-management-prod2.yaml
       kubectl --kubeconfig=gke-prod2-acm-konfig apply -f acm/config-management-prod2.yaml
@@ -103,12 +103,12 @@ steps:
     - |
       source vars.sh
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator-prod3.yaml
-      while [[ $(gcloud container clusters describe $${GKE_PROD3_NAME} --zone $${GKE_PROD3_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
+      while [[ $(gcloud container clusters describe $${GKE_PROD3_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
         echo "Waiting for $${GKE_PROD3_NAME} cluster to be RUNNING."
         sleep 5
       done
       touch gke-prod3-acm-konfig && export KUBECONFIG=gke-prod3-acm-konfig && \
-      gcloud container clusters get-credentials $${GKE_PROD3_NAME} --zone $${GKE_PROD3_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD3_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
       kubectl --kubeconfig=gke-prod3-acm-konfig apply -f config-management-operator-prod3.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD3_NAME}/" acm/config-management-cluster.yaml > acm/config-management-prod3.yaml
       kubectl --kubeconfig=gke-prod3-acm-konfig apply -f acm/config-management-prod3.yaml
@@ -130,12 +130,12 @@ steps:
     - |
       source vars.sh
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator-prod4.yaml
-      while [[ $(gcloud container clusters describe $${GKE_PROD4_NAME} --zone $${GKE_PROD4_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
+      while [[ $(gcloud container clusters describe $${GKE_PROD4_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
         echo "Waiting for $${GKE_PROD4_NAME} cluster to be RUNNING."
         sleep 5
       done
       touch gke-prod4-acm-konfig && export KUBECONFIG=gke-prod4-acm-konfig && \
-      gcloud container clusters get-credentials $${GKE_PROD4_NAME} --zone $${GKE_PROD4_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD4_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
       kubectl --kubeconfig=gke-prod4-acm-konfig apply -f config-management-operator-prod4.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD4_NAME}/" acm/config-management-cluster.yaml > acm/config-management-prod4.yaml
       kubectl --kubeconfig=gke-prod4-acm-konfig apply -f acm/config-management-prod4.yaml
@@ -157,12 +157,12 @@ steps:
     - |
       source vars.sh
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator-prod5.yaml
-      while [[ $(gcloud container clusters describe $${GKE_PROD5_NAME} --zone $${GKE_PROD5_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
+      while [[ $(gcloud container clusters describe $${GKE_PROD5_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
         echo "Waiting for $${GKE_PROD5_NAME} cluster to be RUNNING."
         sleep 5
       done
       touch gke-prod5-acm-konfig && export KUBECONFIG=gke-prod5-acm-konfig && \
-      gcloud container clusters get-credentials $${GKE_PROD5_NAME} --zone $${GKE_PROD5_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD5_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
       kubectl --kubeconfig=gke-prod5-acm-konfig apply -f config-management-operator-prod5.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD5_NAME}/" acm/config-management-cluster.yaml > acm/config-management-prod5.yaml
       kubectl --kubeconfig=gke-prod5-acm-konfig apply -f acm/config-management-prod5.yaml
@@ -184,12 +184,12 @@ steps:
     - |
       source vars.sh
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator-prod6.yaml
-      while [[ $(gcloud container clusters describe $${GKE_PROD6_NAME} --zone $${GKE_PROD6_LOCATION} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
+      while [[ $(gcloud container clusters describe $${GKE_PROD6_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID} --format="value(status)") != "RUNNING" ]]; do
         echo "Waiting for $${GKE_PROD6_NAME} cluster to be RUNNING."
         sleep 5
       done
       touch gke-prod6-acm-konfig && export KUBECONFIG=gke-prod6-acm-konfig && \
-      gcloud container clusters get-credentials $${GKE_PROD6_NAME} --zone $${GKE_PROD6_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD6_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
       kubectl --kubeconfig=gke-prod6-acm-konfig apply -f config-management-operator-prod6.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD6_NAME}/" acm/config-management-cluster.yaml > acm/config-management-prod6.yaml
       kubectl --kubeconfig=gke-prod6-acm-konfig apply -f acm/config-management-prod6.yaml

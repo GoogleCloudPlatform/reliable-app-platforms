@@ -16,7 +16,7 @@ resource "google_gke_hub_feature_membership" "asm_feature_member" {
   }
 }
 
-
+# TODO: Remove config cluster from asm?
 resource "google_gke_hub_feature_membership" "asm_config_feature_member" {
   feature    = google_gke_hub_feature.asm_feature.name
   location   = module.config-hub.location

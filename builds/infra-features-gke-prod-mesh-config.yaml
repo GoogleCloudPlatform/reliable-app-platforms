@@ -30,7 +30,7 @@ steps:
     - |
       source vars.sh
       while [[ $(gcloud container clusters list --project ${_PROJECT_ID} --filter "STATUS=RUNNING AND resourceLabels.env:prod" --format="value(name)"| wc -l | awk '{print $1}') != "6" ]]; do
-        echo "Waiting for all dev the cluster to be RUNNING."
+        echo "Waiting for all the cluster to be RUNNING."
         sleep 5
       done
       gcloud container clusters get-credentials $${GKE_PROD1_NAME} --zone $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}

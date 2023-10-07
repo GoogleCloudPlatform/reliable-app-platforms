@@ -30,60 +30,12 @@ steps:
     - |
       source ../infra/vars.sh
       mkdir -p /workspace/clusterregistry
-      sed -e "s/CLUSTER_NAME/$${GKE_DEV1_NAME}/" -e "s/ENV/dev/" -e "s/REGION/$${GKE_DEV_REGION_1}/" -e "s/ZONE/$${GKE_DEV1_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_DEV1_NAME}.yaml
-      sed -e "s/CLUSTER_NAME/$${GKE_DEV2_NAME}/" -e "s/ENV/dev/" -e "s/REGION/$${GKE_DEV_REGION_1}/" -e "s/ZONE/$${GKE_DEV2_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_DEV2_NAME}.yaml
-      sed -e "s/CLUSTER_NAME/$${GKE_DEV3_NAME}/" -e "s/ENV/dev/" -e "s/REGION/$${GKE_DEV_REGION_1}/" -e "s/ZONE/$${GKE_DEV3_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_DEV3_NAME}.yaml
-      sed -e "s/CLUSTER_NAME/$${GKE_DEV4_NAME}/" -e "s/ENV/dev/" -e "s/REGION/$${GKE_DEV_REGION_2}/" -e "s/ZONE/$${GKE_DEV4_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_DEV4_NAME}.yaml
-      sed -e "s/CLUSTER_NAME/$${GKE_DEV5_NAME}/" -e "s/ENV/dev/" -e "s/REGION/$${GKE_DEV_REGION_2}/" -e "s/ZONE/$${GKE_DEV5_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_DEV5_NAME}.yaml
-      sed -e "s/CLUSTER_NAME/$${GKE_DEV6_NAME}/" -e "s/ENV/dev/" -e "s/REGION/$${GKE_DEV_REGION_2}/" -e "s/ZONE/$${GKE_DEV6_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_DEV6_NAME}.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD1_NAME}/" -e "s/ENV/prod/" -e "s/REGION/$${GKE_PROD_REGION_1}/" -e "s/ZONE/$${GKE_PROD1_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_PROD1_NAME}.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD2_NAME}/" -e "s/ENV/prod/" -e "s/REGION/$${GKE_PROD_REGION_1}/" -e "s/ZONE/$${GKE_PROD2_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_PROD2_NAME}.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD3_NAME}/" -e "s/ENV/prod/" -e "s/REGION/$${GKE_PROD_REGION_1}/" -e "s/ZONE/$${GKE_PROD3_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_PROD3_NAME}.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD4_NAME}/" -e "s/ENV/prod/" -e "s/REGION/$${GKE_PROD_REGION_2}/" -e "s/ZONE/$${GKE_PROD4_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_PROD4_NAME}.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD5_NAME}/" -e "s/ENV/prod/" -e "s/REGION/$${GKE_PROD_REGION_2}/" -e "s/ZONE/$${GKE_PROD5_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_PROD5_NAME}.yaml
       sed -e "s/CLUSTER_NAME/$${GKE_PROD6_NAME}/" -e "s/ENV/prod/" -e "s/REGION/$${GKE_PROD_REGION_2}/" -e "s/ZONE/$${GKE_PROD6_LOCATION}/" -e "s/TYPE/apps/" -e "s/INFRA/gcp/" clusterregistry/cluster.yaml > /workspace/clusterregistry/cluster-$${GKE_PROD6_NAME}.yaml
-- name: "gcr.io/cloud-builders/gcloud"
-  id: "infra-app-clusterselector-resources-dev"
-  dir: "acm"
-  entrypoint: bash
-  args:
-    - -c
-    - |
-      source ../infra/vars.sh
-      mkdir -p /workspace/clusterregistry
-      sed -e "s/NAME/apz-d-r1-ab/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: zone\n      operator: In\n      values:\n      - $${GKE_DEV1_LOCATION}\n      - $${GKE_DEV2_LOCATION}\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-apz-d-r1-ab.yaml
-      sed -e "s/NAME/apz-d-r1-ac/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: zone\n      operator: In\n      values:\n      - $${GKE_DEV1_LOCATION}\n      - $${GKE_DEV3_LOCATION}\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-apz-d-r1-ac.yaml
-      sed -e "s/NAME/apz-d-r1-bc/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: zone\n      operator: In\n      values:\n      - $${GKE_DEV2_LOCATION}\n      - $${GKE_DEV3_LOCATION}\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-apz-d-r1-bc.yaml
-      sed -e "s/NAME/apz-d-r2-ab/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: zone\n      operator: In\n      values:\n      - $${GKE_DEV4_LOCATION}\n      - $${GKE_DEV5_LOCATION}\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-apz-d-r2-ab.yaml
-      sed -e "s/NAME/apz-d-r2-ac/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: zone\n      operator: In\n      values:\n      - $${GKE_DEV4_LOCATION}\n      - $${GKE_DEV6_LOCATION}\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-apz-d-r2-ac.yaml
-      sed -e "s/NAME/apz-d-r2-bc/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: zone\n      operator: In\n      values:\n      - $${GKE_DEV5_LOCATION}\n      - $${GKE_DEV6_LOCATION}\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-apz-d-r2-bc.yaml
-      sed -e "s/NAME/mz-d-r1/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: region\n      operator: In\n      values:\n      - $${GKE_DEV_REGION_1}\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-mz-d-r1.yaml
-      sed -e "s/NAME/mz-d-r2/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: region\n      operator: In\n      values:\n      - $${GKE_DEV_REGION_2}\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-mz-d-r2.yaml
-      sed -e "s/NAME/apr-d/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-apr-d.yaml
-      sed -e "s/NAME/ir-d/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-ir-d.yaml
-      sed -e "s/NAME/g-d/" -e \
-        "s/MATCH/    matchExpressions:\n    - key: env\n      operator: In\n      values:\n      - dev/" \
-         clusterregistry/clusterselector.yaml > /workspace/clusterregistry/clusterselector-g-d.yaml
 - name: "gcr.io/cloud-builders/gcloud"
   id: "infra-app-clusterselector-resources-prod"
   dir: "acm"
@@ -138,9 +90,8 @@ steps:
       git config --global user.name "cloudbuild-ci"
       gcloud source repos clone config --project=${_PROJECT_ID}
       cp -r /workspace/clusterregistry config/
-      cp -r dev config/
       cp -r prod config/
       cp -r policies config/
       cd config
-      git add . && git commit -am "Deploy Clusters, ClusterSelectors, Mesh policy bundle and whereami app to dev and prod env"
+      git add . && git commit -am "Deploy Clusters, ClusterSelectors, Mesh policy bundle and whereami app to prod env"
       git push

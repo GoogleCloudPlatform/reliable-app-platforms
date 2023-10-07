@@ -127,12 +127,42 @@ steps:
       - |
         exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   
-  # # Confirm Mesh gateways on GKE - prod
-  # # This step confirms that the ASM ingress, egress and eastwest gateways are up and running on the prod GKE clusters.
+  # Confirm Mesh gateways on GKE - prod
+  # This step confirms that the ASM ingress, egress and eastwest gateways are up and running on the prod GKE clusters.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-features-gke-mesh-gateways-prod"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  # Install clusterselectros, mesh policy bundles and test application to verify mesh - Whereami
+  # This step deploys a sample/test application called `whereami` on all apps (prod but not config) clusters.
+  # This step creates the following resources:
+  #   1. Namespace called `whereami-prod` for the respective clusters.
+  #   2. `whereami-frontend-prod` and `whereami-backend-prod` in the `whereami-prod` namespace in the prod GKE clusters.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-app-whereami-acm"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+         exec gcloud builds submit --config builds/infra-acm-selectors-policies-whereami-test-app.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  # # Verify whereami on GKE Prod
+  # # This step confirms that the `whereami` app (both frontend and backend) is running on the prod GKE clusters.
   # - name: "gcr.io/cloud-builders/gcloud"
-  #   id: "infra-features-gke-mesh-gateways-prod"
+  #   id: "infra-app-whereami-prod"
   #   entrypoint: bash
   #   args:
   #     - -c
   #     - |
-  #       exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  #       exec gcloud builds submit --config builds/infra-app-whereami-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  # # Verify multicluster connectivity on GKE Prod
+  # # This step uses a shell script and the `whereami` sample to test connectivity between all prod GKE clusters.
+  # - name: "gcr.io/cloud-builders/gcloud"
+  #   id: "infra-app-whereami-multicluster-prod"
+  #   entrypoint: bash
+  #   args:
+  #     - -c
+  #     - |
+  #       exec gcloud builds submit --config builds/infra-app-whereami-multicluster-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}

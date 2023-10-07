@@ -37,55 +37,55 @@ steps:
         echo "Waiting for all dev the cluster to be RUNNING."
         sleep 5
       done
-      gcloud container clusters get-credentials $${GKE_PROD1_NAME} --zone $${GKE_PROD1_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD2_NAME} --zone $${GKE_PROD2_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD3_NAME} --zone $${GKE_PROD3_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD4_NAME} --zone $${GKE_PROD4_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD5_NAME} --zone $${GKE_PROD5_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD6_NAME} --zone $${GKE_PROD6_LOCATION} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD1_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD2_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD3_NAME} --region $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD4_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD5_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD6_NAME} --region $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
       export PROD1_NOMOS_STATUS=0
       until [[ $$PROD1_NOMOS_STATUS == "SYNCED" ]]
       do
-        export PROD1_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD1_LOCATION}_$${GKE_PROD1_NAME} | sed -n 6p | awk '{print $1;}')
+        export PROD1_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD1_NAME} | sed -n 6p | awk '{print $1;}')
         echo -e "PROD1_NOMOS_STATUS is $$PROD1_NOMOS_STATUS"
         sleep 5
       done
       export PROD2_NOMOS_STATUS=0
       until [[ $$PROD2_NOMOS_STATUS == "SYNCED" ]]
       do
-        export PROD2_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD2_LOCATION}_$${GKE_PROD2_NAME} | sed -n 6p | awk '{print $1;}')
+        export PROD2_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD2_NAME} | sed -n 6p | awk '{print $1;}')
         echo -e "PROD2_NOMOS_STATUS is $$PROD2_NOMOS_STATUS"
         sleep 5
       done
       export PROD3_NOMOS_STATUS=0
       until [[ $$PROD3_NOMOS_STATUS == "SYNCED" ]]
       do
-        export PROD3_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD3_LOCATION}_$${GKE_PROD3_NAME} | sed -n 6p | awk '{print $1;}')
+        export PROD3_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD3_NAME} | sed -n 6p | awk '{print $1;}')
         echo -e "PROD3_NOMOS_STATUS is $$PROD3_NOMOS_STATUS"
         sleep 5
       done
       export PROD4_NOMOS_STATUS=0
       until [[ $$PROD4_NOMOS_STATUS == "SYNCED" ]]
       do
-        export PROD4_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD4_LOCATION}_$${GKE_PROD4_NAME} | sed -n 6p | awk '{print $1;}')
+        export PROD4_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD4_NAME} | sed -n 6p | awk '{print $1;}')
         echo -e "PROD4_NOMOS_STATUS is $$PROD4_NOMOS_STATUS"
         sleep 5
       done
       export PROD5_NOMOS_STATUS=0
       until [[ $$PROD5_NOMOS_STATUS == "SYNCED" ]]
       do
-        export PROD5_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD5_LOCATION}_$${GKE_PROD5_NAME} | sed -n 6p | awk '{print $1;}')
+        export PROD5_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD5_NAME} | sed -n 6p | awk '{print $1;}')
         echo -e "PROD5_NOMOS_STATUS is $$PROD5_NOMOS_STATUS"
         sleep 5
       done
       export PROD6_NOMOS_STATUS=0
       until [[ $$PROD6_NOMOS_STATUS == "SYNCED" ]]
       do
-        export PROD6_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD6_LOCATION}_$${GKE_PROD6_NAME} | sed -n 6p | awk '{print $1;}')
+        export PROD6_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD6_NAME} | sed -n 6p | awk '{print $1;}')
         echo -e "PROD6_NOMOS_STATUS is $$PROD6_NOMOS_STATUS"
         sleep 5
       done
-      for CTX in gke_${_PROJECT_ID}_$${GKE_PROD1_LOCATION}_$${GKE_PROD1_NAME} gke_${_PROJECT_ID}_$${GKE_PROD2_LOCATION}_$${GKE_PROD2_NAME} gke_${_PROJECT_ID}_$${GKE_PROD3_LOCATION}_$${GKE_PROD3_NAME} gke_${_PROJECT_ID}_$${GKE_PROD4_LOCATION}_$${GKE_PROD4_NAME} gke_${_PROJECT_ID}_$${GKE_PROD5_LOCATION}_$${GKE_PROD5_NAME} gke_${_PROJECT_ID}_$${GKE_PROD6_LOCATION}_$${GKE_PROD6_NAME}
+      for CTX in gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD1_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD2_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD3_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD4_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD5_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD6_NAME}
       do
         echo -e "Checking whereami status for $$CTX..."
         kubectl --context=$$CTX wait --for=condition=Available deployment whereami-frontend -n whereami-prod --timeout 5m

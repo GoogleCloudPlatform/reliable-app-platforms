@@ -5,6 +5,5 @@ metadata:
   labels:
     env: ENV
     region: REGION
-    zone: ZONE
     type: TYPE
     infra: INFRA

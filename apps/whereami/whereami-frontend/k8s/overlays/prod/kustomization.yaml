@@ -9,4 +9,4 @@ bases:
 - ./destrule.yaml
 - ./virtualservice.yaml
 patches:
-- cm-flag.yaml
+  - path: cm-flag.yaml

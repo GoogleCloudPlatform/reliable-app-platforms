@@ -1,13 +1,20 @@
 # Building Reliable Platforms on GCP with Google SRE
 
-_Last tested on 06/05/2023 by @ameer00_
+_Last tested on 11/03/2023 by @stevemcghee
 
 <!-- ![image.png](./image.png) -->
-<img src="/img/arch52.png" width=70% height=70%>
+<img src="img/arch52.png" width=70% height=70%>
 
-_Figure: Global Anycast with regional isolated stacks and global database deployment model._
+_Figure: An Archetype: Global Anycast with regional isolated stacks and global database deployment model._
 
-[Deployment Archetypes for Cloud Applcations](https://arxiv.org/pdf/2105.00560.pdf)
+<img src="img/arch-diagram.png" width=70% height=70%>
+
+_Figure: An Architecture: The same archetype as deployed on Google Cloud._
+
+
+This is derived from the whitepaper: [Deployment Archetypes for Cloud Applcations](https://arxiv.org/pdf/2105.00560.pdf)
+
+Also explained here: <https://cloud.google.com/architecture/deployment-archetypes>
 
 ## Getting started
 
@@ -135,3 +142,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
 
    After commiting, you can view the [Cloud Build pipeline](https://console.cloud.google.com/cloud-build).
    Cloud Build will build the image and eventually trigger the [Cloud Deploy pipeline](https://console.cloud.google.com/deploy).
+
+1. You can access your apps using the following URL patterns:
+   * `https://{app_name}.endpoints.${project_name}.cloud.goog/`
+     * eg: <https://whereami.endpoints.foo-bar-test.cloud.goog/>

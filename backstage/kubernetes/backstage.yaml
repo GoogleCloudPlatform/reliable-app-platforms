@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: backstage
-          image: backstage:1.0.0
+#          image: backstage:1.0.0
+          image: gcr.io/smcghee-backstage/backstage:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

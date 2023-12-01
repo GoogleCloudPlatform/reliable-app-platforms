@@ -35,7 +35,7 @@ import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 
 import { googleAuthApiRef } from '@backstage/core-plugin-api';
-import { githubAuthApiRef } from '@backstage/core-plugin-api';
+// import { githubAuthApiRef } from '@backstage/core-plugin-api';
 import { SignInPage } from '@backstage/core-components';
 
 const app = createApp({

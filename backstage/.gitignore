@@ -23,7 +23,6 @@ node_modules/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-yarn.lock
 yarn.integrity
 
 # Node version directives

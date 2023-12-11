@@ -1,3 +1,4 @@
+# TODO: can remove this
 resource "google_gke_hub_feature" "gke-config-mci" {
   name     = "multiclusteringress"
   location = "global"

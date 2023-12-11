@@ -91,7 +91,8 @@ steps:
       gcloud source repos clone config --project=${_PROJECT_ID}
       cp -r /workspace/clusterregistry config/
       cp -r prod config/
-      cp -r policies config/
       cd config
       git add . && git commit -am "Deploy Clusters, ClusterSelectors, Mesh policy bundle and whereami app to prod env"
       git push
+
+#      cp -r policies config/

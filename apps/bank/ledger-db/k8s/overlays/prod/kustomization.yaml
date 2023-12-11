@@ -1,5 +1,0 @@
-namespace: "bank-ledger-db"
-commonLabels:
-  app: ledger-db
-bases:
-- ../../base

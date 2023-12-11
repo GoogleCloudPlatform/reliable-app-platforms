@@ -14,13 +14,13 @@
 
 timeout: 7200s # 2hr
 tags:
-  - app-repos-pipelines
+  - acm-repos-pipelines
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 steps:
 - name: "hashicorp/terraform:1.4.6"
-  id: '00-repos-all-services'
-  dir: infra/terraform/source-repos
+  id: '00-repos-acm'
+  dir: infra/terraform/acm-repos
   entrypoint: sh
   args:
     - "-xe"

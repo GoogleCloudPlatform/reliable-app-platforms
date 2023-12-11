@@ -32,17 +32,4 @@ export GKE_PROD6_LOCATION=us-west2-c
 export GKE_CONFIG_NAME=prod-us-west2-0
 export GKE_CONFIG_REGION=us-central1
 export GKE_CONFIG_LOCATION=us-central1-a
-# ASM
-export ASM_VERSION=1.14.3-asm.0
-# Spanner
-export SPANNER_NAME=shop
-export SPANNER_REGION=us-central1
-# CloudSQL
-export CLOUDSQL_NAME=bank
-export CLOUDSQL_REGION=us-central1
-# Shop
-export SHOP_APP_NAME=shop
-# Bank
-export BANK_APP_NAME=bank
-# Whereami
-export WHEREAMI_APP_NAME=whereami
+

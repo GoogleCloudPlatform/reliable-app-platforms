@@ -29,7 +29,10 @@ export GKE_PROD5_LOCATION=us-west2-b
 export GKE_PROD6_NAME=prod-us-west2-2
 export GKE_PROD6_LOCATION=us-west2-c
 # GKE Config
-export GKE_CONFIG_NAME=prod-us-west2-0
+export GKE_CONFIG_NAME=config-us-central1
 export GKE_CONFIG_REGION=us-central1
 export GKE_CONFIG_LOCATION=us-central1-a
+
+
+
 

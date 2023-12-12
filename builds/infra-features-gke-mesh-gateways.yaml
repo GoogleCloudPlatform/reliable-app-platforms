@@ -60,13 +60,11 @@ steps:
     - |
         export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
         echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
-        gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos
-        chmod +x nomos
         git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
         git config --global user.name "cloudbuild-ci"
-        gcloud source repos clone config --project=${_PROJECT_ID}
-        mkdir -p config/gateway
-        cp -r gateway.yaml config/gateway
-        cd config
+        gcloud source repos clone gateway --project=${_PROJECT_ID}
+        mkdir -p gateway/mcg
+        cp -r gateway.yaml gateway/mcg
+        cd gateway
         git add . && git commit -am "Deploy Gateway"
         git push

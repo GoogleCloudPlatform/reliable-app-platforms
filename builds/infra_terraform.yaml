@@ -136,4 +136,11 @@ steps:
       - -c
       - |
         exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  
+  # Deploy MC Gateway to config cluster
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-features-gke-gateways"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-features-gke-gateway.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}

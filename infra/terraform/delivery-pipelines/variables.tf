@@ -2,10 +2,10 @@ variable "project_id" {
   description = "Project ID"
 }
 
-variable "service_names" {
-  type        = list(string)
-  description = "list of service names"
-  default     = ["whereami-frontend", "whereami-backend", "shop-ad", "shop-cart", "shop-checkout", "shop-currency", "shop-email", "shop-frontend", "shop-loadgenerator", "shop-payment", "shop-productcatalog", "shop-recommendation", "shop-shipping", "shop-redis", "bank-accounts-db", "bank-balancereader", "bank-contacts", "bank-frontend", "bank-ledger-db", "bank-ledgerwriter", "bank-loadgenerator", "bank-transactionhistory", "bank-user"]
+variable "service_name" {
+  description = "Name of the service"
+  type = string
+  default = "Unnamed"
 }
 
 variable "pipeline_location" {
@@ -13,3 +13,20 @@ variable "pipeline_location" {
   type        = string
   default     = "us-central1"
 }
+
+variable "archetype"{
+  description = "Archetype to deploy service with. Accepted types are SZ (Single Zone), APZ (Active Passive Zone), MZ (Multi Zonal), APR (Active Passive Region), IR (Isolated Region) and G (Global)"
+  type = string
+  default = "SZ"
+}
+
+variable "region_index" {
+  description = "Region index to deploy service to. Needs to be set for APR, IR"
+  type = list(number) 
+}
+
+variable "zone_index" {
+  description = "Zone index to deploy service to. Needs to be set for SZ, APZ, MZ"
+  type = list(number)
+}
+

@@ -17,7 +17,7 @@ spec:
       containers:
         - name: backstage
 #          image: backstage:1.0.0
-          image: gcr.io/smcghee-backstage/backstage:latest
+          image: us-docker.pkg.dev/arch52-test/ops/backstage:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

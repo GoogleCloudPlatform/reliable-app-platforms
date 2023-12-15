@@ -28,7 +28,7 @@ spec:
             - secretRef:
                 name: backstage-secrets
             - secretRef:
-                name: google-auth-secrets
+                name: google-oauth-secrets
             - secretRef:
                 name: github-secrets
 # Uncomment if health checks are enabled in your app:

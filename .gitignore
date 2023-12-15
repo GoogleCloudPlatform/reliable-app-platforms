@@ -1,3 +1,7 @@
 backstage/yarn.lock
 node_modules/.yarn-integrity
 yarn.lock
+
+kubernetes/backstage-secrets.yaml
+kubernetes/google-oauth-secrets.yaml
+kubernetes/github-secrets.yaml

@@ -27,6 +27,10 @@ spec:
                 name: postgres-secrets
             - secretRef:
                 name: backstage-secrets
+            - secretRef:
+                name: google-auth-secrets
+            - secretRef:
+                name: github-secrets
 # Uncomment if health checks are enabled in your app:
 # https://backstage.io/docs/plugins/observability#health-checks
 #          readinessProbe:

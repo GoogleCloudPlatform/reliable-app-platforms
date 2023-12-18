@@ -1,7 +1,11 @@
-output "module_targets" {
+output "deploy_targets" {
   value = module.deploy-pipeline.targets
 }
 
-# output "module_pipeline" {
-#   value = module.deploy-pipeline.pipeline_id
-# }
+output "pipeline_id" {
+  value = module.deploy-pipeline.pipeline_id
+}
+
+output "endpoint" {
+  value = module.endpoint.endpoints
+}

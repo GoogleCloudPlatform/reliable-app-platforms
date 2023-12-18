@@ -15,16 +15,15 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _VPC: "true"
-  _GKE: "true"
-  _GCLB: "true"
+  _VPC: "false"
+  _GKE: "false"
 tags:
   - infra-main-terraform
 steps:
-  # 0 Build GCS storage bucket for TF state, project files, vars.sh etc
+  # Build GCS storage bucket for TF state, project files, vars.sh etc
   # This step creates a GCS storage bucket in the project with the name of project ID.
   # This step creates the following resources:
-  #   1. GCS storage bucket (with versioning enabled) named PROJECT_ID.
+  # GCS storage bucket (with versioning enabled) named PROJECT_ID.
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-create-gcs"
     entrypoint: bash
@@ -32,7 +31,7 @@ steps:
       - -c
       - |
         exec gcloud builds submit --config builds/terraform/infra-create-gcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # 1 Enable APIs
+  # Enable APIs
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-enable-apis"
     entrypoint: bash
@@ -68,16 +67,15 @@ steps:
         [[ "${_GKE}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  
- # Create GCLB
+ # Deploy MC Gateway to Config cluster
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "infra-create-gclb"
+    id: "infra-features-gke-gateways"
     entrypoint: bash
     args:
       - -c
       - |
-        [[ "${_GCLB}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/terraform/infra-create-gclb.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}   
-
+        exec gcloud builds submit --config builds/infra-features-gke-gateway.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+ 
 # Store platform parameter values in cloud-storage
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-store-platform-values"
@@ -133,11 +131,4 @@ steps:
       - -c
       - |
         exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
-  # Deploy MC Gateway to config cluster
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "infra-features-gke-gateways"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        exec gcloud builds submit --config builds/infra-features-gke-gateway.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  

@@ -45,7 +45,7 @@ while [ "$1" != "" ]; do
 done
 
 # Set project to PROJECT_ID or exit
-[[ ! "${PROJECT_ID}" ]] && echo -e "Please export PROJECT_ID variable (\e[95mexport PROJECT_ID=<YOUR POROJECT ID>\e[0m)\nExiting." && exit 0
+[[ ! "${PROJECT_ID}" ]] && echo -e "Please export PROJECT_ID variable (\e[95mexport PROJECT_ID=<YOUR PROJECT ID>\e[0m)\nExiting." && exit 0
 echo -e "\e[95mPROJECT_ID is set to ${PROJECT_ID}\e[0m"
 gcloud config set core/project ${PROJECT_ID}
 

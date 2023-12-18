@@ -13,3 +13,9 @@ module "deploy-pipeline"{
     zone_index = var.zone_index
     region_index = var.region_index
 }
+
+module "endpoint" {
+    source = "../../../../../../../platform_modules/terraform/endpoints"
+    project_id = var.project_id
+    service_name = var.service_name
+}

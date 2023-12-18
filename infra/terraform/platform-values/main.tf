@@ -9,9 +9,3 @@ resource "google_storage_bucket_object" "cluster_info" {
   content = jsonencode(local.clusters_info)
   bucket = var.project_id
 }
-
-resource "google_storage_bucket_object" "lb_info" {
-  name   = "platform-values/gclb.json"
-  content = jsonencode(local.ip_address)
-  bucket = var.project_id
-}

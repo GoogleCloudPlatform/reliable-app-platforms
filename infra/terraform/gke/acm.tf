@@ -49,10 +49,9 @@ resource "google_gke_hub_feature_membership" "acm_feature_member" {
 }
 
 resource "google_gke_hub_feature_membership" "acm_gateway_feature_member" {
-  for_each   = module.config-hub
-  location   = each.value.location
+  location   = module.config-hub.location
   feature    = google_gke_hub_feature.acm_feature.name
-  membership = each.value.cluster_membership_id
+  membership = module.config-hub.cluster_membership_id
   project    = var.project_id
   configmanagement {
     version = "1.15.1"

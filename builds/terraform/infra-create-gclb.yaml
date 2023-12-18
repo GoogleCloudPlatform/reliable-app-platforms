@@ -14,17 +14,20 @@
 
 timeout: 7200s # 2hr
 tags:
-  - delete-acm-repos
+  - infra-create-gclb
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
+  _BUILD: "true"
 steps:
+# Create Endpoints services
 - name: "hashicorp/terraform:1.4.6"
-  id: '00-delete-acm-repos'
-  dir: infra/terraform/acm-repos
-  entrypoint: sh
+  id: "create-gclb"
+  entrypoint: "sh"
+  dir: "infra/terraform/gclb"
   args:
     - "-xe"
     - "-c"
     - |
-        terraform init -backend-config="bucket=${_PROJECT_ID}" 
-        terraform destroy -var="project_id=${_PROJECT_ID}" --auto-approve
+      [[ "${_BUILD}" == "false" ]] && exit 0
+      terraform init -backend-config="bucket=${_PROJECT_ID}"
+      terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve

@@ -2,6 +2,6 @@
 
 terraform {
  backend "gcs" {
-   prefix  = "tfstate/endpoints"
+   prefix  = "tfstate/gclb"
  }
 }

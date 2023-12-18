@@ -21,12 +21,12 @@ tags:
 steps:
   #  Destroy Endpoints 
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "infra-destroy-endpoints"
+    id: "infra-destroy-gclb"
     entrypoint: bash
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/terraform/infra-destroy-endpoints.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --config builds/terraform/infra-destroy-gclb.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
    #  Destroy GKE clusters
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-destroy-gke"

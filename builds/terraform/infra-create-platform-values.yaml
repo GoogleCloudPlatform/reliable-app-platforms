@@ -14,17 +14,17 @@
 
 timeout: 7200s # 2hr
 tags:
-  - app-cicd-deploy-pipelines
+  - store-platform-values
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 steps:
 - name: "hashicorp/terraform:1.4.6"
-  id: '00-deploy-pipelines-all-services'
-  dir: infra/terraform/delivery-pipelines
+  id: 'store-platform-values'
+  dir: infra/terraform/platform-values
   entrypoint: sh
   args:
     - "-xe"
     - "-c"
     - |
-        terraform init -backend-config="bucket=${_PROJECT_ID}" -backend-config="prefix=tfstate/pipeline"
+        terraform init -backend-config="bucket=${_PROJECT_ID}"
         terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve

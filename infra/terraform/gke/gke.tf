@@ -12,7 +12,9 @@ module "gke" {
   ip_range_pods              = each.value.pod_cidr_name
   ip_range_services          = each.value.svc_cidr_name
   horizontal_pod_autoscaling = true
+  kubernetes_version         = var.kubernetes_version
   cluster_resource_labels    = {"env": each.value.env, "zone": each.value.cluster_zone }
+
 }
 
 module "gke-config-cluster" {
@@ -26,5 +28,6 @@ module "gke-config-cluster" {
   subnetwork                 = local.config_cluster_info.subnet_name
   ip_range_pods              = local.config_cluster_info.pod_cidr_name
   ip_range_services          = local.config_cluster_info.svc_cidr_name
+  kubernetes_version         = var.kubernetes_version
   horizontal_pod_autoscaling = true
 }

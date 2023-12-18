@@ -1,3 +1,7 @@
+output "ip_address" {
+  value = google_compute_global_address.global_loadbalancer_ip.address
+}
+
 /* 
 
 In addition to the arguments, the following attributes are available:

@@ -15,7 +15,7 @@ locals {
 }
 
 data "google_storage_bucket_object_content" "cluster_info" {
-  name   = "clusters.json"
+  name   = "platform-values/clusters.json"
   bucket = var.project_id
 }
 

@@ -30,4 +30,4 @@ steps:
     - |
       [[ "${_BUILD}" == "false" ]] && exit 0
       terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform apply -var="project_id=${_PROJECT_ID}" --auto-approve
+      terraform apply -var="project_id=${_PROJECT_ID}" -var="kubernetes_version=1.27.3-gke.100" --auto-approve

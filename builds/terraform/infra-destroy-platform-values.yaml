@@ -14,19 +14,19 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-create-endpoints
+  - infra-destroy-platform-values
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _BUILD: "true"
 steps:
-# Create Endpoints services
+# Destroy Platform values stored in cloud storage
 - name: "hashicorp/terraform:1.4.6"
-  id: "destroy-endpoints"
+  id: "destroy-platform-values"
   entrypoint: "sh"
-  dir: "infra/terraform/endpoints"
+  dir: "infra/terraform/platform-values"
   args:
     - "-xe"
     - "-c"
     - |
       terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform destroy -var="project_id=${_PROJECT_ID}" --auto-approve 
+      terraform destroy -var="project_id=${_PROJECT_ID}" --auto-approve
+

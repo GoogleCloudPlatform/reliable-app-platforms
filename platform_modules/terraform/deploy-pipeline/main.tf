@@ -19,41 +19,35 @@ data "google_storage_bucket_object_content" "cluster_info" {
   bucket = var.project_id
 }
 
-output "targets" {
-  value = local.targets[*].id
+resource "google_clouddeploy_target" "target" {
+  for_each = { for i, v in local.targets : i => v }
+  location = var.pipeline_location
+  name     = "target-${each.value.name}"
+
+  gke {
+    cluster = each.value.id
+  }
+
+  project          = var.project_id
+  require_approval = false
 }
 
- #https://dev.to/lucassha/consuming-and-decoding-json-in-terraform-309p
+resource "google_clouddeploy_delivery_pipeline" "primary" {
+  location = var.pipeline_location
+  name     = lower("${var.service_name}-pipeline")
 
-# resource "google_clouddeploy_target" "target" {
-#   for_each = { for i, v in local.targets : i => v }
-#   location = var.pipeline_location
-#   name     = "target-${each.value.name}"
+  description = "Service delivery pipeline for the service ${var.service_name}."
+  project     = var.project_id
 
-#   gke {
-#     cluster = each.value.id
-#   }
+  serial_pipeline {
 
-#   project          = var.project_id
-#   require_approval = false
-# }
-
-# resource "google_clouddeploy_delivery_pipeline" "primary" {
-#   location = var.pipeline_location
-#   name     = lower("${var.service_name}-pipeline")
-
-#   description = "Service delivery pipeline for the service ${var.service_name}."
-#   project     = var.project_id
-
-#   serial_pipeline {
-
-#     dynamic "stages" {
-#       for_each = google_clouddeploy_target.target
-#       content {
-#         profiles  = ["prod"]
-#         target_id = stages.value.target_id
-#       }
-#     }
-#   }
-#   provider = google-beta
-# }
+    dynamic "stages" {
+      for_each = google_clouddeploy_target.target
+      content {
+        profiles  = ["prod"]
+        target_id = stages.value.target_id
+      }
+    }
+  }
+  provider = google-beta
+}

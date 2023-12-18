@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package whereami;
+
+//import "google/protobuf/struct.proto";
+
+// The whereami service definition.
+service Whereami {
+  // Send host name and get other metadata back
+  rpc GetPayload (Empty) returns (WhereamiReply) {}
+}
+
+// expecting an empty request from client
+message Empty {
+
+}
+
+// The response message containing the metadata
+// Removed any of the 'header' content since we're using gRPC
+message WhereamiReply {
+    WhereamiReply backend_result = 1;
+    string cluster_name = 2;
+    string metadata = 3;
+    string node_name = 4;
+    string pod_ip = 5;
+    string pod_name = 6;
+    string pod_name_emoji = 7;
+    string pod_namespace = 8;
+    string pod_service_account = 9;
+    string project_id = 10;
+    string timestamp = 11;
+    string zone = 12;
+}

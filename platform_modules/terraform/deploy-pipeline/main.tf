@@ -8,10 +8,9 @@ locals {
   target_APR = var.archetype == "APR" ? [local.clusters_info[local.apr_indices[0]], local.clusters_info[local.apr_indices[1]], local.clusters_info[local.apr_indices[2]],  local.clusters_info[local.apr_indices[3]], local.clusters_info[local.apr_indices[4]], local.clusters_info[local.apr_indices[5]]] :null
   ir_indices = var.archetype == "IR" ? [var.region_index[0]*3+0, var.region_index[0]*3+1, var.region_index[0]*3+2, var.region_index[1]*3+0, var.region_index[1]*3+1, var.region_index[1]*3+2] : null
   target_IR = var.archetype == "IR" ? [local.clusters_info[local.ir_indices[0]], local.clusters_info[local.ir_indices[1]], local.clusters_info[local.ir_indices[2]],  local.clusters_info[local.ir_indices[3]], local.clusters_info[local.ir_indices[4]], local.clusters_info[local.ir_indices[5]]] :null
-
   target_G = var.archetype == "G"  ? local.clusters_info:null
 
-  targets = coalesce(local.target_SZ, local.target_APZ, local.target_MZ, local.target_APR, local.target_IR, local.target_G)
+  targets = coalescelist(local.target_SZ,local.target_APZ, local.target_MZ, local.target_APR, local.target_IR, local.target_G)
 }
 
 data "google_storage_bucket_object_content" "cluster_info" {

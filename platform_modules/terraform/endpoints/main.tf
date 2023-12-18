@@ -1,7 +1,7 @@
 locals {
     gclb_ip_address = jsondecode(data.google_storage_bucket_object_content.gclb_info.content)
-
 }
+
 data "google_storage_bucket_object_content" "gclb_info" {
   name   = "platform-values/gclb.json"
   bucket = var.project_id

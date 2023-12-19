@@ -47,7 +47,7 @@ steps:
         git config --global user.name "cloudbuild-ci"
         gcloud source repos clone config --project=${_PROJECT_ID}
         mkdir -p config/asm
-        cp -r ./ config/asm
+        cp -r ./*.yaml config/asm
         cd config
         git add . && git commit -am "Deploy ASM gateways"
         git push
@@ -64,7 +64,7 @@ steps:
         git config --global user.name "cloudbuild-ci"
         gcloud source repos clone gateway --project=${_PROJECT_ID}
         mkdir -p gateway/mcg
-        cp -r ./ gateway/mcg
+        cp -r ./*.yaml gateway/mcg
         cd gateway
         git add . && git commit -am "Deploy Gateway"
         git push

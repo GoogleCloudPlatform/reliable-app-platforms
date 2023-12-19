@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: nginx-route
+  namespace: nginx
+spec:
+  parentRefs:
+  - name: istio-gateway
+    namespace: gateway
+  rules:
+  - backendRefs:
+    - kind: service
+      name: nginx-services
+      port: 80

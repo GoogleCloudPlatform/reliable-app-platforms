@@ -39,12 +39,12 @@ steps:
       source ./vars.sh
       gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_REGION} --project ${_PROJECT_ID}
       echo -e "Checking Gateways status for $${GKE_CONFIG_NAME}..."
-      while [[ $(kubectl --context=gke_${_PROJECT_ID}_$${GKE_CONFIG_REGION}_$${GKE_CONFIG_NAME} get gateway http-web -n gateway -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-        echo -e "Waiting for Gateway http-web to be READY..."
+      while [[ $(kubectl --context=gke_${_PROJECT_ID}_$${GKE_CONFIG_REGION}_$${GKE_CONFIG_NAME} get gateway gke-gateway -n gateway -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+        echo -e "Waiting for Gateway gke-gateway to be READY..."
         sleep 5
       done
 
-      export GCLB_IP=$(kubectl --context=gke_${_PROJECT_ID}_$${GKE_CONFIG_REGION}_$${GKE_CONFIG_NAME} get gateway http-web -n gateway -o jsonpath='{.status.addresses[0].value}') 
+      export GCLB_IP=$(kubectl --context=gke_${_PROJECT_ID}_$${GKE_CONFIG_REGION}_$${GKE_CONFIG_NAME} get gateway gke-gateway -n gateway -o jsonpath='{.status.addresses[0].value}') 
       echo -e "The ip address is $$GCLB_IP..."
       echo -e "Uploading the ip address to a cloud bucket"
       echo "$(echo "\"$$GCLB_IP\"")" > /tmp/ip-address

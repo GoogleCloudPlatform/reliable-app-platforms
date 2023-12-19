@@ -4,6 +4,7 @@ metadata:
   name: asm-gateways
   labels:
     istio.io/rev: asm-managed
+    shared-gateway-access: "true"
 ---
 apiVersion: v1
 kind: Service

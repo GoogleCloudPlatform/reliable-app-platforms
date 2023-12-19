@@ -64,7 +64,7 @@ steps:
         git config --global user.name "cloudbuild-ci"
         gcloud source repos clone gateway --project=${_PROJECT_ID}
         mkdir -p gateway/mcg
-        cp -r gateway.yaml gateway/mcg
+        cp -r ./ gateway/mcg
         cd gateway
         git add . && git commit -am "Deploy Gateway"
         git push

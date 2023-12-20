@@ -46,7 +46,7 @@ steps:
         git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
         git config --global user.name "cloudbuild-ci"
         gcloud source repos clone config --project=${_PROJECT_ID}
-        rm -rf config/*
+        rm -rf config/asm/*
         mkdir -p config/asm
         cp -r ./*.yaml config/asm
         cd config
@@ -64,9 +64,9 @@ steps:
         git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
         git config --global user.name "cloudbuild-ci"
         gcloud source repos clone gateway --project=${_PROJECT_ID}
-        rm -rf gateway/*
+        rm -rf gateway/mcg/*
         mkdir -p gateway/mcg
         cp -r ./*.yaml gateway/mcg
         cd gateway
-        git add . && git commit -am "Deploy Gateway"
+        git add . && git commit -am "Deploy GKE Gateway"
         git push

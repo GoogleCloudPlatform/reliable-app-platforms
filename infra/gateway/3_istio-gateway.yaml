@@ -2,9 +2,9 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
 metadata:
   name: istio-gateway
-  namespace: gateway
+  namespace: gateways
 spec:
-  gatewayClassName: istio-gateway
+  gatewayClassName: istio
   addresses:
   - value: asm-ingressgateway.asm-gateways.svc.cluster.local
     type: Hostname

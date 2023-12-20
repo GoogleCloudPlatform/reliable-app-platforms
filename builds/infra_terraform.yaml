@@ -67,15 +67,6 @@ steps:
         [[ "${_GKE}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  
- # Deploy MC Gateway to Config cluster
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "infra-features-gke-gateways"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        exec gcloud builds submit --config builds/infra-features-gke-gateway.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
- 
 # Confirm Mesh on GKE
   # This step confirms that ASM managed control plane (MCP) is successfully Provisioned on prod GKE clusters.
   - name: "gcr.io/cloud-builders/gcloud"
@@ -113,6 +104,15 @@ steps:
       - |
         exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   
+  # Deploy MC Gateway to Config cluster
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-features-gke-gateways"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-features-gke-gateway.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+ 
   # Confirm Mesh gateways on GKE - prod
   # This step confirms that the ASM ingress, egress and eastwest gateways are up and running on the prod GKE clusters.
   - name: "gcr.io/cloud-builders/gcloud"

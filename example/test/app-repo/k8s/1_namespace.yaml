@@ -4,5 +4,7 @@ metadata:
   name: nginx
   labels:
     shared-gateway-access: "true"
+    istio.io/rev: asm-managed
+
 
   

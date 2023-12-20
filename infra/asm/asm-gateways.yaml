@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: asm-gateways
+  name: gateways
   labels:
     istio.io/rev: asm-managed
     shared-gateway-access: "true"
@@ -10,7 +10,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: asm-ingressgateway
-  namespace: asm-gateways
+  namespace: gateways
   labels:
     app: asm-ingressgateway
     asm: ingressgateway
@@ -28,13 +28,13 @@ kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
   name: asm-ingressgateway
-  namespace: asm-gateways
+  namespace: gateways
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: asm-ingressgateway
-  namespace: asm-gateways
+  namespace: gateways
   labels:
     app: asm-ingressgateway
     asm: ingressgateway
@@ -61,7 +61,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: asm-egressgateway
-  namespace: asm-gateways
+  namespace: gateways
   labels:
     app: asm-egressgateway
     asm: egressgateway
@@ -79,13 +79,13 @@ kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
   name: asm-egressgateway
-  namespace: asm-gateways
+  namespace: gateways
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: asm-egressgateway
-  namespace: asm-gateways
+  namespace: gateways
   labels:
     app: asm-egressgateway
     asm: egressgateway
@@ -112,7 +112,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: asm-eastwestgateway
-  namespace: asm-gateways
+  namespace: gateways
   labels:
     app: asm-eastwestgateway
     asm: eastwestgateway
@@ -133,13 +133,13 @@ kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
   name: asm-eastwestgateway
-  namespace: asm-gateways      
+  namespace: gateways      
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: asm-eastwestgateway
-  namespace: asm-gateways
+  namespace: gateways
   labels:
     app: asm-eastwestgateway
     asm: eastwestgateway
@@ -173,7 +173,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: asm-gateways-sds
-  namespace: asm-gateways
+  namespace: gateways
 rules:
 - apiGroups: [""]
   resources: ["secrets"]
@@ -183,7 +183,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: asm-gateways-sds
-  namespace: asm-gateways
+  namespace: gateways
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

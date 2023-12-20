@@ -5,10 +5,11 @@ metadata:
   namespace: nginx
 spec:
   parentRefs:
-  - name: istio-gateway
-    namespace: gateway
+  - kind: Gateway
+    name: istio-gateway
+    namespace: gateways
   rules:
   - backendRefs:
-    - kind: service
-      name: nginx-services
+    - kind: Service
+      name: nginx-service
       port: 80

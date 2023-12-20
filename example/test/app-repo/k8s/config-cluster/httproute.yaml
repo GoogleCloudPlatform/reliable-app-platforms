@@ -9,5 +9,7 @@ spec:
     namespace: gateways
   rules:
   - backendRefs:
-    - name: nginx-service
+    - group: net.gke.io
+      kind: ServiceImport
+      name: nginx-service
       port: 80

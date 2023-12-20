@@ -6,7 +6,7 @@ metadata:
 spec:
   gatewayClassName: istio
   addresses:
-  - value: asm-ingressgateway.asm-gateways.svc.cluster.local
+  - value: asm-ingressgateway.gateways.svc.cluster.local
     type: Hostname
   listeners:
   - protocol: HTTP

@@ -4,7 +4,7 @@ metadata:
   name: gke-gateway
   namespace: gateways
 spec:
-  gatewayClassName: gke-l7-global-external-managed-mc
+  gatewayClassName: gke-l7-global-external-managed 
   listeners:
   - protocol: HTTP
     port: 80

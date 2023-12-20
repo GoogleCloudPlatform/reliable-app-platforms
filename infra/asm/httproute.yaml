@@ -7,7 +7,7 @@ spec:
   parentRefs:
   - kind: Gateway
     name: gke-gateway
-    namespace: gateway
+    namespace: gateways
   rules:
   - backendRefs:
     - kind: Service

@@ -8,4 +8,5 @@ resource "google_gke_hub_feature" "gke-config-mci" {
       config_membership = "projects/${var.project_id}/locations/global/memberships/${module.gke-config-cluster.name}"
     }
   }
+  
 }

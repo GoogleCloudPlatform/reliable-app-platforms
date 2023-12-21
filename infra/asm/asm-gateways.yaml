@@ -97,8 +97,8 @@ spec:
   template:
     metadata:
       annotations:
-        # This is required to tell Anthos Service Mesh to inject the gateway with the
-        # required configuration.
+        This is required to tell Anthos Service Mesh to inject the gateway with the
+        required configuration.
         inject.istio.io/templates: gateway
       labels:
         app: asm-egressgateway
@@ -133,7 +133,7 @@ kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
   name: asm-eastwestgateway
-  namespace: gateways      
+  namespace: gateways
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -151,8 +151,8 @@ spec:
   template:
     metadata:
       annotations:
-        # This is required to tell Anthos Service Mesh to inject the gateway with the
-        # required configuration.
+        This is required to tell Anthos Service Mesh to inject the gateway with the
+        required configuration.
         inject.istio.io/templates: gateway
       labels:
         app: asm-eastwestgateway
@@ -163,7 +163,7 @@ spec:
       - name: istio-proxy
         image: auto # The image will automatically update each time the pod starts.
         env:
-        # traffic through this gateway should be routed inside the network
+        traffic through this gateway should be routed inside the network
         - name: ISTIO_META_REQUESTED_NETWORK_VIEW
           value: default
         - name: ISTIO_META_ROUTER_MODE

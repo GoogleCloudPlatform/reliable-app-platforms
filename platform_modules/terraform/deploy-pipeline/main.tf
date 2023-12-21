@@ -21,7 +21,7 @@ data "google_storage_bucket_object_content" "cluster_info" {
 resource "google_clouddeploy_target" "target" {
   for_each = { for i, v in local.targets : i => v }
   location = var.pipeline_location
-  name     = "target-${each.value.name}"
+  name     = "target-${var.service_name}-${each.value.name}"
 
   gke {
     cluster = each.value.id

@@ -13,16 +13,16 @@ usage()
 {
    echo ""
    echo "Usage: $0"
-   echo -e "\t--app | -a Must be one of 'whereami' or 'bank', or 'shop'. Default is 'whereami'."
+   echo -e "\t--app | -a Must be one of 'nginx' or 'whereami', or 'shop'. Default is 'nginx'."
    echo -e "\tExample usage:"op
-   echo -e "\t./deploy.sh -a whereami"
+   echo -e "\t./deploy.sh -a nginx"
    exit 1 # Exit script after printing help
 }
 
 
 
 # Setting default value
-APPLICATION=whereami
+APPLICATION=nginx
 
 # Define bash args
 while [ "$1" != "" ]; do
@@ -36,14 +36,19 @@ while [ "$1" != "" ]; do
     shift
 done
 
+# Create a short SHA until this is tied to a git repo and can use a commit sha
+SHORT_SHA=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
+
 # Set project to PROJECT_ID or exit
 [[ ! "${PROJECT_ID}" ]] && echo -e "Please export PROJECT_ID variable (\e[95mexport PROJECT_ID=<YOUR POROJECT ID>\e[0m)\nExiting." && exit 0
 echo -e "\e[95mPROJECT_ID is set to ${PROJECT_ID}\e[0m"
 echo -e "\e[95mAPPLICATION is set to ${APPLICATION}\e[0m"
+echo -e "\e[95mSHORT_SHA is set to ${SHORT_SHA}\e[0m"
+
+
 
 gcloud config set core/project ${PROJECT_ID}
 
-# Enable Cloudbuild API
-
- gcloud builds submit --config=builds/cloudbuild/cloudbuild_whereami.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
-# echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"
+[[ ${APPLICATION} == "nginx" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m"
+ gcloud builds submit --config=nginx/app-repo/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA} --async
+echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

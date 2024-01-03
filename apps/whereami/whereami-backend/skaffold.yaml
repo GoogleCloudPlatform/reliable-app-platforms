@@ -9,7 +9,7 @@ build:
       docker:
         dockerfile: Dockerfile
 deploy:
-  kustomize:
+  kubectl:
     paths:
       - k8s/overlays/dev
 portForward:

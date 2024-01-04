@@ -18,10 +18,10 @@ data "google_storage_bucket_object_content" "cluster_info" {
   bucket = var.project_id
 }
 
-resource "google_clouddeploy_target" "target" {
+resource "google_clouddeploy_target" "child_target" {
   for_each = { for i, v in local.targets : i => v }
   location = var.pipeline_location
-  name     = "target-${var.service_name}-${each.value.name}"
+  name     = "child-target-${var.service_name}-${each.value.name}"
 
   gke {
     cluster = each.value.id
@@ -30,6 +30,19 @@ resource "google_clouddeploy_target" "target" {
   project          = var.project_id
   require_approval = false
 }
+
+resource "google_clouddeploy_target" "multi_target" {
+  location = var.pipeline_location
+  name     = "multi-target-${var.service_name}"
+
+  multi_target {
+    target_ids =[ for v in google_clouddeploy_target.child_target : v.id ]
+  }
+
+  project          = var.project_id
+  require_approval = false
+}
+
 
 resource "google_clouddeploy_delivery_pipeline" "primary" {
   location = var.pipeline_location
@@ -40,12 +53,9 @@ resource "google_clouddeploy_delivery_pipeline" "primary" {
 
   serial_pipeline {
 
-    dynamic "stages" {
-      for_each = google_clouddeploy_target.target
-      content {
+    stages {
         profiles  = ["prod"]
-        target_id = stages.value.target_id
-      }
+        target_id = google_clouddeploy_target.multi_target.target_id
     }
   }
   provider = google-beta

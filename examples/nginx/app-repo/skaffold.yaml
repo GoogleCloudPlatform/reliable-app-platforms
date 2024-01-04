@@ -1,7 +1,7 @@
 apiVersion: skaffold/v2beta28
 kind: Config
 metadata:
-  name: nginx-app-skaffold
+  name: nginx-app
 deploy:
   kubectl:
     manifests:

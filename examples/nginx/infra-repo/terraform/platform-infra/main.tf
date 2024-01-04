@@ -17,5 +17,5 @@ module "deploy-pipeline"{
 module "endpoint" {
     source = "../../../../../platform_modules/terraform/endpoints"
     project_id = var.project_id
-    service_name = var.service_name
+    service_name = "${var.service_name}1"
 }

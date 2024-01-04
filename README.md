@@ -55,6 +55,7 @@ The **nginx** application is a single service application which by default uses 
    1. Endpoints
    1. Artifact Registry (although unused in this application)
    1. and SLOs.
+   
    The platform-terraform modules used in this step are found in the *modules* directory
    The GCP deployment pipelines select and configure the required GKE cluster targets based on the archetypes and the regions/zones specified. 
    After the creation of this basic infrastructure, the script then creates a new release on the *Cloud Deploy* pipeline the k8s manifests to the relevant GKE clusters.

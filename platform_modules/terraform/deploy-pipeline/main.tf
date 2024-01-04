@@ -1,4 +1,4 @@
-
+# TODO: Make indices for zones and regions strings
 locals {
   clusters_info = jsondecode(data.google_storage_bucket_object_content.clusters_info.content)
   config_cluster_info = jsondecode(data.google_storage_bucket_object_content.config_cluster_info.content)

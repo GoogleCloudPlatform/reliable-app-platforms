@@ -2,6 +2,6 @@
 
 terraform {
   backend "gcs" {
-    prefix = "whereami/test/tfstate/platform-infra"
+    prefix = "nginx/nginx/tfstate/platform-infra"
   }
 }

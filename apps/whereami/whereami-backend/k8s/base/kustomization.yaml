@@ -1,9 +1,0 @@
-resources:
-- ksa.yaml
-- deployment.yaml
-- service.yaml
-- configmap.yaml
-- namespace.yaml
-- peerauthn-mtls.yaml
-- authzpolicy.yaml
-- networkpolicy.yaml

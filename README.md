@@ -43,7 +43,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
 ## Deploy an example application from this repo
 ### Deploy `nginx`.
 
-The **nginx** application is a single service application which by default uses the active passive zone (APZ) archetype. 
+The **nginx** application is a single service application which by default uses the *Active Passive Zone (APZ)* archetype. 
    ```bash
    
    cd $HOME/examples
@@ -55,7 +55,7 @@ The **nginx** application is a single service application which by default uses 
    1. Endpoints
    1. Artifact Registry (although unused in this application)
    1. and SLOs.
-   
+
    The platform-terraform modules used in this step are found in the *modules* directory
    The GCP deployment pipelines select and configure the required GKE cluster targets based on the archetypes and the regions/zones specified. 
    After the creation of this basic infrastructure, the script then creates a new release on the *Cloud Deploy* pipeline the k8s manifests to the relevant GKE clusters.
@@ -65,7 +65,7 @@ The **nginx** application is a single service application which by default uses 
 
 **WIP: Incomplete**
 
-The **whereami** application is a two-service application. Each service in the application may use a different archetype. In this example, by default the *whereami-frontend* uses the Active Passive Region (APR) archetype, and the *whereami-backend* uses the Single Zone (SZ) archetype.
+The **whereami** application is a two-service application. Each service in the application may use a different archetype. In this example, by default the *whereami-frontend* uses the *Active Passive Region (APR)* archetype, and the *whereami-backend* uses the *Single Zone (SZ)* archetype.
 
    ```bash
    

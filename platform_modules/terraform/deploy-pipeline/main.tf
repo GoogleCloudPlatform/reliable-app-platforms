@@ -1,6 +1,8 @@
 
 locals {
-  clusters_info = jsondecode(data.google_storage_bucket_object_content.cluster_info.content)
+  clusters_info = jsondecode(data.google_storage_bucket_object_content.clusters_info.content)
+  config_cluster_info = jsondecode(data.google_storage_bucket_object_content.config_cluster_info.content)
+
   target_SZ = var.archetype == "SZ"  ? [local.clusters_info[var.zone_index[0]]] :null
   target_APZ = var.archetype == "APZ"  ? [local.clusters_info[var.zone_index[0]], local.clusters_info[var.zone_index[1]]] :null
   target_MZ = var.archetype == "MZ"  ? [local.clusters_info[var.zone_index[0]], local.clusters_info[var.zone_index[1]], local.clusters_info[var.zone_index[2]]] :null
@@ -13,10 +15,15 @@ locals {
   targets = coalescelist(local.target_SZ,local.target_APZ, local.target_MZ, local.target_APR, local.target_IR, local.target_G)
 }
 
-data "google_storage_bucket_object_content" "cluster_info" {
+data "google_storage_bucket_object_content" "clusters_info" {
   name   = "platform-values/clusters.json"
   bucket = var.project_id
 }
+data "google_storage_bucket_object_content" "config_cluster_info" {
+  name   = "platform-values/config_cluster.json"
+  bucket = var.project_id
+}
+
 
 resource "google_clouddeploy_target" "child_target" {
   for_each = { for i, v in local.targets : i => v }
@@ -43,12 +50,40 @@ resource "google_clouddeploy_target" "multi_target" {
   require_approval = false
 }
 
+resource "google_clouddeploy_target" "config_target" {
+  location = var.pipeline_location
+  name     = "target-config-${var.service_name}"
+
+  gke {
+    cluster = local.config_cluster_info[0].id
+  }
+
+  project          = var.project_id
+  require_approval = false
+}
+
+resource "google_clouddeploy_delivery_pipeline" "config" {
+  location = var.pipeline_location
+  name     = lower("${var.service_name}-config-pipeline")
+
+  description = "Service delivery pipeline for the service ${var.service_name} for config cluster."
+  project     = var.project_id
+
+  serial_pipeline {
+
+    stages {
+        profiles  = ["prod"]
+        target_id = google_clouddeploy_target.config_target.target_id
+    }
+  }
+  provider = google-beta
+}
 
 resource "google_clouddeploy_delivery_pipeline" "primary" {
   location = var.pipeline_location
   name     = lower("${var.service_name}-pipeline")
 
-  description = "Service delivery pipeline for the service ${var.service_name}."
+  description = "Service delivery pipeline for the service ${var.service_name} for app clusters."
   project     = var.project_id
 
   serial_pipeline {

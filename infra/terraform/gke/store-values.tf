@@ -15,3 +15,9 @@ resource "google_storage_bucket_object" "zone_cluster_info" {
   content = jsonencode(local.zone-clusters-info)
   bucket = var.project_id
 }
+
+resource "google_storage_bucket_object" "config_cluster_info" {
+  name   = "platform-values/config_cluster.json"
+  content = jsonencode(local.config-clusters)
+  bucket = var.project_id
+}

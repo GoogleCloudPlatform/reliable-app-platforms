@@ -17,5 +17,5 @@ module "deploy-pipeline"{
 module "endpoint" {
     source = "git::https://github.com/ameer00/Building-Reliable-Platforms-on-GCP-with-Google-SRE.git//modules/endpoints?ref=tf"
     project_id = var.project_id
-    service_name = "${var.service_name}1"
+    service_name = "${var.service_name}service"
 }

@@ -12,6 +12,8 @@ metadata:
   name: nginx-route
   namespace: nginx
 spec:
+  hostnames:
+  - "nginxservice.endpoints.arch001.cloud.goog"
   parentRefs:
   - name: istio-gateway
     namespace: gateways

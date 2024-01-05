@@ -16,7 +16,7 @@ timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _INFRA: "true"
-  _DEPLOY_APP: "false"
+  _DEPLOY_APP: "true"
 tags:
   - infra-main-terraform
 steps:

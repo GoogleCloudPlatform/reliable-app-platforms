@@ -35,5 +35,5 @@ steps:
       - -c
       - |
         [[ "${_DEPLOY_APP}" == "false" ]] && exit 0
-        exec gcloud builds submit --config nginx/app-repo/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}, _SHORT_SHA=${_SHORT_SHA}
+        exec gcloud builds submit --config nginx/app-repo/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
  

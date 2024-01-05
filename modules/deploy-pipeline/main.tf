@@ -26,7 +26,7 @@ data "google_storage_bucket_object_content" "config_cluster_info" {
 
 resource "google_service_account" "clouddeploy" {
   project = var.project_id
-  account_id   = "clouddeploy"
+  account_id   = "clouddeploy-${var.service_name}"
   display_name = "Cloud Deploy Service Account"
 }
 

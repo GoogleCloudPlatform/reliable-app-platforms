@@ -27,7 +27,7 @@ steps:
    - |
       source vars.sh
       echo -e "Setting GKE Gateway config cluster as $${GKE_CONFIG_NAME}..."
-      gcloud container fleet ingress enable --config-membership=$${GKE_CONFIG_NAME} --location=${GKE_CONFIG_REGION}
+      gcloud container fleet ingress enable --config-membership=$${GKE_CONFIG_NAME} --location=$${GKE_CONFIG_REGION}
 
 - name: "gcr.io/cloud-builders/gcloud"
   id: "infra-features-gke-get-gateway-address"

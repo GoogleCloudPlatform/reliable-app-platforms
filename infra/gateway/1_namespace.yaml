@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: gateways
   labels:
-    shared-gateway-access: "true"
+    istio.io/rev: asm-managed

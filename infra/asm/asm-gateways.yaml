@@ -14,15 +14,36 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: gateways
+  name: asm-ingress
   labels:
-    istio.io/rev: asm-managed
+    namespace: asm-ingress
+--- 
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: asm-ingressgateway
+  namespace: asm-ingress
+spec:
+  selector:
+    asm: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: asm-ingressgateway
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: asm-ingressgateway
-  namespace: gateways
+  namespace: asm-ingress
   labels:
     app: asm-ingressgateway
     asm: ingressgateway
@@ -31,22 +52,30 @@ spec:
   selector:
     asm: ingressgateway
   ports:
+  - name: status-port
+    port: 15021
+    protocol: TCP
+    targetPort: 15021
   - port: 80
     name: http
+    targetPort: 8080
+    appProtocol: HTTP
   - port: 443
     name: https
+    targetPort: 8443
+    appProtocol: HTTP2
 ---
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
   name: asm-ingressgateway
-  namespace: gateways
+  namespace: asm-ingress
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: asm-ingressgateway
-  namespace: gateways
+  namespace: asm-ingress
   labels:
     app: asm-ingressgateway
     asm: ingressgateway
@@ -73,7 +102,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: asm-egressgateway
-  namespace: gateways
+  namespace: asm-ingress
   labels:
     app: asm-egressgateway
     asm: egressgateway
@@ -91,13 +120,13 @@ kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
   name: asm-egressgateway
-  namespace: gateways
+  namespace: asm-ingress
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: asm-egressgateway
-  namespace: gateways
+  namespace: asm-ingress
   labels:
     app: asm-egressgateway
     asm: egressgateway
@@ -124,7 +153,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: asm-eastwestgateway
-  namespace: gateways
+  namespace: asm-ingress
   labels:
     app: asm-eastwestgateway
     asm: eastwestgateway
@@ -145,13 +174,13 @@ kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
   name: asm-eastwestgateway
-  namespace: gateways      
+  namespace: asm-ingress
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: asm-eastwestgateway
-  namespace: gateways
+  namespace: asm-ingress
   labels:
     app: asm-eastwestgateway
     asm: eastwestgateway
@@ -185,7 +214,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: asm-gateways-sds
-  namespace: gateways
+  namespace: asm-ingress
 rules:
 - apiGroups: [""]
   resources: ["secrets"]
@@ -195,7 +224,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: asm-gateways-sds
-  namespace: gateways
+  namespace: asm-ingress
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

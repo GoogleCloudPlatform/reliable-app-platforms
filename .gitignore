@@ -4,3 +4,4 @@ yarn.lock
 backstage/kubernetes/github-secrets.yaml
 backstage/kubernetes/google-oauth-secrets.yaml
 backstage/kubernetes/backstage-secrets.yaml
+backstage/kubernetes/github-secrets.yaml

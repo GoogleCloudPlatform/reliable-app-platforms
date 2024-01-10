@@ -13,7 +13,7 @@ locals {
   target_G = var.archetype == "G"  ? local.clusters_info:null
 
   targets = coalescelist(local.target_SZ,local.target_APZ, local.target_MZ, local.target_APR, local.target_IR, local.target_G)
-  remaining_clusters = setsubtract(concat(local.clusters_info, local.config_cluster_info), local.targets)
+  remaining_targets = tolist(setsubtract(concat(local.clusters_info, local.config_cluster_info), local.targets))
 }
 
 data "google_storage_bucket_object_content" "clusters_info" {
@@ -90,7 +90,7 @@ resource "google_clouddeploy_delivery_pipeline" "primary" {
 
 
 resource "google_clouddeploy_target" "child_target_vs" {
-  for_each = { for i, v in local.remaining_clusters : i => v }
+  for_each = { for i, v in local.remaining_targets :i =>  v }
   location = var.pipeline_location
   name     = "child-target-vs-${var.service_name}-${each.value.name}"
   execution_configs {
@@ -110,7 +110,7 @@ resource "google_clouddeploy_target" "multi_target_vs" {
   name     = "multi-target-vs-${var.service_name}"
 
   multi_target {
-    target_ids =[ for v in local.remaining_clusters : "child-target-${var.service_name}-${v.name}" ]
+    target_ids =[ for v in local.remaining_targets : "child-target-${var.service_name}-${v.name}" ]
   }
 
   project          = var.project_id

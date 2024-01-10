@@ -6,3 +6,7 @@ output "targets" {
   value = local.targets 
 }
 
+output "other_targets" {
+  value = local.remaining_targets 
+}
+

@@ -5,7 +5,7 @@ variable "project_id" {
 variable "service_name" {
   description = "Name of the service"
   type = string
-  default = "Unnamed"
+  default = "unnamed"
 }
 
 variable "pipeline_location" {

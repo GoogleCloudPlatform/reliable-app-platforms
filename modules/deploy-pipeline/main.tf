@@ -110,7 +110,7 @@ resource "google_clouddeploy_target" "multi_target_vs" {
   name     = "multi-target-vs-${var.service_name}"
 
   multi_target {
-    target_ids =[ for v in local.remaining_targets : "child-target-${var.service_name}-${v.name}" ]
+    target_ids =[ for v in local.remaining_targets : "child-target-vs-${var.service_name}-${v.name}" ]
   }
 
   project          = var.project_id

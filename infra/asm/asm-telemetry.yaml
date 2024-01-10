@@ -3,8 +3,8 @@ kind: ConfigMap
 metadata:
   name: istio-asm-managed
   namespace: istio-system
-  # annotations:
-  #   configsync.gke.io/cluster-name-selector: prod-us-central1-0, prod-us-central1-1, prod-us-central1-2, prod-us-west2-0, prod-us-west2-1, prod-us-west2-2
+  annotations:
+    configsync.gke.io/cluster-name-selector: prod-us-central1-0, prod-us-central1-1, prod-us-central1-2, prod-us-west2-0, prod-us-west2-1, prod-us-west2-2
 data:
   mesh: |-
     accessLogFile: /dev/stdout

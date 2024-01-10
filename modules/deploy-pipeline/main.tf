@@ -117,7 +117,7 @@ resource "google_clouddeploy_target" "multi_target_vs" {
   require_approval = false
 }
 
-resource "google_clouddeploy_delivery_pipeline" "primary" {
+resource "google_clouddeploy_delivery_pipeline" "secondary" {
   location = var.pipeline_location
   name     = vs-lower("${var.service_name}-pipeline")
 

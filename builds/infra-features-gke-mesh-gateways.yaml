@@ -52,21 +52,3 @@ steps:
         cd config
         git add . && git commit -am "Deploy ASM gateways"
         git push
-- name: "gcr.io/cloud-builders/gcloud"
-  id: "infra-features-gke-gateway-api"
-  dir: "infra/gateway"
-  entrypoint: bash
-  args:
-    - -c
-    - |
-        export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
-        echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
-        git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
-        git config --global user.name "cloudbuild-ci"
-        gcloud source repos clone gateway --project=${_PROJECT_ID}
-        rm -rf gateway/mcg/*
-        mkdir -p gateway/mcg
-        cp -r ./*.yaml gateway/mcg
-        cd gateway
-        git add . && git commit -am "Deploy GKE Gateway"
-        git push

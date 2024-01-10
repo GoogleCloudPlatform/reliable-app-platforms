@@ -14,7 +14,7 @@ spec:
     hosts:
     - "nginxservice.endpoints.arch001.cloud.goog"
     gateways:
-    - asm-ingress/asm-ingressgateway
+    - asm-ingress-gw/asm-ingressgateway
     http:
     - route:
       - destination:

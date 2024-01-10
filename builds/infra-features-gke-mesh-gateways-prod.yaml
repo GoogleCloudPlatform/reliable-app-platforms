@@ -88,6 +88,4 @@ steps:
       do
         echo -e "Checking ASM gateways status for $$CTX..."
         kubectl --context=$$CTX wait --for=condition=Available deployment asm-ingressgateway -n asm-ingress --timeout 5m
-        kubectl --context=$$CTX wait --for=condition=Available deployment asm-egressgateway -n asm-ingress --timeout 5m
-        kubectl --context=$$CTX wait --for=condition=Available deployment asm-eastwestgateway -n asm-ingress --timeout 5m
       done

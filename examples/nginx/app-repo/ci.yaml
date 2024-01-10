@@ -23,7 +23,7 @@ substitutions:
 steps:
   # Create release in Google Cloud Deploy for App Clusters
   - name: gcr.io/cloud-builders/gcloud
-    id: "deploy_to_app_clusters"
+    id: "deploy-to-app-clusters"
     entrypoint: bash
     args:
       - -c
@@ -38,3 +38,20 @@ steps:
         --delivery-pipeline ${_SERVICE}-pipeline \
         --region ${_REGION} \
         --skaffold-file=./nginx/app-repo/skaffold_app.yaml
+ # Create release in Google Cloud Deploy for other Clusters to deploy the virtual service
+  - name: gcr.io/cloud-builders/gcloud
+    id: "deploy-to-other-clusters"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo -e "_PROJECT_ID is ${_PROJECT_ID}"
+        echo -e "_SHORT_SHA is ${_SHORT_SHA}"
+        echo -e "_PIPELINE_LOCATION is ${_REGION}"
+        echo -e "_APP_NAME is ${_APP_NAME}"
+        echo -e "_SERVICE is ${_SERVICE}"
+
+        gcloud deploy releases create rel-${_SHORT_SHA} \
+        --delivery-pipeline ${_SERVICE}-vs-pipeline \
+        --region ${_REGION} \
+        --skaffold-file=./nginx/app-repo/skaffold_vs.yaml

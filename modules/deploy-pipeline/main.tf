@@ -1,7 +1,6 @@
 # TODO: Make indices for zones and regions strings
 locals {
   clusters_info = jsondecode(data.google_storage_bucket_object_content.clusters_info.content)
-  config_cluster_info = jsondecode(data.google_storage_bucket_object_content.config_cluster_info.content)
 
   target_SZ = var.archetype == "SZ"  ? [local.clusters_info[var.zone_index[0]]] :null
   target_APZ = var.archetype == "APZ"  ? [local.clusters_info[var.zone_index[0]], local.clusters_info[var.zone_index[1]]] :null
@@ -13,15 +12,11 @@ locals {
   target_G = var.archetype == "G"  ? local.clusters_info:null
 
   targets = coalescelist(local.target_SZ,local.target_APZ, local.target_MZ, local.target_APR, local.target_IR, local.target_G)
-  remaining_targets = tolist(setsubtract(concat(local.clusters_info, local.config_cluster_info), local.targets))
+  remaining_targets = tolist(setsubtract(local.clusters_info), local.targets)
 }
 
 data "google_storage_bucket_object_content" "clusters_info" {
   name   = "platform-values/clusters.json"
-  bucket = var.project_id
-}
-data "google_storage_bucket_object_content" "config_cluster_info" {
-  name   = "platform-values/config_cluster.json"
   bucket = var.project_id
 }
 

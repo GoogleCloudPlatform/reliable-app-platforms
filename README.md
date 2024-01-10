@@ -117,5 +117,14 @@ External services use this module to create an external endpoint for users to th
 WIP
 
 
+## TODO
+1. SLOs
+1. Implement whereami and shop or bank
+1. Implement https
+1. Builds: Parameterize where possible. Clean up names.
+1. module  deploy-pipelines: check why first deploy always fails.
+1. module deploy-pipelines: Use zone names and region names instead of indices
+1. infra/asm: parameterise names of clusters in configsync annotation.
+1. examples: deploy.sh should be faster.
 
    

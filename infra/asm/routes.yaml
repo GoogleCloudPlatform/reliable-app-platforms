@@ -6,7 +6,7 @@ metadata:
 spec:
   parentRefs:
   - name: external-http
-    namespace: gateways
+    namespace: asm-ingress
     sectionName: http
   rules:
   - backendRefs:

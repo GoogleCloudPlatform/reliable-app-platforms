@@ -24,15 +24,13 @@ metadata:
   name: asm-ingressgateway
   namespace: asm-ingress
 spec:
-  selector:
-    asm: ingressgateway
   servers:
-    - port:
-        number: 80
-        name: http
-        protocol: HTTP
-      hosts:
-        - "*"
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -44,26 +42,17 @@ kind: Service
 metadata:
   name: asm-ingressgateway
   namespace: asm-ingress
-  labels:
-    app: asm-ingressgateway
-    asm: ingressgateway
 spec:
-  type: ClusterIP
-  selector:
-    asm: ingressgateway
   ports:
   - name: status-port
     port: 15021
     protocol: TCP
     targetPort: 15021
-  - port: 80
-    name: http
+  - name: http
+    port: 80
     targetPort: 8080
     appProtocol: HTTP
-  - port: 443
-    name: https
-    targetPort: 8443
-    appProtocol: HTTP2
+  type: ClusterIP
 ---
 kind: ServiceExport
 apiVersion: net.gke.io/v1
@@ -97,115 +86,141 @@ spec:
       containers:
       - name: istio-proxy
         image: auto # The image will automatically update each time the pod starts.
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: asm-egressgateway
-  namespace: asm-ingress
-  labels:
-    app: asm-egressgateway
-    asm: egressgateway
-spec:
-  type: ClusterIP
-  selector:
-    asm: egressgateway
-  ports:
-  - port: 80
-    name: http
-  - port: 443
-    name: https
----
-kind: ServiceExport
-apiVersion: net.gke.io/v1
-metadata:
-  name: asm-egressgateway
-  namespace: asm-ingress
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: asm-egressgateway
-  namespace: asm-ingress
-  labels:
-    app: asm-egressgateway
-    asm: egressgateway
-spec:
-  selector:
-    matchLabels:
-      app: asm-egressgateway
-      asm: egressgateway
-  template:
-    metadata:
-      annotations:
-        # This is required to tell Anthos Service Mesh to inject the gateway with the
-        # required configuration.
-        inject.istio.io/templates: gateway
-      labels:
-        app: asm-egressgateway
-        asm: egressgateway
-    spec:
-      containers:
-      - name: istio-proxy
-        image: auto # The image will automatically update each time the pod starts.
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: asm-eastwestgateway
-  namespace: asm-ingress
-  labels:
-    app: asm-eastwestgateway
-    asm: eastwestgateway
-    topology.istio.io/network: default
-spec:
-  type: ClusterIP
-  selector:
-    asm: eastwestgateway
-  ports:
-  - port: 15021
-    name: status-port
-    targetPort: 15021
-  - port: 15443
-    name: tls
-    targetPort: 15443
----
-kind: ServiceExport
-apiVersion: net.gke.io/v1
-metadata:
-  name: asm-eastwestgateway
-  namespace: asm-ingress
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: asm-eastwestgateway
-  namespace: asm-ingress
-  labels:
-    app: asm-eastwestgateway
-    asm: eastwestgateway
-spec:
-  selector:
-    matchLabels:
-      app: asm-eastwestgateway
-      asm: eastwestgateway
-  template:
-    metadata:
-      annotations:
-        # This is required to tell Anthos Service Mesh to inject the gateway with the
-        # required configuration.
-        inject.istio.io/templates: gateway
-      labels:
-        app: asm-eastwestgateway
-        asm: eastwestgateway
-        topology.istio.io/network: default
-    spec:
-      containers:
-      - name: istio-proxy
-        image: auto # The image will automatically update each time the pod starts.
         env:
-        # traffic through this gateway should be routed inside the network
-        - name: ISTIO_META_REQUESTED_NETWORK_VIEW
-          value: default
-        - name: ISTIO_META_ROUTER_MODE
-          value: sni-dnat
+        - name: ISTIO_META_UNPRIVILEGED_POD
+          value: "true"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - all
+          privileged: false
+          readOnlyRootFilesystem: true
+      securityContext:
+        fsGroup: 1337
+        runAsGroup: 1337
+        runAsNonRoot: true
+        runAsUser: 1337
+      serviceAccountName: asm-ingressgateway
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: asm-egressgateway
+#   namespace: asm-ingress
+#   labels:
+#     app: asm-egressgateway
+#     asm: egressgateway
+# spec:
+#   type: ClusterIP
+#   selector:
+#     asm: egressgateway
+#   ports:
+#   - port: 80
+#     name: http
+#   - port: 443
+#     name: https
+# ---
+# kind: ServiceExport
+# apiVersion: net.gke.io/v1
+# metadata:
+#   name: asm-egressgateway
+#   namespace: asm-ingress
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: asm-egressgateway
+#   namespace: asm-ingress
+#   labels:
+#     app: asm-egressgateway
+#     asm: egressgateway
+# spec:
+#   selector:
+#     matchLabels:
+#       app: asm-egressgateway
+#       asm: egressgateway
+#   template:
+#     metadata:
+#       annotations:
+#         # This is required to tell Anthos Service Mesh to inject the gateway with the
+#         # required configuration.
+#         inject.istio.io/templates: gateway
+#       labels:
+#         app: asm-egressgateway
+#         asm: egressgateway
+#     spec:
+#       containers:
+#       - name: istio-proxy
+#         image: auto # The image will automatically update each time the pod starts.
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: asm-eastwestgateway
+#   namespace: asm-ingress
+#   labels:
+#     app: asm-eastwestgateway
+#     asm: eastwestgateway
+#     topology.istio.io/network: default
+# spec:
+#   type: ClusterIP
+#   selector:
+#     asm: eastwestgateway
+#   ports:
+#   - port: 15021
+#     name: status-port
+#     targetPort: 15021
+#   - port: 15443
+#     name: tls
+#     targetPort: 15443
+# ---
+# kind: ServiceExport
+# apiVersion: net.gke.io/v1
+# metadata:
+#   name: asm-eastwestgateway
+#   namespace: asm-ingress
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: asm-eastwestgateway
+#   namespace: asm-ingress
+#   labels:
+#     app: asm-eastwestgateway
+#     asm: eastwestgateway
+# spec:
+#   selector:
+#     matchLabels:
+#       app: asm-eastwestgateway
+#       asm: eastwestgateway
+#   template:
+#     metadata:
+#       annotations:
+#         # This is required to tell Anthos Service Mesh to inject the gateway with the
+#         # required configuration.
+#         inject.istio.io/templates: gateway
+#       labels:
+#         app: asm-eastwestgateway
+#         asm: eastwestgateway
+#         topology.istio.io/network: default
+#     spec:
+#       containers:
+#       - name: istio-proxy
+#         image: auto # The image will automatically update each time the pod starts.
+#         env:
+#         # traffic through this gateway should be routed inside the network
+#         - name: ISTIO_META_REQUESTED_NETWORK_VIEW
+#           value: default
+#         - name: ISTIO_META_ROUTER_MODE
+#           value: sni-dnat

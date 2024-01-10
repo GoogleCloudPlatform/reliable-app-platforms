@@ -13,6 +13,7 @@ locals {
   target_G = var.archetype == "G"  ? local.clusters_info:null
 
   targets = coalescelist(local.target_SZ,local.target_APZ, local.target_MZ, local.target_APR, local.target_IR, local.target_G)
+  remaining_clusters = setsubtract(merge(local.clusters_info, local.config_cluster_info), local.targets)
 }
 
 data "google_storage_bucket_object_content" "clusters_info" {
@@ -42,7 +43,7 @@ resource "google_project_iam_member" "clouddeploy_member_deploy_jobrunner" {
   member  = "serviceAccount:${google_service_account.clouddeploy.email}"
 }
 
-resource "google_clouddeploy_target" "child_target" {
+resource "google_clouddeploy_target" "child_target_apps" {
   for_each = { for i, v in local.targets : i => v }
   location = var.pipeline_location
   name     = "child-target-${var.service_name}-${each.value.name}"
@@ -58,7 +59,7 @@ resource "google_clouddeploy_target" "child_target" {
   require_approval = false
 }
 
-resource "google_clouddeploy_target" "multi_target" {
+resource "google_clouddeploy_target" "multi_target_apps" {
   location = var.pipeline_location
   name     = "multi-target-${var.service_name}"
 
@@ -81,7 +82,53 @@ resource "google_clouddeploy_delivery_pipeline" "primary" {
 
     stages {
         profiles  = ["prod"]
-        target_id = google_clouddeploy_target.multi_target.target_id
+        target_id = google_clouddeploy_target.multi_target_apps.target_id
+    }
+  }
+  provider = google-beta
+}
+
+
+resource "google_clouddeploy_target" "child_target_vs" {
+  for_each = { for i, v in local.remaining_clusters : i => v }
+  location = var.pipeline_location
+  name     = "child-target-vs-${var.service_name}-${each.value.name}"
+  execution_configs {
+    usages            = ["RENDER", "DEPLOY"]
+    service_account = google_service_account.clouddeploy.email
+  }
+  gke {
+    cluster = each.value.id
+  }
+
+  project          = var.project_id
+  require_approval = false
+}
+
+resource "google_clouddeploy_target" "multi_target_vs" {
+  location = var.pipeline_location
+  name     = "multi-target-vs-${var.service_name}"
+
+  multi_target {
+    target_ids =[ for v in local.remaining_clusters : "child-target-${var.service_name}-${v.name}" ]
+  }
+
+  project          = var.project_id
+  require_approval = false
+}
+
+resource "google_clouddeploy_delivery_pipeline" "primary" {
+  location = var.pipeline_location
+  name     = vs-lower("${var.service_name}-pipeline")
+
+  description = "Virtual service delivery pipeline for the service ${var.service_name} for app clusters."
+  project     = var.project_id
+
+  serial_pipeline {
+
+    stages {
+        profiles  = ["prod"]
+        target_id = google_clouddeploy_target.multi_target_vs.target_id
     }
   }
   provider = google-beta

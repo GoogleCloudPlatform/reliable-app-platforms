@@ -80,6 +80,7 @@ steps:
     args:
       - -c
       - |
+        [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
         exec gcloud builds submit --config builds/infra-features-gke-prod-mesh-confirm.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
 
   # Configure Mesh (multicluster and telemetry) on GKE

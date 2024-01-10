@@ -18,9 +18,8 @@ tags:
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 steps:
-# Enable ASM Config - multicluster, access logs and tracing
-# Docs:
-# 1. Enable optional features on managed Anthos Service Mesh -> https://cloud.google.com/service-mesh/docs/managed/enable-managed-anthos-service-mesh-optional-features
+# Get Project Number
+# Give roles to MCI service account
 - name: "gcr.io/cloud-builders/gcloud"
   id: "infra-sa-gke-mci-roles"
   entrypoint: bash
@@ -28,13 +27,13 @@ steps:
   args:
     - -c
     - |
-      PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+      PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format="value(projectNumber)")
       echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
       
-      gcloud projects add-iam-policy-binding ${PROJECT} \
+      gcloud projects add-iam-policy-binding ${_PROJECT_ID} \
       --member "serviceAccount:service-$${PROJECT_NUMBER}@gcp-sa-multiclusteringress.iam.gserviceaccount.com" \
       --role "roles/container.admin"
 
-      gcloud projects add-iam-policy-binding ${PROJECT} \
+      gcloud projects add-iam-policy-binding ${_PROJECT_ID} \
       --member "serviceAccount:service-$${PROJECT_NUMBER}@gcp-sa-multiclusteringress.iam.gserviceaccount.com" \
       --role "roles/compute.networkViewer"

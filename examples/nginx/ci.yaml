@@ -27,7 +27,7 @@ steps:
       - -c
       - |
         [[ "${_INFRA}" == "false" ]] && exit 0
-        exec gcloud builds submit --config nginx/infra-repo/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --config nginx/infra-repo/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
   - name: "gcr.io/cloud-builders/gcloud"
     id: "deploy-to-gke"
     entrypoint: bash

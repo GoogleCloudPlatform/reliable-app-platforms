@@ -15,6 +15,7 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
+  _DEBUG_SKIP_INFRA: "true"
   _VPC: "true"
   _GKE: "true"
 tags:
@@ -38,6 +39,7 @@ steps:
     args:
       - -c
       - |
+        [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-enable-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  # Create CloudSource repos, artifact registries and triggers
   - name: "gcr.io/cloud-builders/gcloud"
@@ -46,6 +48,7 @@ steps:
     args:
       - -c
       - |
+        [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-repos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
 
   # Create VPC
@@ -55,6 +58,7 @@ steps:
     args:
       - -c
       - |
+        [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
         [[ "${_VPC}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  # Create GKE clusters
@@ -64,6 +68,7 @@ steps:
     args:
       - -c
       - |
+        [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
         [[ "${_GKE}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-create-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  
@@ -113,6 +118,15 @@ steps:
       - |
         exec gcloud builds submit --config builds/infra-features-gke-gateway.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  
+  # Give the MCI service account the necessary roles
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "infra-sa-gke-roles"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-sa-gke-mci-roles.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  
   # Confirm Mesh gateways on GKE - prod
   # This step confirms that the ASM ingress, egress and eastwest gateways are up and running on the prod GKE clusters.
   - name: "gcr.io/cloud-builders/gcloud"

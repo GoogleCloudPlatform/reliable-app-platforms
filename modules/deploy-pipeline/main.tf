@@ -70,38 +70,6 @@ resource "google_clouddeploy_target" "multi_target" {
   require_approval = false
 }
 
-resource "google_clouddeploy_target" "config_target" {
-  location = var.pipeline_location
-  name     = "target-config-${var.service_name}"
-  execution_configs {
-    usages            = ["RENDER", "DEPLOY"]
-    service_account = google_service_account.clouddeploy.email
-  }
-  gke {
-    cluster = local.config_cluster_info[0].id
-  }
-
-  project          = var.project_id
-  require_approval = false
-}
-
-resource "google_clouddeploy_delivery_pipeline" "config" {
-  location = var.pipeline_location
-  name     = lower("${var.service_name}-config-pipeline")
-
-  description = "Service delivery pipeline for the service ${var.service_name} for config cluster."
-  project     = var.project_id
-
-  serial_pipeline {
-
-    stages {
-        profiles  = ["prod"]
-        target_id = google_clouddeploy_target.config_target.target_id
-    }
-  }
-  provider = google-beta
-}
-
 resource "google_clouddeploy_delivery_pipeline" "primary" {
   location = var.pipeline_location
   name     = lower("${var.service_name}-pipeline")

@@ -119,7 +119,7 @@ resource "google_clouddeploy_target" "multi_target_vs" {
 
 resource "google_clouddeploy_delivery_pipeline" "secondary" {
   location = var.pipeline_location
-  name     = vs-lower("${var.service_name}-pipeline")
+  name     = lower("${var.service_name}-vs-pipeline")
 
   description = "Virtual service delivery pipeline for the service ${var.service_name} for app clusters."
   project     = var.project_id

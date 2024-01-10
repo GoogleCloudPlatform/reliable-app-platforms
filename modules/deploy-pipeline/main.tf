@@ -13,7 +13,7 @@ locals {
   target_G = var.archetype == "G"  ? local.clusters_info:null
 
   targets = coalescelist(local.target_SZ,local.target_APZ, local.target_MZ, local.target_APR, local.target_IR, local.target_G)
-  remaining_clusters = setsubtract(merge(local.clusters_info, local.config_cluster_info), local.targets)
+  remaining_clusters = setsubtract(concat(local.clusters_info, local.config_cluster_info), local.targets)
 }
 
 data "google_storage_bucket_object_content" "clusters_info" {

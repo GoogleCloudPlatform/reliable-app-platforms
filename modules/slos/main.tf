@@ -1,21 +1,23 @@
 locals {
-  slo_configs = [
-    for file in fileset(path.module, "/templates/*.yaml") :
-    yamldecode(templatefile(file,
-      {
-        project_id            = var.project_id,
+  latency_config = yamldecode(templatefile("${path.module}/templates/latency.yaml",
+  {
+      project_id            = var.project_id,
         service_id            = google_monitoring_custom_service.primary.service_id,
         service_name = var.service_name
-
         latency_threshold     = var.latency_threshold
         latency_goal = var.latency_goal
         latency_window = var.latency_window
         latency_rolling_period = var.latency_rolling_period
+  }))
+
+    availability_config = yamldecode(templatefile("${path.module}/templates/availability.yaml",
+  {
+      project_id            = var.project_id,
+        service_id            = google_monitoring_custom_service.primary.service_id,
+        service_name = var.service_name
         availability_rolling_period = var.availability_rolling_period
         availability_goal = var.availability_goal
-    }))
-  ]
-  slo_config_map = { for config in local.slo_configs : config.slo_id => config }
+  }))
 }
 
 resource "google_monitoring_custom_service" "primary" {
@@ -28,7 +30,7 @@ module "slo-latency" {
   source  = "terraform-google-modules/slo/google//modules/slo-native"
   version = "~> 3.0"
 
-  config = local.slo_config_map["latency-window"]
+  config = local.latency_config 
 }
 
 
@@ -36,7 +38,7 @@ module "slo-availability" {
   source  = "terraform-google-modules/slo/google//modules/slo-native"
   version = "~> 3.0"
 
-  config = local.slo_config_map["availability-window"]
+  config = local.availability_config
 }
 
 resource "google_monitoring_alert_policy" "latency_alert_policy" {

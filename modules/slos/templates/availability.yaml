@@ -3,7 +3,7 @@ service: ${service_id}
 slo_id: availability-window
 display_name: >
    - "Availability - ${availability_goal} - Calendar ${availability_rolling_period} Day
-goal: ${latency_goal}
+goal: ${availability_goal}
 rolling_period_days: ${availability_rolling_period}
 type: request_based_sli
 method: good_total_ratio

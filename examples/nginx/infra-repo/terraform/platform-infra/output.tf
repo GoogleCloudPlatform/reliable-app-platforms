@@ -9,3 +9,7 @@ output "pipeline_id" {
 output "endpoint" {
   value = module.endpoint.endpoints
 }
+
+output "path" {
+  value = path.module
+}

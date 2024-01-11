@@ -28,6 +28,14 @@ module "slo-latency" {
   config = local.slo_config_map["latency-window"]
 }
 
+
+module "slo-availability" {
+  source  = "terraform-google-modules/slo/google//modules/slo-native"
+  version = "~> 3.0"
+
+  config = local.slo_config_map["availability-window"]
+}
+
 resource "google_monitoring_alert_policy" "latency_alert_policy" {
   project = var.project_id
   display_name = "latency-alert"

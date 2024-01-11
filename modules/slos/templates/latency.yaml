@@ -14,4 +14,4 @@ metric_filter: >
   metric.type="istio.io/service/server/response_latencies"
   metric.label.destination_service_name=${service_name}
 range_min: 0   # ms
-range_max: ${latency_threshold} # ms
+# range_max: ${latency_threshold} # ms

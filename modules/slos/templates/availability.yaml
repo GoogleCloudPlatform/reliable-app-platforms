@@ -2,9 +2,9 @@ project_id: ${project_id}
 service: ${service_id}
 slo_id: availability-window
 display_name: >
-   - "Availability - ${latency_goal} - Calendar ${latency_rolling_period} Day
+   - "Availability - ${availability_goal} - Calendar ${availability_rolling_period} Day
 goal: ${latency_goal}
-rolling_period_days: ${latency_rolling_period}
+rolling_period_days: ${availability_rolling_period}
 type: request_based_sli
 method: good_total_ratio
 good_total_ratio: 0.95
@@ -12,11 +12,10 @@ good_service_filter: >
   resource.type="istio_canonical_service"
   metric.type="istio.io/service/server/request_count"
   metric.label.destination_service_name=${service_name}
-  metric.label.response_code_class="200"
 total_service_filter: >
   resource.type="istio_canonical_service"
   metric.type="istio.io/service/server/request_count"
   metric.label.destination_service_name=${service_name}
-range_min: 0   # ms
 
+#https://github.com/terraform-google-modules/terraform-google-slo/blob/master/modules/slo-native/dynamic.tf
 #https://cloud.google.com/stackdriver/docs/solutions/slo-monitoring/api/identifying-custom-sli

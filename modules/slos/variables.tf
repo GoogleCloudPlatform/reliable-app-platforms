@@ -36,3 +36,26 @@ variable "latency_alert_lookback_duration" {
   description = "in s. Defaults to 300"
   default = 300
 }
+
+
+
+variable "availability_goal" {
+  description = "Availability target goal. Defaults to 0.999"
+  default = 0.999
+} 
+
+variable "availability_rolling_period" {
+  description = "Availability rolling period in days. Defaults to 1"
+  default = 1
+} 
+
+
+variable "availability_alert_threshold" {
+  description = "value"
+  default = 10
+}
+
+variable "availability_alert_lookback_duration" {
+  description = "in s. Defaults to 300"
+  default = 300
+}

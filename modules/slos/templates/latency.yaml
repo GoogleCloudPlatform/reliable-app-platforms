@@ -10,8 +10,8 @@ method: performance_window
 method_performance: distribution_cut
 window_period: ${latency_window}s
 metric_filter: >
+  resource.type="istio_canonical_service"
   metric.type="istio.io/service/server/response_latencies"
-  resource.type="istio_canonical_service" 
-  metric.label."destination_service_name"="nginx"
+  metric.label.destination_service_name=${service_name}
 range_min: 0   # ms
 range_max: ${latency_threshold} # ms

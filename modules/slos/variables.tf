@@ -22,8 +22,17 @@ variable "latency_rolling_period" {
   default = 1
 } 
 
-
 variable "latency_threshold" {
   description = "Latency rolling threshold in ms. Defaults to 500"
   default = 500
 } 
+
+variable "latency_alert_threshold" {
+  description = "value"
+  default = 10
+}
+
+variable "latency_alert_lookback_duration" {
+  description = "in s. Defaults to 300"
+  default = 300
+}

@@ -21,9 +21,9 @@ module "slo_latency" {
     project_id        = var.project_id
     service           = data.google_monitoring_istio_canonical_service.default.service_id
     slo_id            = "${var.service_name}-latency-slo"
-    display_name      = "Latency - ${var.latency_threshold}ms - ${var.latency_goal} - Calendar  Day"
+    display_name      = "Latency - ${var.latency_threshold}ms - ${var.latency_goal} - Calendar ${var.latency_calendar_period} Day"
     goal              = var.latency_goal
-    calendar_period   = "DAY"
+    calendar_period   = var.latency_calendar_period
     type              = "basic_sli"
     method            = "latency"
     latency_threshold = "${var.latency_threshold}s"
@@ -51,9 +51,9 @@ module "slo_availability" {
     project_id        = var.project_id
     service           = data.google_monitoring_istio_canonical_service.default.service_id
     slo_id            = "${var.service_name}-availability-slo"
-    display_name      = "Availability - ${var.availability_goal} - Calendar  Day"
+    display_name      = "Availability - ${var.availability_goal} - Calendar ${var.availability_calendar_period} Day"
     goal              = var.availability_goal
-    calendar_period   = "DAY"
+    calendar_period   = var.availability_calendar_period
     type              = "basic_sli"
     method            = "availability"
   }

@@ -32,12 +32,15 @@ variable "latency_alert_threshold" {
   default = 10
 }
 
+variable "latency_calendar_period" {
+  description = "Defaults to DAY"
+  default = "DAY"
+}
+
 variable "latency_alert_lookback_duration" {
   description = "in s. Defaults to 300"
   default = 300
 }
-
-
 
 variable "availability_goal" {
   description = "Availability target goal. Defaults to 0.999"
@@ -58,4 +61,9 @@ variable "availability_alert_threshold" {
 variable "availability_alert_lookback_duration" {
   description = "in s. Defaults to 300"
   default = 300
+}
+
+variable "availability_calendar_period" {
+  description = "Defaults to DAY"
+  default = "DAY"
 }

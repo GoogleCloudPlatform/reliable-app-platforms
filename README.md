@@ -125,6 +125,5 @@ WIP
 1. module  deploy-pipelines: check why first deploy always fails.
 1. module deploy-pipelines: Use zone names and region names instead of indices
 1. infra/asm: parameterise names of clusters in configsync annotation.
-1. examples: deploy.sh should be faster.
 
    

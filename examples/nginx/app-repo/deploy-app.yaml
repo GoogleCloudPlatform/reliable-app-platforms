@@ -37,7 +37,7 @@ steps:
         gcloud deploy releases create rel-${_SHORT_SHA} \
         --delivery-pipeline ${_SERVICE}-pipeline \
         --region ${_REGION} \
-        --skaffold-file=./nginx/app-repo/skaffold_app.yaml
+        --skaffold-file=./examples/nginx/app-repo/skaffold_app.yaml
  # Create release in Google Cloud Deploy for other Clusters to deploy the virtual service
   - name: gcr.io/cloud-builders/gcloud
     id: "deploy-to-other-clusters"
@@ -54,4 +54,4 @@ steps:
         gcloud deploy releases create rel-${_SHORT_SHA} \
         --delivery-pipeline ${_SERVICE}-vs-pipeline \
         --region ${_REGION} \
-        --skaffold-file=./nginx/app-repo/skaffold_vs.yaml
+        --skaffold-file=./examples/nginx/app-repo/skaffold_vs.yaml

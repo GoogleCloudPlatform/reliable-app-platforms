@@ -17,6 +17,8 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _INFRA: "true"
   _DEPLOY_APP: "true"
+  _CREATE_SLO: "true"
+
 tags:
   - infra-main-terraform
 steps:
@@ -27,7 +29,7 @@ steps:
       - -c
       - |
         [[ "${_INFRA}" == "false" ]] && exit 0
-        exec gcloud builds submit --config nginx/infra-repo/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+        exec gcloud builds submit --config examples/nginx/infra-repo/create-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
   - name: "gcr.io/cloud-builders/gcloud"
     id: "deploy-to-gke"
     entrypoint: bash
@@ -35,5 +37,13 @@ steps:
       - -c
       - |
         [[ "${_DEPLOY_APP}" == "false" ]] && exit 0
-        exec gcloud builds submit --config nginx/app-repo/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
- 
+        exec gcloud builds submit --config examples/nginx/app-repo/deploy-app.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "slos-create"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CREATE_SLO}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/nginx/infra-repo/create-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+  

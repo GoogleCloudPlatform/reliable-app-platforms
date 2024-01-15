@@ -33,6 +33,7 @@ substitutions:
   _BUILD: "true"
   _APP_NAME: "nginx"
   _SERVICE: "nginx"
+  _PIPELINE_LOCATION: "us-central1"
   _ARCHETYPE: "APZ"
   _ZONE_INDEX: "[0,1]"
   _REGION_INDEX: "[0,1]"
@@ -41,11 +42,14 @@ steps:
   - name: "hashicorp/terraform:1.4.6"
     id: "create-infra"
     entrypoint: "sh"
-    dir: "nginx/infra-repo/terraform/platform-infra"
+    dir: "examples/nginx/infra-repo/terraform/platform-infra"
     args:
       - "-xe"
       - "-c"
       - |
         [[ "${_BUILD}" == "false" ]] && exit 0
         terraform init -backend-config="bucket=${_PROJECT_ID}"
-        terraform apply -var="project_id=${_PROJECT_ID}" -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}" -var="archetype=${_ARCHETYPE}" -var="zone_index=${_ZONE_INDEX}" -var="region_index=${_REGION_INDEX}" --auto-approve
+        terraform apply -var="project_id=${_PROJECT_ID}" \
+        -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}" -var="archetype=${_ARCHETYPE}" \
+        -var="zone_index=${_ZONE_INDEX}" -var="region_index=${_REGION_INDEX}" -var="pipeline_location=${_PIPELINE_LOCATION}" \
+        --auto-approve

@@ -8,3 +8,5 @@ To start the app, run:
 yarn install
 yarn dev
 ```
+
+don't forget ENV secrets, eg: `source /tmp/backstage-local-secrets.sh`

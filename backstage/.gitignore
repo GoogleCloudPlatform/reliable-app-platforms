@@ -55,5 +55,6 @@ site
 e2e-test-report/
 
 kubernetes/backstage-secrets.yaml
-kubernetes/google-oauth-secrets.yaml
 kubernetes/github-secrets.yaml
+kubernetes/google-oauth-secrets.yaml
+kubernetes/postgres-secrets.yaml

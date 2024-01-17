@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@backstage/plugin-cloudbuild": "^0.3.29",
+    "@backstage/plugin-kubernetes": "^0.11.4"
+  }
+}

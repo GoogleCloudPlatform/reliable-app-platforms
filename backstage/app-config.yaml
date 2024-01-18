@@ -124,3 +124,20 @@ catalog:
     #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
     #   rules:
     #     - allow: [User, Group]
+
+kubernetes:
+  serviceLocatorMethod:
+    type: 'multiTenant'
+  clusterLocatorMethods:
+#    - type: 'gke'
+#      projectId: 'arch52-test'
+#      region: 'us-west2'
+#      skipTLSVerify: true
+#      skipMetricsLookup: true
+#      exposeDashboard: true
+    - type: 'config'
+      clusters:
+        - url: https://34.102.155.239
+          name: 'arch52'
+          skipTLSVerify: true
+          authProvider: 'google'

@@ -18,7 +18,7 @@ spec:
         - name: backstage
 #          image: backstage:1.0.0
           image: us-docker.pkg.dev/arch52-test/ops/backstage:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 7007

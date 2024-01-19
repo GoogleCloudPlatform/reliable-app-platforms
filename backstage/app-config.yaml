@@ -19,7 +19,7 @@ backend:
     # host: 127.0.0.1
   csp:
     upgrade-insecure-requests: false
-    connect-src: ["'self'", 'http:', 'https:']
+    # connect-src: ["'self'", 'http:', 'https:']
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:

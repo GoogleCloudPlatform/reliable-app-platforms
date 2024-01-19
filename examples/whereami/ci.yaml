@@ -22,7 +22,7 @@ tags:
   - deploy-whereami
 steps:
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "deploy-backend"
+    id: "backend-deploy"
     entrypoint: bash
     args:
       - -c
@@ -30,11 +30,11 @@ steps:
         [[ "${_BACKEND}" == "false" ]] && exit 0
         exec gcloud builds submit --config examples/whereami/whereami-backend/ci-backend.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA} 
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "deploy-frontend"
+    id: "frontend-deploy"
     entrypoint: bash
     args:
       - -c
       - |
         [[ "${_FRONTEND}" == "false" ]] && exit 0
         exec gcloud builds submit --config examples/whereami/whereami-frontend/ci-frontend.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
-  
+   

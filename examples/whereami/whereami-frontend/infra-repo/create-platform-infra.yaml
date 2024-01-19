@@ -27,15 +27,16 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-cicd-nginx-nginx
+  - infra-cicd-whereami-whereamifrontend
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
   _APP_NAME: "whereami"
   _SERVICE: "whereami-frontend"
   _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "SZ"
-  _ZONE_INDEX: "[2]"
+  _ARCHETYPE: "APR"
+  _ZONE_INDEX: "[]"
+  _REGION_INDEX: "[0,1]"
 
 steps:
   - name: "hashicorp/terraform:1.4.6"

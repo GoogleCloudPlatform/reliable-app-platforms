@@ -5,7 +5,6 @@ output "deploy_targets" {
 output "pipeline_id" {
   value = module.deploy-pipeline.pipeline_id
 }
-
 output "endpoint" {
   value = module.endpoint.endpoints
 }

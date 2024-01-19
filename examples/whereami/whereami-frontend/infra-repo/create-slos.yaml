@@ -27,18 +27,18 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-cicd-nginx-nginx
+  - infra-cicd-whereami-whereamifrontend
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
-  _APP_NAME: "nginx"
-  _SERVICE: "nginx"
+  _APP_NAME: "whereami"
+  _SERVICE: "whereami-frontend"
 
 steps:
   - name: "hashicorp/terraform:1.4.6"
     id: "create-infra"
     entrypoint: "sh"
-    dir: "examples/nginx/infra-repo/terraform/slos"
+    dir: "examples/whereami/whereami-frontend/infra-repo/terraform/slos"
     args:
       - "-xe"
       - "-c"

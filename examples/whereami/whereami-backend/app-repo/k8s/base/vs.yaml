@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: whereami-backend-virtualservice
+    namespace: whereami-backend
+spec:
+    hosts:
+    - "whereami-backend.whereami-backend.svc.cluster.local"
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: whereami-backend
+          port:
+            number: 80

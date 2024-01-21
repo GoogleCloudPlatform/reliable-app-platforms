@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: shipping-workload
+namePrefix: "shipping"
+namespace: shipping
+commonLabels:
+  app: shipping
+resources:
+  - ../../base
+patches:

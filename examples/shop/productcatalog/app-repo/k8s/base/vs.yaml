@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: productcatalog-virtualservice
+    namespace: productcatalog
+spec:
+    hosts:
+    - productcatalog.productcatalog.cluster.local.svc
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: productcatalog
+          port:
+            number: 80

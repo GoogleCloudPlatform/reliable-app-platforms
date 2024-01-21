@@ -1,0 +1,103 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 14400s # 2hr
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _FRONTEND: "true"
+  _CART: "true"
+  _AD: "true"
+  _CHECKOUT: "true"
+  _CURRENCY: "true"
+  _EMAIL: "true"
+  _CATALOG: "true"
+  _RECOMMENDATIONS: "true"
+  _SHIPPING: "true"
+
+tags:
+  - deploy-shop
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "shop-frontend-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_FRONTEND}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/shop-frontend/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA} 
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "cart-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CART}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/cart/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "ad-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_AD}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/ad/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "checkout-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CHECKOUT}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/checkout/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "currency-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CURRENCY}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/currency/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "email-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_EMAIL}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/email/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "catalog-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CATALOG}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/catalog/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "recommendations-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_RECOMMENDATIONS}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/recommendations/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "shipping-deploy"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_SHIPPONG}" == "false" ]] && exit 0
+        exec gcloud builds submit --config examples/shop/shipping/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+    

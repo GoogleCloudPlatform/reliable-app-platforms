@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: ad-virtualservice
+    namespace: ad
+spec:
+    hosts:
+    - ad.ad.cluster.local.svc
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: ad
+          port:
+            number: 80

@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: currency-virtualservice
+    namespace: currency
+spec:
+    hosts:
+    - currency.currency.cluster.local.svc
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: currency
+          port:
+            number: 80

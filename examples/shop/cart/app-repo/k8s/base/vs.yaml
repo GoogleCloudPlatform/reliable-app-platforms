@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: cart-virtualservice
+    namespace: cart
+spec:
+    hosts:
+    - cart.cart.cluster.local.svc
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: cart
+          port:
+            number: 80

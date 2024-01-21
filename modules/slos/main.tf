@@ -33,7 +33,7 @@ module "slo_latency" {
 
 resource "google_monitoring_alert_policy" "latency_alert_policy" {
   project = var.project_id
-  display_name = "latency-alert"
+  display_name = "${var.service_name}-latency-alert"
   combiner     = "OR"
   conditions {
     display_name = " Burn rate for ${var.service_name} Latency with ${var.latency_alert_threshold} for ${var.latency_alert_lookback_duration}s lookback period"
@@ -62,7 +62,7 @@ module "slo_availability" {
 
 resource "google_monitoring_alert_policy" "availability_alert_policy" {
   project = var.project_id
-  display_name = "availability-alert"
+  display_name = "${var.service_name}-availability-alert"
   combiner     = "OR"
   conditions {
     display_name = " Burn rate for ${var.service_name} Availability with ${var.availability_alert_threshold} for ${var.availability_alert_lookback_duration}s lookback period"

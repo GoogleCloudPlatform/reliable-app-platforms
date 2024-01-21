@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: email-virtualservice
+    namespace: email
+spec:
+    hosts:
+    - email.email.cluster.local.svc
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: email
+          port:
+            number: 80

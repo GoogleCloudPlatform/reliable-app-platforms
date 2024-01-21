@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: shipping-virtualservice
+    namespace: shipping
+spec:
+    hosts:
+    - shipping.shipping.cluster.local.svc
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: shipping
+          port:
+            number: 80

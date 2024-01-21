@@ -27,7 +27,7 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-cicd-whereami-whereamifrontend
+  - infra-slos-whereami-whereamifrontend
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
@@ -36,7 +36,7 @@ substitutions:
 
 steps:
   - name: "hashicorp/terraform:1.4.6"
-    id: "create-infra"
+    id: "create-slos"
     entrypoint: "sh"
     dir: "examples/whereami/whereami-frontend/infra-repo/terraform/slos"
     args:

@@ -3,6 +3,6 @@ variable "project_id" {
 }
 
 variable "kubernetes_version" {
-  description = "Kubernetes version to use. Defaults to latest"
-  default = "latest"
+  description = "Kubernetes version to use. Defaults to 1.27.3-gke.100"
+  default = "1.27.3-gke.100"
 }

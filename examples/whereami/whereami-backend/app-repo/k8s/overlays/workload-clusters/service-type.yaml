@@ -3,4 +3,10 @@ kind: "Service"
 metadata:
   name: "whereami"
 spec:
+  selector:
+    app: whereami-backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
   type: ClusterIP

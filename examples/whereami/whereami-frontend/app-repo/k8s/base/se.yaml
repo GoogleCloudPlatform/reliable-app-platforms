@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: whereami-backend
+  namespace: whereami-frontend
+spec:
+  hosts:
+  - whereami-backend.whereami-backend.svc.cluster.local
+  ports:
+  - name: whereami-backend
+    number: 80
+    protocol: TCP
+  resolution: DNS

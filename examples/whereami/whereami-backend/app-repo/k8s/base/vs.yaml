@@ -5,12 +5,10 @@ metadata:
     namespace: whereami-backend
 spec:
     hosts:
-    - "whereami-backend.whereami-backend.svc.cluster.local"
-    gateways:
-    - asm-ingress-gw/asm-ingressgateway
+    - whereami-backend.whereami-backend.svc.cluster.local
     http:
     - route:
       - destination:
-          host: whereami-backend
+          host: whereami-backend.whereami-backend.svc.cluster.local
           port:
             number: 80

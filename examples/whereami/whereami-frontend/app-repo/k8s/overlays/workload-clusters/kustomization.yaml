@@ -16,3 +16,6 @@ patches:
 - path: service-type.yaml
   target:
     kind: Service
+- path: deployment.yaml
+  target:
+    kind: Deployment

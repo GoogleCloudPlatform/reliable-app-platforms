@@ -7,4 +7,6 @@ commonLabels:
   app: ad
 resources:
   - ../../base
-patches:
+images:
+- name: adservice
+- newName: us-central1-docker.pkg.dev/arch001/shop-ad/service:latest

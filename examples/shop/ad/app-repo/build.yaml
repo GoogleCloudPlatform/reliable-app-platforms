@@ -16,13 +16,14 @@ timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _REGION: us-central1
-
 tags:
   - build-images
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
+- name: 'gcr.io/cloud-builders/docker'
+  dir: "./app-repo/src"
   args: [ 'build', 
-  '-t', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/ad/ad:${_SHORT_SHA}',
-   '.', '-f', 'builds/docker/Dockerfile' ]
+  '-t', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_APP_NAME}-${_SERVICE}/service:${_SHORT_SHA}', 
+  '-t', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_APP_NAME}-${_SERVICE}/service:latest', 
+  '.', '-f', './Dockerfile' ]
 images:
-- '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/ad/ad:${_SHORT_SHA}'
+- '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_APP_NAME}-${_SERVICE}/service'

@@ -42,7 +42,7 @@ steps:
   - name: "hashicorp/terraform:1.4.6"
     id: "create-infra"
     entrypoint: "sh"
-    dir: "examples/shop/ad/infra-repo/terraform/platform-infra"
+    dir: "./infra-repo/terraform/platform-infra"
     args:
       - "-xe"
       - "-c"

@@ -6,7 +6,16 @@ namespace: ad
 commonLabels:
   app: ad
 resources:
-  - ../../base
+- ../../base
+- deployment.yaml
+patches:
+- path: deployment.yaml
+  target:
+    kind: deployment
+- path: service.yaml
+  target:
+    kind: Service
 images:
 - name: adservice
-- newName: us-central1-docker.pkg.dev/arch001/shop-ad/service:latest
+  newName: us-central1-docker.pkg.dev/arch001/shop-ad/service
+  newTag: latest

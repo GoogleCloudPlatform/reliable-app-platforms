@@ -5,7 +5,7 @@ metadata:
     namespace: ad
 spec:
     hosts:
-    - ad.ad.cluster.local.svc
+    - ad.ad.svc.cluster.local
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

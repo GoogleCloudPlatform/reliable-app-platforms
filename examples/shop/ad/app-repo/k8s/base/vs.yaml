@@ -13,4 +13,4 @@ spec:
       - destination:
           host: ad
           port:
-            number: 80
+            number: 9555

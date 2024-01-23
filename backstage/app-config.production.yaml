@@ -1,6 +1,6 @@
 app:
   # Should be the same as backend.baseUrl when using the `app-backend` plugin.
-  baseUrl: http://localhost:7007
+  baseUrl: http://bs.rap.smig.cloudadvocacyorg.joonix.net:3000
 
 backend:
   # Note that the baseUrl should be the URL that the browser and other clients

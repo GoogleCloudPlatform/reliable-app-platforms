@@ -1,0 +1,23 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: managed-cert
+  namespace: backstage
+spec:
+  domains:
+    - bs.rap.smig.cloudadvocacyorg.joonix.net
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backstage
+  namespace: backstage
+  annotations:
+    networking.gke.io/managed-certificates: managed-cert
+    kubernetes.io/ingress.global-static-ip-name: backstage-public
+spec:
+  defaultBackend:
+    service:
+      name: backstage
+      port:
+        name: backstage-port

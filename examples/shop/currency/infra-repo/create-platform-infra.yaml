@@ -31,8 +31,6 @@ tags:
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
-  _APP_NAME: "shop"
-  _SERVICE: "currency"
   _PIPELINE_LOCATION: "us-central1"
   _ARCHETYPE: "APZ"
   _ZONE_INDEX: "[1,2]"

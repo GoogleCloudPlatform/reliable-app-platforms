@@ -34,15 +34,15 @@ substitutions:
   _APP_NAME: "shop"
   _SERVICE: "productcatalog"
   _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "APR"
-  _ZONE_INDEX: "[]"
-  _REGION_INDEX: "[0,1]"
+  _ARCHETYPE: "APZ"
+  _ZONE_INDEX: "[1,2]"
+  _REGION_INDEX: "[]"
 
 steps:
   - name: "hashicorp/terraform:1.4.6"
     id: "create-infra"
     entrypoint: "sh"
-    dir: "examples/shop/productcatalog/infra-repo/terraform/platform-infra"
+    dir: "./infra-repo/terraform/platform-infra"
     args:
       - "-xe"
       - "-c"

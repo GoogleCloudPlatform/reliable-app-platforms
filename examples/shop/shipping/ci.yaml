@@ -29,7 +29,15 @@ steps:
       - -c
       - |
         [[ "${_INFRA}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/shop/shipping/infra-repo/create-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+        exec gcloud builds submit --config examples/shop/shipping/infra-repo/create-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "build-app-image"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_BUILD}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./app-repo/build.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
   - name: "gcr.io/cloud-builders/gcloud"
     id: "deploy-app-to-gke"
     entrypoint: bash
@@ -37,7 +45,7 @@ steps:
       - -c
       - |
         [[ "${_APP}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/shop/shipping/app-repo/deploy-app.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+        exec gcloud builds submit --config examples/shop/shipping/app-repo/deploy-app.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
   - name: "gcr.io/cloud-builders/gcloud"
     id: "create-app-slos"
     entrypoint: bash
@@ -45,5 +53,5 @@ steps:
       - -c
       - |
         [[ "${_SLO}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/shop/shipping/infra-repo/create-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+        exec gcloud builds submit --config examples/shop/shipping/infra-repo/create-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
   

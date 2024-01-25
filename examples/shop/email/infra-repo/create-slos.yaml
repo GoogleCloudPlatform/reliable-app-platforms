@@ -38,7 +38,7 @@ steps:
   - name: "hashicorp/terraform:1.4.6"
     id: "create-slos"
     entrypoint: "sh"
-    dir: "examples/shop/email/infra-repo/terraform/slos"
+    dir: "./infra-repo/terraform/slos"
     args:
       - "-xe"
       - "-c"

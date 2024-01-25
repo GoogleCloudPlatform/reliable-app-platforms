@@ -11,6 +11,6 @@ spec:
     http:
     - route:
       - destination:
-          host: shop-frontend
+          host: frontend
           port:
             number: 80

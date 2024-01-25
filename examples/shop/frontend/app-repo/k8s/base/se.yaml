@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: frontend
+  namespace: frontend
+spec:
+  hosts:
+  - frontend.frontend.svc.cluster.local
+  ports:
+  - name: frontend
+    number: 80
+    protocol: TCP
+  resolution: DNS

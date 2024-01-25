@@ -5,7 +5,7 @@ metadata:
     namespace: productcatalog
 spec:
     hosts:
-    - productcatalog.productcatalog.cluster.local.svc
+    - productcatalog.productcatalog.svc.cluster.local
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

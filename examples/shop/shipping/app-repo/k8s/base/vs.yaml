@@ -5,7 +5,7 @@ metadata:
     namespace: shipping
 spec:
     hosts:
-    - shipping.shipping.cluster.local.svc
+    - shipping.shipping.svc.cluster.local
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

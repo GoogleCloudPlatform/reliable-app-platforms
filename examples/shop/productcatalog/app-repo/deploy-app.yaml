@@ -37,5 +37,5 @@ steps:
         gcloud deploy releases create rel-${_SHORT_SHA} \
         --delivery-pipeline ${_SERVICE}-pipeline \
         --region ${_REGION} \
-        --skaffold-file=./examples/${_APP_NAME}/${_SERVICE}/app-repo/skaffold_workload_clusters.yaml
+        --skaffold-file=./app-repo/skaffold_workload_clusters.yaml
  

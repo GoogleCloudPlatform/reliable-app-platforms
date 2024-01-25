@@ -5,7 +5,7 @@ metadata:
     namespace: recommendations
 spec:
     hosts:
-    - recommendations.recommendations.cluster.local.svc
+    - recommendations.recommendations.svc.cluster.local
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

@@ -17,9 +17,9 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _FRONTEND: "false"
   _CART: "false"
-  _AD: "true"
+  _AD: "false"
   _CHECKOUT: "false"
-  _CURRENCY: "false"
+  _CURRENCY: "true"
   _EMAIL: "false"
   _CATALOG: "false"
   _RECOMMENDATIONS: "false"
@@ -64,11 +64,12 @@ steps:
   - name: "gcr.io/cloud-builders/gcloud"
     id: "currency-deploy"
     entrypoint: bash
+    dir: ./examples/shop/currency
     args:
       - -c
       - |
         [[ "${_CURRENCY}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/shop/currency/ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="currency"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "email-deploy"
     entrypoint: bash

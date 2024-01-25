@@ -5,7 +5,7 @@ metadata:
     namespace: currency
 spec:
     hosts:
-    - currency.currency.cluster.local.svc
+    - currency.currency.svc.cluster.local
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

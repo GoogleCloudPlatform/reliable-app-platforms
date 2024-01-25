@@ -5,5 +5,4 @@ metadata:
 resources:
   - namespace.yaml
   - vs.yaml
-  - se.yaml
 

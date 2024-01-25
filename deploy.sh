@@ -37,7 +37,12 @@ while [ "$1" != "" ]; do
 done
 
 # Create a short SHA until this is tied to a git repo and can use a commit sha
-SHORT_SHA=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
+while true; do
+    SHORT_SHA=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
+    if [[ -n $SHORT_SHA ]]; then  # Check if SHORT_SHA is not empty
+        break
+    fi
+done
 
 # Set project to PROJECT_ID or exit
 [[ ! "${PROJECT_ID}" ]] && echo -e "Please export PROJECT_ID variable (\e[95mexport PROJECT_ID=<YOUR POROJECT ID>\e[0m)\nExiting." && exit 0

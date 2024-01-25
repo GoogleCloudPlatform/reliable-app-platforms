@@ -8,6 +8,7 @@ commonLabels:
 resources:
 - ../../base
 - deployment.yaml
+- service.yaml
 patches:
 - path: deployment.yaml
   target:

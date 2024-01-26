@@ -17,7 +17,8 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _INFRA: "true"
   _APP: "true"
-  _SLO: "true"
+  _SLO: "false"
+  _BUILD: "true"
 
 tags:
   - deploy-shop-checkout
@@ -30,6 +31,14 @@ steps:
       - |
         [[ "${_INFRA}" == "false" ]] && exit 0
         exec gcloud builds submit --config ./infra-repo/create-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "build-app-image"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_BUILD}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./app-repo/build.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
   - name: "gcr.io/cloud-builders/gcloud"
     id: "deploy-app-to-gke"
     entrypoint: bash

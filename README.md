@@ -81,8 +81,8 @@ The structure assumed is as follows:
             1. SLOs-infra folder
    1. ...
 
-### Infra-repo/Folder
-The infrastucture repo will contain a terraform folder where all the terraform modules are stored.
+### Infra-repo
+The infrastucture repo/folder will contain a terraform folder where all the terraform modules are stored.
 1. The Platform-infra folder: Use this folder to create a terraform modules that will consume the following platform modules:
    1. deploy-pipeline: *Required*. You can use this module to define the archetype of the service along with the zones/regions where the service needs to be deployed. 
    1. artifact-registry: *Optional*, if you want an artifact registry to store container images of your service. 

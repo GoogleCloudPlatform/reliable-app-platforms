@@ -1,0 +1,70 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: currency
+  namespace: checkout
+spec:
+  hosts:
+  - currency.currency.svc.cluster.local
+  ports:
+  - name: currency
+    number: 7000
+    protocol: TCP
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: productcatalog
+  namespace: checkout
+spec:
+  hosts:
+  - productcatalog.productcatalog.svc.cluster.local
+  ports:
+  - name: productcatalog
+    number: 3550
+    protocol: TCP
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: cart
+  namespace: checkout
+spec:
+  hosts:
+  - cart.cart.svc.cluster.local
+  ports:
+  - name: cart
+    number: 7070
+    protocol: TCP
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: shipping
+  namespace: checkout
+spec:
+  hosts:
+  - shipping.shipping.svc.cluster.local
+  ports:
+  - name: shipping
+    number: 50051
+    protocol: TCP
+  resolution: DNS
+--- 
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: email
+  namespace: checkout
+spec:
+  hosts:
+  - email.email.svc.cluster.local
+  ports:
+  - name: email
+    number: 5000
+    protocol: TCP
+  resolution: DNS
+---

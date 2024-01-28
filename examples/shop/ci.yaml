@@ -15,7 +15,7 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _FRONTEND: "false"
+  _FRONTEND: "true"
   _CART: "true"
   _AD: "true"
   _CHECKOUT: "true"
@@ -24,6 +24,7 @@ substitutions:
   _CATALOG: "true"
   _RECOMMENDATIONS: "true"
   _SHIPPING: "true"
+  _PAYMENT: "true"
 
 tags:
   - deploy-shop
@@ -109,4 +110,13 @@ steps:
       - |
         [[ "${_SHIPPING}" == "false" ]] && exit 0
         exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="shipping"
-    
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "payment-deploy"
+    dir: ./examples/shop/payment
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_PAYMENT}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="payment"
+     

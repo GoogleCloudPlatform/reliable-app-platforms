@@ -5,7 +5,7 @@ metadata:
     namespace: frontend
 spec:
     hosts:
-    - "shop.endpoints.arch001.cloud.goog"
+    - "shop-frontend.endpoints.arch001.cloud.goog"
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

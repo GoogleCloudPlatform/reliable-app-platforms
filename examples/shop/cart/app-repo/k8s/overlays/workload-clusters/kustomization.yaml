@@ -3,20 +3,12 @@ kind: Kustomization
 metadata:
   name: cart-workload
 namespace: cart
-commonLabels:
-  app: cart
 resources:
 - ../../base
 - deployment.yaml
 - service.yaml
 - redis.yaml
-patches:
-- path: deployment.yaml
-  target:
-    kind: deployment
-- path: service.yaml
-  target:
-    kind: Service
+
 images:
 - name: cartservice
   newName: us-central1-docker.pkg.dev/arch001/shop-cart/service

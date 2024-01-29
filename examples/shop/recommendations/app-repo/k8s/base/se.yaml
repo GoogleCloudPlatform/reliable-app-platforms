@@ -1,0 +1,13 @@
+piVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: productcatalog
+  namespace: recommendations
+spec:
+  hosts:
+  - productcatalog.productcatalog.svc.cluster.local
+  ports:
+  - name: productcatalog
+    number: 3550
+    protocol: TCP
+  resolution: DNS

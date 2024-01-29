@@ -15,16 +15,16 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _FRONTEND: "true"
-  _CART: "true"
-  _AD: "true"
-  _CHECKOUT: "true"
-  _CURRENCY: "true"
-  _EMAIL: "true"
-  _CATALOG: "true"
-  _RECOMMENDATIONS: "true"
+  _FRONTEND: "false"
+  _CART: "false"
+  _AD: "false"
+  _CHECKOUT: "false"
+  _CURRENCY: "false"
+  _EMAIL: "false"
+  _CATALOG: "false"
+  _RECOMMENDATIONS: "false"
   _SHIPPING: "true"
-  _PAYMENT: "true"
+  _PAYMENT: "false"
 
 tags:
   - deploy-shop

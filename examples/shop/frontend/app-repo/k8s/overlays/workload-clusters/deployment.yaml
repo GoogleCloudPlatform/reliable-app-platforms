@@ -90,6 +90,8 @@ spec:
           #   value: "aws"
           - name: ENABLE_PROFILER
             value: "0"
+          - name: ENABLE_TRACING
+            value: "0"
           # - name: CYMBAL_BRANDING
           #   value: "true"
           # - name: FRONTEND_MESSAGE

@@ -62,7 +62,7 @@ spec:
           - name: SHIPPING_SERVICE_ADDR
             value: "shipping.shipping.svc.cluster.local:50051"
           - name: PAYMENT_SERVICE_ADDR
-            value: "paymentservice:50051"
+            value: "payment.payment.svc.cluster.local:50051"
           - name: EMAIL_SERVICE_ADDR
             value: "email.email.svc.cluster.local:5000"
           - name: CURRENCY_SERVICE_ADDR

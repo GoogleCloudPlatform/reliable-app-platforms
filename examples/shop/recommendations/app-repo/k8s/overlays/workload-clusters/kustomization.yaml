@@ -9,14 +9,7 @@ resources:
 - ../../base
 - deployment.yaml
 - service.yaml
-patches:
-- path: deployment.yaml
-  target:
-    kind: deployment
-- path: service.yaml
-  target:
-    kind: Service
 images:
-- name: recommendationsservice
+- name: recommendationservice
   newName: us-central1-docker.pkg.dev/arch001/shop-recommendations/service
   newTag: latest

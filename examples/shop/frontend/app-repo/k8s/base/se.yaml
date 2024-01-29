@@ -93,5 +93,5 @@ spec:
   ports:
   - name: ad
     number: 9555
-    protocol: GRPC
+    protocol: TCP
   resolution: DNS

@@ -6,11 +6,9 @@ metadata:
 spec:
     hosts:
     - recommendations.recommendations.svc.cluster.local
-    gateways:
-    - asm-ingress-gw/asm-ingressgateway
     http:
     - route:
       - destination:
           host: recommendations
           port:
-            number: 80
+            number: 8080

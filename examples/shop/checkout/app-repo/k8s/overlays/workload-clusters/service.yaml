@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: checkoutservice
+  name: checkout
 spec:
   type: ClusterIP
   selector:
-    app: checkoutservice
+    app: checkout
   ports:
   - name: grpc
     port: 5050

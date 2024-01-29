@@ -9,13 +9,6 @@ resources:
 - ../../base
 - deployment.yaml
 - service.yaml
-patches:
-- path: deployment.yaml
-  target:
-    kind: deployment
-- path: service.yaml
-  target:
-    kind: Service
 images:
 - name: adservice
   newName: us-central1-docker.pkg.dev/arch001/shop-ad/service

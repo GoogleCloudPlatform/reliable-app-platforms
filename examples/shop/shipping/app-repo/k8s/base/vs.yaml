@@ -6,11 +6,9 @@ metadata:
 spec:
     hosts:
     - shipping.shipping.svc.cluster.local
-    gateways:
-    - asm-ingress-gw/asm-ingressgateway
     http:
     - route:
       - destination:
           host: shipping
           port:
-            number: 80
+            number: 50051

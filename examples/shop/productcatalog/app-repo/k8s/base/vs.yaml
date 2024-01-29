@@ -6,11 +6,9 @@ metadata:
 spec:
     hosts:
     - productcatalog.productcatalog.svc.cluster.local
-    gateways:
-    - asm-ingress-gw/asm-ingressgateway
     http:
     - route:
       - destination:
           host: productcatalog
           port:
-            number: 80
+            number: 3550

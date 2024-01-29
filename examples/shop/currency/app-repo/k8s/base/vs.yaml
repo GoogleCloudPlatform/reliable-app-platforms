@@ -6,11 +6,9 @@ metadata:
 spec:
     hosts:
     - currency.currency.svc.cluster.local
-    gateways:
-    - asm-ingress-gw/asm-ingressgateway
     http:
     - route:
       - destination:
           host: currency
           port:
-            number: 80
+            number: 7000

@@ -85,7 +85,7 @@ type frontendServer struct {
 func main() {
 	ctx := context.Background()
 	log := logrus.New()
-	log.Level = logrus.DebugLevel
+	log.Level = logrus.WarnLevel
 	log.Formatter = &logrus.JSONFormatter{
 		FieldMap: logrus.FieldMap{
 			logrus.FieldKeyTime:  "timestamp",

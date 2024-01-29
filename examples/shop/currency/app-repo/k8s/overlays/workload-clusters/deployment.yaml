@@ -15,17 +15,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: currencyservice
+  name: currency
   labels:
-    app: currencyservice
+    app: currency
 spec:
   selector:
     matchLabels:
-      app: currencyservice
+      app: currency
   template:
     metadata:
       labels:
-        app: currencyservice
+        app: currency
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5

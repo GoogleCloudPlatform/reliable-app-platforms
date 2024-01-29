@@ -9,7 +9,7 @@ spec:
   ports:
   - name: currency
     number: 7000
-    protocol: TCP
+    protocol: GRPC
   resolution: DNS
 ---
 apiVersion: networking.istio.io/v1beta1
@@ -23,7 +23,7 @@ spec:
   ports:
   - name: productcatalog
     number: 3550
-    protocol: TCP
+    protocol: GRPC
   resolution: DNS
 ---
 apiVersion: networking.istio.io/v1beta1
@@ -37,7 +37,7 @@ spec:
   ports:
   - name: cart
     number: 7070
-    protocol: TCP
+    protocol: GRPC
   resolution: DNS
 ---
 apiVersion: networking.istio.io/v1beta1
@@ -51,7 +51,7 @@ spec:
   ports:
   - name: shipping
     number: 50051
-    protocol: TCP
+    protocol: GRPC
   resolution: DNS
 --- 
 apiVersion: networking.istio.io/v1beta1
@@ -65,6 +65,6 @@ spec:
   ports:
   - name: email
     number: 5000
-    protocol: TCP
+    protocol: GRPC
   resolution: DNS
 ---

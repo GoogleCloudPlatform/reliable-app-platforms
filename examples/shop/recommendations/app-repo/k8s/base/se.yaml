@@ -1,4 +1,4 @@
-piVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
   name: productcatalog
@@ -9,5 +9,5 @@ spec:
   ports:
   - name: productcatalog
     number: 3550
-    protocol: TCP
+    protocol: GRPC
   resolution: DNS

@@ -6,8 +6,6 @@ metadata:
 spec:
     hosts:
     - ad.ad.svc.cluster.local
-    gateways:
-    - asm-ingress-gw/asm-ingressgateway
     http:
     - route:
       - destination:

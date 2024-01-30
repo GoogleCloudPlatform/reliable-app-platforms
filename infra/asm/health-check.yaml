@@ -4,7 +4,7 @@ metadata:
   name: ingress-gateway-healthcheck
   namespace: asm-ingress-gw
   annotations:
-    configsync.gke.io/cluster-name-selector: config-us-central1
+    configmanagement.gke.io/cluster-selector: selector-config
 spec:
   default:
     config:

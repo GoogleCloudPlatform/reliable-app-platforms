@@ -4,7 +4,7 @@ metadata:
   name: external-http
   namespace: asm-ingress-gw
   annotations:
-    configsync.gke.io/cluster-name-selector: config-us-central1
+    configmanagement.gke.io/cluster-selector: selector-config
 spec:
   gatewayClassName: gke-l7-global-external-managed-mc
   listeners:

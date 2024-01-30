@@ -4,7 +4,7 @@ metadata:
   name: default-httproute
   namespace: asm-ingress-gw
   annotations:
-    configsync.gke.io/cluster-name-selector: config-us-central1
+    configmanagement.gke.io/cluster-selector: selector-config
 spec:
   parentRefs:
   - name: external-http

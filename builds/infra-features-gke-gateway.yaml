@@ -23,6 +23,7 @@ steps:
 - name: "gcr.io/cloud-builders/gke-deploy"
   id: "infra-features-gke-gateway-config-cluster"
   entrypoint: bash
+  dir: infra
   args:
    - -c
    - |
@@ -33,10 +34,11 @@ steps:
 - name: "gcr.io/cloud-builders/gcloud"
   id: "infra-features-gke-get-gateway-address"
   entrypoint: bash
+  dir: infra
   args:
     - -c
     - |
-      source ./vars.sh
+      source vars.sh
       gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_REGION} --project ${_PROJECT_ID}
       echo -e "Checking Gateways status for $${GKE_CONFIG_NAME}..."
       while [[ $(kubectl --context=gke_${_PROJECT_ID}_$${GKE_CONFIG_REGION}_$${GKE_CONFIG_NAME} get gateway ${_GW_NAME} -n ${_GW_NAMESPACE} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do

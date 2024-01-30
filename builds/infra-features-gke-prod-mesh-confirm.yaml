@@ -28,6 +28,8 @@ steps:
   args:
     - -c
     - |
+      echo -e "Verifying ASM on clusters. If you're running this for the first time, this can take 10-15 minutes..."
+
       source vars.sh
       export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
       export PROD1_MEMBERSHIP="projects/$${PROJECT_NUMBER}/locations/global/memberships/$${GKE_PROD1_NAME}"

@@ -17,6 +17,8 @@ tags:
   - infra-destroy-gke
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
+  _KUBE_VERSION: 1.27.3-gke.100
+
 steps:
 # Destroy GKE infrastructure
 - name: "hashicorp/terraform:1.4.6"
@@ -28,4 +30,4 @@ steps:
     - "-c"
     - |
       terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform destroy -var="project_id=${_PROJECT_ID}" --auto-approve 
+      terraform destroy -var="project_id=${_PROJECT_ID}" -var="kubernetes_version=${_KUBE_VERSION}" --auto-approve 

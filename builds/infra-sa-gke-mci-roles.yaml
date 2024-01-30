@@ -18,8 +18,6 @@ tags:
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 steps:
-# Get Project Number
-# Give roles to MCI service account
 - name: "gcr.io/cloud-builders/gcloud"
   id: "infra-sa-gke-mci-roles"
   entrypoint: bash
@@ -34,7 +32,6 @@ steps:
       --member "serviceAccount:service-$${PROJECT_NUMBER}@gcp-sa-multiclusteringress.iam.gserviceaccount.com" \
       --role "roles/container.admin"
 
-# This might not be necessary. Confirm before removing.
       gcloud projects add-iam-policy-binding ${_PROJECT_ID} \
       --member "serviceAccount:service-$${PROJECT_NUMBER}@gcp-sa-multiclusteringress.iam.gserviceaccount.com" \
       --role "roles/compute.networkViewer"

@@ -24,6 +24,7 @@ steps:
   # Create release in Google Cloud Deploy for App Clusters
   - name: gcr.io/cloud-builders/gcloud
     id: "deploy-to-app-clusters"
+    dir: ./app-repo
     entrypoint: bash
     args:
       - -c
@@ -37,5 +38,23 @@ steps:
         gcloud deploy releases create rel-${_SHORT_SHA} \
         --delivery-pipeline ${_SERVICE}-pipeline \
         --region ${_REGION} \
-        --skaffold-file=./examples/${_APP_NAME}/${_SERVICE}/app-repo/skaffold_workload_clusters.yaml
+        --skaffold-file=./app-repo/skaffold_workload_clusters.yaml
+  - name: gcr.io/cloud-builders/gcloud
+    id: "deploy-to-other-clusters"
+    dir: ./app-repo
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_ARCHETYPE}" == "G" || "${_ARCHETYPE}" == "APR" ]] && exit 0
+        echo -e "_PROJECT_ID is ${_PROJECT_ID}"
+        echo -e "_SHORT_SHA is ${_SHORT_SHA}"
+        echo -e "_PIPELINE_LOCATION is ${_REGION}"
+        echo -e "_APP_NAME is ${_APP_NAME}"
+        echo -e "_SERVICE is ${_SERVICE}"
+
+        gcloud deploy releases create rel-${_SHORT_SHA} \
+        --delivery-pipeline ${_SERVICE}-pipeline \
+        --region ${_REGION} \
+        --skaffold-file=./app-repo/skaffold_other_clusters.yaml
  

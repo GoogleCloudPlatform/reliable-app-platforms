@@ -17,6 +17,8 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _FRONTEND: "true"
   _BACKEND: "true"
+  _DEPLOY_SLO_ONLY: "false"
+
 
 tags:
   - deploy-whereami
@@ -24,17 +26,21 @@ steps:
   - name: "gcr.io/cloud-builders/gcloud"
     id: "backend-deploy"
     entrypoint: bash
+    dir: ./examples/whereami/whereami-backend
     args:
       - -c
       - |
         [[ "${_BACKEND}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/whereami/whereami-backend/ci-backend.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA} 
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="whereami",_SERVICE="whereami-backend",_SLO=true,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="whereami",_SERVICE="whereami-backend",_SLO=false,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "frontend-deploy"
     entrypoint: bash
+    dir: ./examples/whereami/whereami-frontend
     args:
       - -c
       - |
         [[ "${_FRONTEND}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/whereami/whereami-frontend/ci-frontend.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="whereami",_SERVICE="whereami-frontend",_SLO=true,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="whereami",_SERVICE="whereami-frontend",_SLO=false,_APP=true,_INFRA=true
    

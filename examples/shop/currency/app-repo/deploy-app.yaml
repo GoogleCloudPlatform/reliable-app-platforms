@@ -39,6 +39,7 @@ steps:
         --delivery-pipeline ${_SERVICE}-pipeline \
         --region ${_REGION} \
         --skaffold-file=./skaffold_workload_clusters.yaml
+  
   - name: gcr.io/cloud-builders/gcloud
     id: "deploy-to-other-clusters"
     dir: "./app-repo"

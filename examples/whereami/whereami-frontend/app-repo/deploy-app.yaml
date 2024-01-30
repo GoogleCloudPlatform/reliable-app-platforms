@@ -38,7 +38,7 @@ steps:
         gcloud deploy releases create rel-${_SHORT_SHA} \
         --delivery-pipeline ${_SERVICE}-pipeline \
         --region ${_REGION} \
-        --skaffold-file=./app-repo/skaffold_workload_clusters.yaml
+        --skaffold-file=./skaffold_workload_clusters.yaml
   - name: gcr.io/cloud-builders/gcloud
     id: "deploy-to-other-clusters"
     dir: ./app-repo
@@ -56,5 +56,5 @@ steps:
         gcloud deploy releases create rel-${_SHORT_SHA} \
         --delivery-pipeline ${_SERVICE}-pipeline \
         --region ${_REGION} \
-        --skaffold-file=./app-repo/skaffold_other_clusters.yaml
+        --skaffold-file=./skaffold_other_clusters.yaml
  

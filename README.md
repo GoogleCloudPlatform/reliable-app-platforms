@@ -19,10 +19,10 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    git clone https://github.com/ameer00/Building-Reliable-Platforms-on-GCP-with-Google-SRE.git
    cd Building-Reliable-Platforms-on-GCP-with-Google-SRE
    ```
-1. Checkout the *tf* branch
+1. Checkout the *tf_in_repo_examples * branch
 
    ```bash
-   git checkout tf
+   git checkout tf_in_repo_examples 
    ```
 **NOTE** If you want to change any of the infrastructure defaults used in this repo, please follow instructions in the **Deploy the platform infrastructure** section and return to the next step.
 

@@ -4,7 +4,7 @@ locals {
 
   target_SZ = var.archetype == "SZ"  ? [local.clusters_info[var.zone_index[0]]] :null
   target_APZ = var.archetype == "APZ"  ? [local.clusters_info[var.zone_index[0]], local.clusters_info[var.zone_index[1]]] :null
-  target_MZ = var.archetype == "MZ"  ? [local.clusters_info[var.zone_index[0]], local.clusters_info[var.zone_index[1]], local.clusters_info[var.zone_index[2]]] :null
+  target_MZ = var.archetype == "MZ"  ? [var.region_index[0]*3+0, var.region_index[0]*3+1, var.region_index[0]*3+2] :null
   apr_indices = var.archetype == "APR" ? [var.region_index[0]*3+0, var.region_index[0]*3+1, var.region_index[0]*3+2, var.region_index[1]*3+0, var.region_index[1]*3+1, var.region_index[1]*3+2] : null
   target_APR = var.archetype == "APR" ? [local.clusters_info[local.apr_indices[0]], local.clusters_info[local.apr_indices[1]], local.clusters_info[local.apr_indices[2]],  local.clusters_info[local.apr_indices[3]], local.clusters_info[local.apr_indices[4]], local.clusters_info[local.apr_indices[5]]] :null
   ir_indices = var.archetype == "IR" ? [var.region_index[0]*3+0, var.region_index[0]*3+1, var.region_index[0]*3+2, var.region_index[1]*3+0, var.region_index[1]*3+1, var.region_index[1]*3+2] : null

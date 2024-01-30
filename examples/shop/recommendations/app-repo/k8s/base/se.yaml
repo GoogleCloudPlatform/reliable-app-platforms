@@ -1,13 +1,12 @@
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
-  name: productcatalog
-  namespace: recommendations
+  name: recommendations
 spec:
   hosts:
-  - productcatalog.productcatalog.svc.cluster.local
+  - recommendations.recommendations.svc.cluster.local
   ports:
-  - name: productcatalog
-    number: 3550
+  - name: recommendations
+    number: 8080
     protocol: GRPC
   resolution: DNS

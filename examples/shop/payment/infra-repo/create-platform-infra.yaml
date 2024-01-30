@@ -22,7 +22,7 @@ substitutions:
   _SERVICE: "payment"
   _PIPELINE_LOCATION: "us-central1"
   _ARCHETYPE: "APZ"
-  _ZONE_INDEX: "[1,0]"
+  _ZONE_INDEX: "[0,1]"
   _REGION_INDEX: "[]"
 
 steps:

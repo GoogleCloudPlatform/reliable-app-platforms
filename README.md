@@ -164,19 +164,21 @@ This module creates 2 SLOs per service deployed.
 
 ## Bugs:
    - The K8s version needs to fixed in the buils/terraform/infra-create-gke.yaml. This is because using the *latest* version causes tf to teardown and recreate cluster everytime the default version changes.
+      - Short-term fix: Not required. Just hardcode a K8s version in the file mentioned above.
    - ACM: ACM doesn't sometimes pick up all the clusters in the fleet. 
+      - Short-term fix: Not known. Not easily reproducible.
    - CloudDeploy: Deployments sometimes fail the first time. This error usually occurs in the deployment validation phase when the pod is declared Unschedulable due to insufficient memory and cpu. This has likely to do with the interaction with Autopilot's autoscaling feature.
-      Short-term fix: Retrying the deployment(s) in cloud deploy (click retry on the roll-out) will fix it.
-   - SLOs: SLOs cannot be created by tf until atleast one SLO is created for the service via console. This is because the canonical service cannot be found by cloud monitoring. This is a bug. 
-      Short-term fix: Create an SLO manually for the service in the ASM section of the GKE console. 
-      
+      - Short-term fix: Retrying the deployment(s) in cloud deploy console (click retry on the roll-out page) will fix it.
+   - SLOs: SLOs cannot be created by tf until atleast one SLO is created for the service via console. This is because the canonical service cannot be found by cloud monitoring. This is a bug.
+      - Short-term fix: Run the deploy  pipeline with SLO set to *false* in the ci pipeline for each service (Note: not the ci of the app, the ci of each service). After the service is deployed, create (any) SLO manually for the service in the ASM section of the GKE console. And rerun the deploy pipeline with SLO set to *true* in the ci pipeline for each service.
+   - GKE teardown: When running the destruction pipeline (./build --terraform --destory), the GKE module fails at the end after the clusters are destroyed. This is because of a GKE hub"feature" that is prevents destroy. Not sure which feature it is.
+
 ## TODO
-1. SLOs
 1. Implement shop or bank
 1. Implement https
 1. Builds: Parameterize where possible. Clean up names.
-1. module  deploy-pipelines: check why first deploy always fails.
-1. module deploy-pipelines: Use zone names and region names instead of indices
+1. deploy-pipelines: check why first deploy always fails.
+1. terraform module deploy-pipelines: Use zone names and region names instead of indices
 1. infra/asm: parameterise names of clusters in configsync annotation.
 
    

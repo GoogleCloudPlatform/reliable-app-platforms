@@ -15,10 +15,10 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _INFRA: "false"
+  _INFRA: "true"
   _APP: "true"
   _SLO: "false"
-  _BUILD: "false"
+  _BUILD: "true"
 
 tags:
   - deploy-shop-cart

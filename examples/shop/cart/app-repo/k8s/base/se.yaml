@@ -1,12 +1,12 @@
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
-  name: checkout
+  name: cart
 spec:
   hosts:
-  - checkout.checkout.svc.cluster.local
+  - cart.cart.svc.cluster.local
   ports:
-  - name: checkout
-    number: 5050
+  - name: cart
+    number: 7070
     protocol: GRPC
   resolution: DNS

@@ -1,12 +1,12 @@
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
-  name: checkout
+  name: currency
 spec:
   hosts:
-  - checkout.checkout.svc.cluster.local
+  - currency.currency.svc.cluster.local
   ports:
-  - name: checkout
-    number: 5050
+  - name: currency
+    number: 7000
     protocol: GRPC
   resolution: DNS

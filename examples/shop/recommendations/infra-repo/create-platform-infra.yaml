@@ -21,8 +21,8 @@ substitutions:
   _APP_NAME: "shop"
   _SERVICE: "shipping"
   _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "APZ"
-  _ZONE_INDEX: "[1,2]"
+  _ARCHETYPE: "SZ"
+  _ZONE_INDEX: "[2]"
   _REGION_INDEX: "[]"
 
 steps:

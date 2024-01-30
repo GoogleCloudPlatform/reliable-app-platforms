@@ -17,7 +17,7 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _INFRA: "true"
   _APP: "true"
-  _SLO: "true"
+  _SLO: "false"
 
 tags:
   - deploy-whereami-backend

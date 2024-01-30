@@ -87,5 +87,5 @@ steps:
       for CTX in gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD1_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD2_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD3_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD4_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD5_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD6_NAME}
       do
         echo -e "Checking ASM gateways status for $$CTX..."
-        kubectl --context=$$CTX wait --for=condition=Available deployment asm-ingressgateway -n asm-ingress --timeout 5m
+        kubectl --context=$$CTX wait --for=condition=Available deployment asm-ingressgateway -n asm-ingress-gw --timeout 5m
       done

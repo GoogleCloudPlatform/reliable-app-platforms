@@ -34,6 +34,7 @@ steps:
       --member "serviceAccount:service-$${PROJECT_NUMBER}@gcp-sa-multiclusteringress.iam.gserviceaccount.com" \
       --role "roles/container.admin"
 
+# This might not be necessary. Confirm before removing.
       gcloud projects add-iam-policy-binding ${_PROJECT_ID} \
       --member "serviceAccount:service-$${PROJECT_NUMBER}@gcp-sa-multiclusteringress.iam.gserviceaccount.com" \
       --role "roles/compute.networkViewer"

@@ -21,8 +21,7 @@ substitutions:
   _GW_NAME: external-http 
 steps:
 - name: "gcr.io/cloud-builders/gke-deploy"
-  id: "infra-features-gke-gateway-api"
-  dir: "infra"
+  id: "infra-features-gke-gateway-config-cluster"
   entrypoint: bash
   args:
    - -c
@@ -33,7 +32,6 @@ steps:
 
 - name: "gcr.io/cloud-builders/gcloud"
   id: "infra-features-gke-get-gateway-address"
-  dir: "infra"
   entrypoint: bash
   args:
     - -c

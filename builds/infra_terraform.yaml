@@ -108,7 +108,7 @@ steps:
       - |
         exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   # Confirm Mesh gateways on GKE - prod
-  # This step confirms that the ASM ingress, egress and eastwest gateways are up and running on the prod GKE clusters.
+  # This step confirms that the ASM ingress gateway and the multicluster gateway are up and running on the prod GKE clusters.
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-features-gke-mesh-gateways-prod"
     entrypoint: bash

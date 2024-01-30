@@ -89,6 +89,7 @@ steps:
     - -c
     - |
       source vars.sh
+      echo "If you're running this for the first time, this step can take a long time..."
       while [[ $(gcloud container clusters list --project ${_PROJECT_ID} --filter "STATUS=RUNNING" --format="value(name)"| wc -l | awk '{print $1}') < "6" ]]; do
         echo "Waiting for all  the cluster to be RUNNING."
         sleep 5

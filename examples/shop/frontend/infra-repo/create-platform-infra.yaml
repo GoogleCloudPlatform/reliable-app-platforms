@@ -21,9 +21,9 @@ substitutions:
   _APP_NAME: "shop"
   _SERVICE: "shop-frontend"
   _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "MR"
+  _ARCHETYPE: "G"
   _ZONE_INDEX: "[]"
-  _REGION_INDEX: "[0,1]"
+  _REGION_INDEX: "[]"
 
 steps:
   - name: "hashicorp/terraform:1.4.6"

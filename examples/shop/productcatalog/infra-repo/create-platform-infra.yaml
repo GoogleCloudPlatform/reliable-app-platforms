@@ -21,7 +21,7 @@ substitutions:
   _APP_NAME: "shop"
   _SERVICE: "productcatalog"
   _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "MR"
+  _ARCHETYPE: "APR"
   _ZONE_INDEX: "[]"
   _REGION_INDEX: "[0,1]"
 

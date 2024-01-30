@@ -46,6 +46,7 @@ steps:
     args:
       - -c
       - |
+        [[ "${_ARCHETYPE}" == "G" || "${_ARCHETYPE}" == "APR" ]] && exit 0
         echo -e "_PROJECT_ID is ${_PROJECT_ID}"
         echo -e "_SHORT_SHA is ${_SHORT_SHA}"
         echo -e "_PIPELINE_LOCATION is ${_REGION}"

@@ -25,6 +25,7 @@ substitutions:
   _RECOMMENDATIONS: "true"
   _SHIPPING: "true"
   _PAYMENT: "true"
+  _DEPLOY_SLO_ONLY: "false"
 
 tags:
   - deploy-shop
@@ -37,7 +38,8 @@ steps:
       - -c
       - |
         [[ "${_CART}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="cart"
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="cart",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="cart",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "ad-deploy"
     entrypoint: bash
@@ -46,7 +48,8 @@ steps:
       - -c
       - |
         [[ "${_AD}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="ad"
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="ad",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="ad",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "currency-deploy"
     entrypoint: bash
@@ -55,7 +58,8 @@ steps:
       - -c
       - |
         [[ "${_CURRENCY}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="currency"
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="MZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="currency",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="MZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="currency",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "email-deploy"
     dir: ./examples/shop/email
@@ -64,7 +68,8 @@ steps:
       - -c
       - |
         [[ "${_EMAIL}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="email"
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="email",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="email",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "catalog-deploy"
     dir: ./examples/shop/productcatalog
@@ -73,8 +78,8 @@ steps:
       - -c
       - |
         [[ "${_CATALOG}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="productcatalog"
-  
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="productcatalog",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="productcatalog",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "shipping-deploy"
     dir: ./examples/shop/shipping
@@ -83,7 +88,8 @@ steps:
       - -c
       - |
         [[ "${_SHIPPING}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="shipping"
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="shipping",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="shipping",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "payment-deploy"
     dir: ./examples/shop/payment
@@ -92,7 +98,8 @@ steps:
       - -c
       - |
         [[ "${_PAYMENT}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="payment"
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="payment",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="payment",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "recommendations-deploy"
     dir: ./examples/shop/recommendations
@@ -101,7 +108,8 @@ steps:
       - -c
       - |
         [[ "${_RECOMMENDATIONS}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="recommendations"
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="recommendations",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="recommendations",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "checkout-deploy"
     dir: ./examples/shop/checkout
@@ -110,7 +118,8 @@ steps:
       - -c
       - |
         [[ "${_CHECKOUT}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="checkout"
+         [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="checkout",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="checkout",_SLO=false,_BUILD=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "shop-frontend-deploy"
     dir: ./examples/shop/frontend
@@ -119,4 +128,5 @@ steps:
       - -c
       - |
         [[ "${_FRONTEND}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="frontend"
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="frontend",_SLO=true,_BUILD=false,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="frpntend",_SLO=false,_BUILD=true,_APP=true,_INFRA=true

@@ -17,8 +17,8 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _INFRA: "true"
   _APP: "true"
-  _SLO: "false"
   _BUILD: "true"
+  _SLO: "true"
 
 tags:
   - deploy-shop-recommendations
@@ -30,7 +30,7 @@ steps:
       - -c
       - |
         [[ "${_INFRA}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./infra-repo/create-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
+        exec gcloud builds submit --config ./infra-repo/create-platform-infra.yaml --substitutions=_ARCHETYPE=${_ARCHETYPE},_PROJECT_ID=${_PROJECT_ID},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
   - name: "gcr.io/cloud-builders/gcloud"
     id: "build-app-image"
     entrypoint: bash
@@ -46,7 +46,7 @@ steps:
       - -c
       - |
         [[ "${_APP}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./app-repo/deploy-app.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
+        exec gcloud builds submit --config ./app-repo/deploy-app.yaml --substitutions=_ARCHETYPE=${_ARCHETYPE},_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
   - name: "gcr.io/cloud-builders/gcloud"
     id: "create-app-slos"
     entrypoint: bash

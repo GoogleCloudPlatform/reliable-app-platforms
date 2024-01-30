@@ -19,9 +19,9 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
   _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "APZ"
-  _ZONE_INDEX: "[1,2]"
-  _REGION_INDEX: "[]"
+  _ARCHETYPE: "MZ"
+  _ZONE_INDEX: "[]"
+  _REGION_INDEX: "[1]"
 
 steps:
   - name: "hashicorp/terraform:1.4.6"

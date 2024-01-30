@@ -167,11 +167,11 @@ This module creates 2 SLOs per service deployed.
       - Short-term fix: Not required. Just hardcode a K8s version in the file mentioned above.
    - ACM: ACM doesn't sometimes pick up all the clusters in the fleet. 
       - Short-term fix: Not known. Not easily reproducible.
-   - CloudDeploy: Deployments sometimes fail the first time. This error usually occurs in the deployment validation phase when the pod is declared Unschedulable due to insufficient memory and cpu. This has likely to do with the interaction with Autopilot's autoscaling feature.
+   - CloudDeploy: Deployments sometimes fail the first time. This error usually occurs in the deployment validation phase when the pod is declared Unschedulable due to insufficient memory and cpu. This has likely to do with the interaction with Autopilot's autoscaling and really small starting size.
       - Short-term fix: Retrying the deployment(s) in cloud deploy console (click retry on the roll-out page) will fix it.
    - SLOs: SLOs cannot be created by tf until atleast one SLO is created for the service via console. This is because the canonical service cannot be found by cloud monitoring. This is a bug.
-      - Short-term fix: Run the deploy  pipeline with SLO set to *false* in the ci pipeline for each service (Note: not the ci of the app, the ci of each service). After the service is deployed, create (any) SLO manually for the service in the ASM section of the GKE console. And rerun the deploy pipeline with SLO set to *true* in the ci pipeline for each service.
-   - GKE teardown: When running the destruction pipeline (./build --terraform --destory), the GKE module fails at the end after the clusters are destroyed. This is because of a GKE hub"feature" that is prevents destroy. Not sure which feature it is.
+      - Short-term fix: Run the deploy  pipeline with the flag _DEPLOY_SLO_ONLY set to *false* in the ci pipeline for the shop service. After all the services in shop are deployed, create an (any) SLO manually for the service in the ASM section of the GKE console. And rerun the deploy pipeline with _DEPLOY_SLO_ONLY set to *true* in the ci pipeline for each service.
+   - GKE teardown: When running the destruction pipeline (./build --terraform --destory), the GKE module fails at the end after the clusters are destroyed. This is because of a GKE hub "feature" that prevents destroy. Not sure which feature it is.
 
 ## TODO
 1. Implement shop or bank

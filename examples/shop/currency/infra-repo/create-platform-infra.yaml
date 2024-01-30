@@ -19,8 +19,8 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
   _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "MZ"
-  _ZONE_INDEX: "[]"
+  _ARCHETYPE: "APZ"
+  _ZONE_INDEX: "[0,1]"
   _REGION_INDEX: "[1]"
 
 steps:

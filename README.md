@@ -96,7 +96,7 @@ Please read *examples/Examples.md* for more info on the structure of the example
 The **nginx** application is a single service application which by default uses the *Active Passive Zone (APZ)* archetype. 
    ```bash
    
-   cd $HOME/examples
+   cd $HOME
    ./deploy.sh --app nginx
    ```
    This will kick of a script that first creates the necessary infrastructure for the application using terraform. 
@@ -118,7 +118,7 @@ The **whereami** application is a two-service application. Each service in the a
 
    ```bash
    
-   cd $HOME/examples
+   cd $HOME
    ./deploy.sh --app whereami
    ```
    This will kick of a script that first creates the necessary infrastructure for the two services using terraform. 

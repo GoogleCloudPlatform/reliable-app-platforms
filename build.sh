@@ -51,7 +51,7 @@ gcloud config set core/project ${PROJECT_ID}
 
 # Enable Cloudbuild API
 echo -e "\e[95mEnabling Cloudbuild API in ${PROJECT_ID}\e[0m"
-gcloud services enable cloudbuild.googleapis.com storage.googleapis.com
+gcloud services enable cloudbuild.googleapis.com storage.googleapis.com serviceusage.googleapis.com
 
 # Make cloudbiuld SA roles/owner for PROJECT_ID
 # TODO: Make these permissions more granular to precisely what is required by cloudbuild

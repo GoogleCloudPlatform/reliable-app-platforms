@@ -6,6 +6,8 @@ metadata:
 spec:
     hosts:
     - "shop-frontend.endpoints.arch001.cloud.goog"
+    - "shop-frontend.endpoints.smig-rad-001.cloud.goog"
+
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

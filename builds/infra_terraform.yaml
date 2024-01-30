@@ -15,7 +15,7 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _DEBUG_SKIP_INFRA: "true" # used to skip infra portions while testing asm and gateway deployments only
+  _DEBUG_SKIP_INFRA: "false" # used to skip infra portions while testing asm and gateway deployments only
   _VPC: "true"
   _GKE: "true"
 tags:

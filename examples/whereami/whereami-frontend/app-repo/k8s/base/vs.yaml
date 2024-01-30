@@ -6,6 +6,7 @@ metadata:
 spec:
     hosts:
     - "whereami.endpoints.arch001.cloud.goog"
+    - "whereami.endpoints.smig-rad-001.cloud.goog"
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

@@ -162,6 +162,14 @@ This module creates 2 SLOs per service deployed.
 1. A latency SLO with alerting policies. 
 1. An availability SLO with alerting policies. 
 
+## Bugs:
+   - The K8s version needs to fixed in the buils/terraform/infra-create-gke.yaml. This is because using the *latest* version causes tf to teardown and recreate cluster everytime the default version changes.
+   - ACM: ACM doesn't sometimes pick up all the clusters in the fleet. 
+   - CloudDeploy: Deployments sometimes fail the first time. This error usually occurs in the deployment validation phase when the pod is declared Unschedulable due to insufficient memory and cpu. This has likely to do with the interaction with Autopilot's autoscaling feature.
+      Short-term fix: Retrying the deployment(s) in cloud deploy (click retry on the roll-out) will fix it.
+   - SLOs: SLOs cannot be created by tf until atleast one SLO is created for the service via console. This is because the canonical service cannot be found by cloud monitoring. This is a bug. 
+      Short-term fix: Create an SLO manually for the service in the ASM section of the GKE console. 
+      
 ## TODO
 1. SLOs
 1. Implement shop or bank

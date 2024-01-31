@@ -16,10 +16,6 @@ locals {
   remaining_targets = tolist(setsubtract(local.clusters_info, local.targets))
 }
 
-output "target" {
-  value = local.targets
-}
-
 data "google_storage_bucket_object_content" "clusters_info" {
   name   = "platform-values/clusters.json"
   bucket = var.project_id

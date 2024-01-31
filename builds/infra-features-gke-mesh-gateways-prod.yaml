@@ -42,6 +42,8 @@ steps:
       gcloud container clusters get-credentials $${GKE_PROD4_NAME} --zone $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
       gcloud container clusters get-credentials $${GKE_PROD5_NAME} --zone $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
       gcloud container clusters get-credentials $${GKE_PROD6_NAME} --zone $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_REGION} --project ${_PROJECT_ID}
+
       export PROD1_NOMOS_STATUS=0
       until [[ $$PROD1_NOMOS_STATUS == "SYNCED" ]]
       do
@@ -84,10 +86,15 @@ steps:
         echo -e "PROD6_NOMOS_STATUS is $$PROD6_NOMOS_STATUS"
         sleep 5
       done
+      export CONFIG_NOMOS_STATUS=0
+      until [[ $$CONFIG_NOMOS_STATUS == "SYNCED" ]]
+      do
+        export CONFIG_NOMOS_STATUS=$(./nomos status --contexts gke_${_PROJECT_ID}_$${GKE_CONFIG_REGION}_$${GKE_CONFIG_NAME} | sed -n 6p | awk '{print $1;}')
+        echo -e "CONFIG_NOMOS_STATUS is $$CONFIG_NOMOS_STATUS"
+        sleep 5
+      done
       for CTX in gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD1_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD2_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD3_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD4_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD5_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD6_NAME}
       do
         echo -e "Checking ASM gateways status for $$CTX..."
-        kubectl --context=$$CTX wait --for=condition=Available deployment asm-ingressgateway -n gateways --timeout 5m
-        kubectl --context=$$CTX wait --for=condition=Available deployment asm-egressgateway -n gateways --timeout 5m
-        kubectl --context=$$CTX wait --for=condition=Available deployment asm-eastwestgateway -n gateways --timeout 5m
+        kubectl --context=$$CTX wait --for=condition=Available deployment asm-ingressgateway -n asm-ingress-gw --timeout 5m
       done

@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: productcatalog-virtualservice
+    namespace: productcatalog
+spec:
+    hosts:
+    - productcatalog.productcatalog.svc.cluster.local
+    http:
+    - route:
+      - destination:
+          host: productcatalog
+          port:
+            number: 3550

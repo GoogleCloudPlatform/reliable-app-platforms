@@ -1,0 +1,11 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: shop-checkout-app
+manifests:
+  kustomize:
+    paths:
+      - ./k8s/overlays/workload-clusters
+profiles:
+  - name: prod
+

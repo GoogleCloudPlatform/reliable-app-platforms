@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: nginx-virtualservice
+    namespace: nginx
+spec:
+    hosts:
+    - "nginxservice.endpoints.arch001.cloud.goog"
+    - "nginxservice.endpoints.smig-rad-001.cloud.goog"
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: nginx
+          port:
+            number: 80

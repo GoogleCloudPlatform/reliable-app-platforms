@@ -3,5 +3,10 @@ output "pipeline_id" {
 }
 
 output "targets" {
-  value = local.targets #google_clouddeploy_target.target[*].id
+  value = local.targets 
 }
+
+output "other_targets" {
+  value = local.remaining_targets 
+}
+

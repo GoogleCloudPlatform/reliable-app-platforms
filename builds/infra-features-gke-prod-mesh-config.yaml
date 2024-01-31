@@ -45,9 +45,4 @@ steps:
       kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD4_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
       kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD5_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
       kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD6_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD1_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD2_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD3_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD4_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD5_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD6_NAME} apply -f asm/asm-telemetry.yaml
+      

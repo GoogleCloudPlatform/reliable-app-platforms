@@ -1,11 +1,11 @@
 # TODO: Make indices for zones and regions strings
 locals {
   clusters_info = jsondecode(data.google_storage_bucket_object_content.clusters_info.content)
-  config_cluster_info = jsondecode(data.google_storage_bucket_object_content.config_cluster_info.content)
 
   target_SZ = var.archetype == "SZ"  ? [local.clusters_info[var.zone_index[0]]] :null
   target_APZ = var.archetype == "APZ"  ? [local.clusters_info[var.zone_index[0]], local.clusters_info[var.zone_index[1]]] :null
-  target_MZ = var.archetype == "MZ"  ? [local.clusters_info[var.zone_index[0]], local.clusters_info[var.zone_index[1]], local.clusters_info[var.zone_index[2]]] :null
+  mz_indices = var.archetype == "MZ"  ? [var.region_index[0]*3+0, var.region_index[0]*3+1, var.region_index[0]*3+2] :null
+  target_MZ = var.archetype == "MZ" ? [local.clusters_info[local.mz_indices[0]], local.clusters_info[local.mz_indices[1]], local.clusters_info[local.mz_indices[2]]] :null
   apr_indices = var.archetype == "APR" ? [var.region_index[0]*3+0, var.region_index[0]*3+1, var.region_index[0]*3+2, var.region_index[1]*3+0, var.region_index[1]*3+1, var.region_index[1]*3+2] : null
   target_APR = var.archetype == "APR" ? [local.clusters_info[local.apr_indices[0]], local.clusters_info[local.apr_indices[1]], local.clusters_info[local.apr_indices[2]],  local.clusters_info[local.apr_indices[3]], local.clusters_info[local.apr_indices[4]], local.clusters_info[local.apr_indices[5]]] :null
   ir_indices = var.archetype == "IR" ? [var.region_index[0]*3+0, var.region_index[0]*3+1, var.region_index[0]*3+2, var.region_index[1]*3+0, var.region_index[1]*3+1, var.region_index[1]*3+2] : null
@@ -13,20 +13,21 @@ locals {
   target_G = var.archetype == "G"  ? local.clusters_info:null
 
   targets = coalescelist(local.target_SZ,local.target_APZ, local.target_MZ, local.target_APR, local.target_IR, local.target_G)
+  remaining_targets = tolist(setsubtract(local.clusters_info, local.targets))
+}
+
+output "target" {
+  value = local.targets
 }
 
 data "google_storage_bucket_object_content" "clusters_info" {
   name   = "platform-values/clusters.json"
   bucket = var.project_id
 }
-data "google_storage_bucket_object_content" "config_cluster_info" {
-  name   = "platform-values/config_cluster.json"
-  bucket = var.project_id
-}
 
 resource "google_service_account" "clouddeploy" {
   project = var.project_id
-  account_id   = "clouddeploy"
+  account_id   = "clouddeploy-${var.service_name}"
   display_name = "Cloud Deploy Service Account"
 }
 
@@ -42,7 +43,7 @@ resource "google_project_iam_member" "clouddeploy_member_deploy_jobrunner" {
   member  = "serviceAccount:${google_service_account.clouddeploy.email}"
 }
 
-resource "google_clouddeploy_target" "child_target" {
+resource "google_clouddeploy_target" "child_target_apps" {
   for_each = { for i, v in local.targets : i => v }
   location = var.pipeline_location
   name     = "child-target-${var.service_name}-${each.value.name}"
@@ -58,7 +59,7 @@ resource "google_clouddeploy_target" "child_target" {
   require_approval = false
 }
 
-resource "google_clouddeploy_target" "multi_target" {
+resource "google_clouddeploy_target" "multi_target_apps" {
   location = var.pipeline_location
   name     = "multi-target-${var.service_name}"
 
@@ -68,38 +69,6 @@ resource "google_clouddeploy_target" "multi_target" {
 
   project          = var.project_id
   require_approval = false
-}
-
-resource "google_clouddeploy_target" "config_target" {
-  location = var.pipeline_location
-  name     = "target-config-${var.service_name}"
-  execution_configs {
-    usages            = ["RENDER", "DEPLOY"]
-    service_account = google_service_account.clouddeploy.email
-  }
-  gke {
-    cluster = local.config_cluster_info[0].id
-  }
-
-  project          = var.project_id
-  require_approval = false
-}
-
-resource "google_clouddeploy_delivery_pipeline" "config" {
-  location = var.pipeline_location
-  name     = lower("${var.service_name}-config-pipeline")
-
-  description = "Service delivery pipeline for the service ${var.service_name} for config cluster."
-  project     = var.project_id
-
-  serial_pipeline {
-
-    stages {
-        profiles  = ["prod"]
-        target_id = google_clouddeploy_target.config_target.target_id
-    }
-  }
-  provider = google-beta
 }
 
 resource "google_clouddeploy_delivery_pipeline" "primary" {
@@ -113,7 +82,53 @@ resource "google_clouddeploy_delivery_pipeline" "primary" {
 
     stages {
         profiles  = ["prod"]
-        target_id = google_clouddeploy_target.multi_target.target_id
+        target_id = google_clouddeploy_target.multi_target_apps.target_id
+    }
+  }
+  provider = google-beta
+}
+
+
+resource "google_clouddeploy_target" "child_target_vs" {
+  for_each = { for i, v in local.remaining_targets :i =>  v }
+  location = var.pipeline_location
+  name     = "child-target-vs-${var.service_name}-${each.value.name}"
+  execution_configs {
+    usages            = ["RENDER", "DEPLOY"]
+    service_account = google_service_account.clouddeploy.email
+  }
+  gke {
+    cluster = each.value.id
+  }
+
+  project          = var.project_id
+  require_approval = false
+}
+
+resource "google_clouddeploy_target" "multi_target_vs" {
+  location = var.pipeline_location
+  name     = "multi-target-vs-${var.service_name}"
+
+  multi_target {
+    target_ids =[ for v in local.remaining_targets : "child-target-vs-${var.service_name}-${v.name}" ]
+  }
+
+  project          = var.project_id
+  require_approval = false
+}
+
+resource "google_clouddeploy_delivery_pipeline" "secondary" {
+  location = var.pipeline_location
+  name     = lower("${var.service_name}-vs-pipeline")
+
+  description = "Virtual service delivery pipeline for the service ${var.service_name} for app clusters."
+  project     = var.project_id
+
+  serial_pipeline {
+
+    stages {
+        profiles  = ["prod"]
+        target_id = google_clouddeploy_target.multi_target_vs.target_id
     }
   }
   provider = google-beta

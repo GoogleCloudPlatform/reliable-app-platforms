@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: shipping-workload
+namespace: shipping
+commonLabels:
+  app: shipping
+resources:
+- ../../base
+- deployment.yaml
+- service.yaml
+images:
+- name: shippingservice
+  newName: us-central1-docker.pkg.dev/arch001/shop-shipping/service
+  newTag: latest

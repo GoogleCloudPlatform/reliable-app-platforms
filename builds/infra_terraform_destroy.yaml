@@ -15,18 +15,20 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _DESTROY_STATE_BUCKET: "true"
+  _DESTROY_STATE_BUCKET: "false"
+  _DESTROY_VPC: "false"
+
 tags:
   - infra-destroy-terraform
 steps:
-  #  Destroy Endpoints 
+# Destroy ACM Repo
   - name: "gcr.io/cloud-builders/gcloud"
-    id: "infra-destroy-gclb"
+    id: "infra-destroy-acm-repo"
     entrypoint: bash
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/terraform/infra-destroy-gclb.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --config builds/terraform/infra-destroy-repos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
    #  Destroy GKE clusters
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-destroy-gke"
@@ -42,6 +44,7 @@ steps:
     args:
       - -c
       - |
+        [[ "${_DESTROY_VPC}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/terraform/infra-destroy-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   
   # Disable APIs

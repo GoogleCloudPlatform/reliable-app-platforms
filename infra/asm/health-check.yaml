@@ -1,0 +1,19 @@
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: ingress-gateway-healthcheck
+  namespace: asm-ingress-gw
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-config
+spec:
+  default:
+    config:
+      httpHealthCheck:
+        port: 15021
+        portSpecification: USE_FIXED_PORT
+        requestPath: /healthz/ready
+      type: HTTP
+  targetRef:
+    group: net.gke.io
+    kind: ServiceImport
+    name: asm-ingressgateway

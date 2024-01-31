@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: currency-virtualservice
+    namespace: currency
+spec:
+    hosts:
+    - currency.currency.svc.cluster.local
+    http:
+    - route:
+      - destination:
+          host: currency
+          port:
+            number: 7000

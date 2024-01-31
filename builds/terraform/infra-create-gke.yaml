@@ -17,7 +17,7 @@ tags:
   - infra-create-gke
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _BUILD: "true"
+  _KUBE_VERSION: 1.27.3-gke.100
 steps:
 # Create GKE infrastructure
 - name: "hashicorp/terraform:1.4.6"
@@ -28,6 +28,5 @@ steps:
     - "-xe"
     - "-c"
     - |
-      [[ "${_BUILD}" == "false" ]] && exit 0
       terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform apply -var="project_id=${_PROJECT_ID}" -var="kubernetes_version=1.27.3-gke.100" --auto-approve
+      terraform apply -var="project_id=${_PROJECT_ID}" -var="kubernetes_version=${_KUBE_VERSION}" --auto-approve

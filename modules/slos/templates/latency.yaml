@@ -1,0 +1,17 @@
+project_id: ${project_id}
+service: ${service_id}
+slo_id: latency-window
+display_name: >
+   - "Latency - ${latency_threshold}ms - ${latency_goal} - Calendar ${latency_rolling_period} Day
+goal: ${latency_goal}
+rolling_period_days: ${latency_rolling_period}
+type: windows_based_sli
+method: performance_window
+method_performance: distribution_cut
+window_period: ${latency_window}s
+metric_filter: >
+  resource.type="istio_canonical_service"
+  metric.type="istio.io/service/server/response_latencies"
+  metric.label.destination_service_name=${service_name}
+range_min: 0   # ms
+range_max: ${latency_threshold} # ms

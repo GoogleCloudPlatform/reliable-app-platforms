@@ -51,7 +51,7 @@ gcloud config set core/project ${PROJECT_ID}
 
 # Enable Cloudbuild API
 echo -e "\e[95mEnabling Cloudbuild API in ${PROJECT_ID}\e[0m"
-gcloud services enable cloudbuild.googleapis.com storage.googleapis.com
+gcloud services enable cloudbuild.googleapis.com storage.googleapis.com serviceusage.googleapis.com cloudresourcemanager.googleapis.com
 
 # Make cloudbiuld SA roles/owner for PROJECT_ID
 # TODO: Make these permissions more granular to precisely what is required by cloudbuild
@@ -63,7 +63,6 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${P
 [[ "${DESTROY}" != "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to CREATE infrastructure using ${BUILD}...\e[0m"
 [[ "${DESTROY}" == "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to DELETE infrastructure using ${BUILD}...\e[0m"
 
-[[ "${BUILD}" == "kcc" ]] && [[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_kcc.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 [[ "${BUILD}" == "terraform" ]] && [[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_terraform.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 [[ "${BUILD}" == "terraform" ]] && [[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

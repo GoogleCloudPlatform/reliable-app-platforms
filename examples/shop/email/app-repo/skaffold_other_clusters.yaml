@@ -1,0 +1,10 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: shop-email-vs
+manifests:
+    kustomize:
+      paths:
+        - ./k8s/overlays/other-clusters
+profiles:
+  - name: prod

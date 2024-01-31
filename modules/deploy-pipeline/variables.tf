@@ -5,7 +5,7 @@ variable "project_id" {
 variable "service_name" {
   description = "Name of the service"
   type = string
-  default = "Unnamed"
+  default = "unnamed"
 }
 
 variable "pipeline_location" {
@@ -21,12 +21,12 @@ variable "archetype"{
 }
 
 variable "region_index" {
-  description = "Region index to deploy service to. Needs to be set for APR, IR"
+  description = "Region index to deploy service to. Needs to be set for MZ, APR, IR"
   type = list(number) 
 }
 
 variable "zone_index" {
-  description = "Zone index to deploy service to. Needs to be set for SZ, APZ, MZ"
+  description = "Zone index to deploy service to. Needs to be set for SZ, APZ"
   type = list(number)
 }
 

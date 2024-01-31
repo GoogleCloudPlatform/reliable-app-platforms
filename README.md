@@ -1,6 +1,6 @@
 # Building Reliable Platforms on GCP with Google SRE
 
-NOT up-to-date WIP
+**NOTE: WIP**
 
 _Last tested on 06/05/2023 by @ameer00_
 

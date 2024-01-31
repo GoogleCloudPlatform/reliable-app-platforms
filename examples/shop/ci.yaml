@@ -25,7 +25,7 @@ substitutions:
   _RECOMMENDATIONS: "true"
   _CHECKOUT: "true"
   _FRONTEND: "true"
-  _DEPLOY_SLO_ONLY: "false"
+  _DEPLOY_SLO_ONLY: "true"
 
 tags:
   - deploy-shop

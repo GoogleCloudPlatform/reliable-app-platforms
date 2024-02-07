@@ -8,4 +8,6 @@ manifests:
       - ./k8s/overlays/workload-clusters
 profiles:
   - name: prod
-
+deploy:
+  statusCheck: true
+  statusCheckDeadlineSeconds: 2400 # High timeout required with autopilot as scaling can be slow

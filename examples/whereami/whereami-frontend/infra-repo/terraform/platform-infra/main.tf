@@ -1,5 +1,5 @@
 module "deploy-pipeline"{
-    source = "git::https://github.com/ameer00/Building-Reliable-Platforms-on-GCP-with-Google-SRE.git//modules/deploy-pipeline?ref=tf_in_repo_examples"
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/deploy-pipeline?ref=tf"
     project_id = var.project_id
     service_name = var.service_name
     pipeline_location = var.pipeline_location
@@ -9,7 +9,7 @@ module "deploy-pipeline"{
 }
 
 module "endpoint" {
-    source = "git::https://github.com/ameer00/Building-Reliable-Platforms-on-GCP-with-Google-SRE.git//modules/endpoints?ref=tf_in_repo_examples"
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/endpoints?ref=tf"
     project_id = var.project_id
     service_name = "${var.app_name}"
 }

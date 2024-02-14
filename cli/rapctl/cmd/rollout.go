@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"os/exec" // do better
 
 	"github.com/spf13/cobra"
@@ -32,14 +33,27 @@ var rolloutCmd = &cobra.Command{
 		// from deploy.sh:
 		// [[ ${APPLICATION} == "whereami" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/whereami/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
 
+		// should probably do it with cloud build API:
 		// https://pkg.go.dev/cloud.google.com/go/cloudbuild@v1.15.1/apiv2#pkg-overview
 		// ctx := context.Background()
 		// cloudbuildService, err := cloudbuild.NewService(ctx)
 
-		gcmd := exec.Command("gcloud", "builds submit", "config=examples/whereami/ci.yaml", "substitutions=_PROJECT_ID=foo,_SHORT_SHA=bar", "async")
-		cmd.Env = append(os.Environ(),
+		gcloudService := "builds"
+		gcloudMethod := "submit"
+
+		appStr := cmd.Flag("app").Value.String()
+		configArg := "config=examples/" + appStr + "/ci.yaml"
+		substitutionsArg := ""
+		// substitutionsArg = "PROJECT_ID=" =examples/" + app + "/ci.yaml"
+		asyncArg := "async"
+
+		gcmd := exec.Command("gcloud", gcloudService, gcloudMethod, configArg, substitutionsArg, asyncArg)
+		gcmd.Env = append(os.Environ(),
 			"PROJECT_ID=duplicate_value", // ignored
-			"SHORT_SHA=actual_value",    // this value is used
+			"SHORT_SHA=actual_value",
+		)
+
+		fmt.Println(gcmd.String())
 
 		err := gcmd.Run()
 		if err != nil {
@@ -60,6 +74,8 @@ func init() {
 	// rolloutCmd.PersistentFlags().String("foo", "", "A help for foo")
 	rolloutCmd.PersistentFlags().String("app", "", "Name of app to rollout")
 	rolloutCmd.PersistentFlags().String("strategy", "", "Type of rollout strategy")
+
+	rolloutCmd.MarkFlagRequired("app") // not working yet
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

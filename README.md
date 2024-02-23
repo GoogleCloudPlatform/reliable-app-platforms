@@ -93,6 +93,15 @@ Please read *examples/Examples.md* for more info on the structure of the example
 ### Deploy `nginx`.
 
 The **nginx** application is a single service application which by default uses the *Active Passive Zone (APZ)* archetype. 
+
+**NOTE**: Make sure you update the virtual service file found in */examples/nginx/app-repo/k8s/base/vs.yaml* to point to the endpoint for your application's frontend.
+
+```
+spec:
+   hosts:
+   - "whereami.endpoints.$PROJECT_ID.cloud.goog"
+```
+
    ```bash
    
    cd $HOME
@@ -115,7 +124,15 @@ The **nginx** application is a single service application which by default uses 
 
 The **whereami** application is a two-service application. Each service in the application may use a different archetype. In this example, by default the *whereami-frontend* uses the *Active Passive Region (APR)* archetype, and the *whereami-backend* uses the *Single Zone (SZ)* archetype.
 
-   ```bash
+**NOTE**:Make sure you update the virtual service file found in */examples/whereami/whereami-frontend/app-repo/k8s/base/vs.yaml* to point to the endpoint for your application's frontend.
+
+```
+spec:
+   hosts:
+   - "whereami.endpoints.$PROJECT_ID.cloud.goog"
+```
+
+```bash
    
    cd $HOME
    ./deploy.sh --app whereami

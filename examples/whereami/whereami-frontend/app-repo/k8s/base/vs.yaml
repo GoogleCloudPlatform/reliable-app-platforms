@@ -5,8 +5,7 @@ metadata:
     namespace: whereami-frontend
 spec:
     hosts:
-    - "whereami.endpoints.arch001.cloud.goog"
-    - "whereami.endpoints.smig-rad-001.cloud.goog"
+    - "whereami.endpoints.<project_id>.cloud.goog"
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

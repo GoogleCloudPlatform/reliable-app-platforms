@@ -1,0 +1,57 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - app-cicd-nginx-nginx
+substitutions:
+  _PROJECT_ID: ${_PROJECT_ID}
+  _REGION: us-central1
+  _APP_NAME: "nginx"
+  _SERVICE: "nginx"
+steps:
+  # Create release in Google Cloud Deploy for App Clusters
+  - name: gcr.io/cloud-builders/gcloud
+    id: "deploy-to-app-clusters"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo -e "_PROJECT_ID is ${_PROJECT_ID}"
+        echo -e "_SHORT_SHA is ${_SHORT_SHA}"
+        echo -e "_PIPELINE_LOCATION is ${_REGION}"
+        echo -e "_APP_NAME is ${_APP_NAME}"
+        echo -e "_SERVICE is ${_SERVICE}"
+
+        gcloud deploy releases create rel-${_SHORT_SHA} \
+        --delivery-pipeline ${_SERVICE}-pipeline \
+        --region ${_REGION} \
+        --skaffold-file=./examples/nginx/app-repo/skaffold_workload_clusters.yaml
+ # Create release in Google Cloud Deploy for other Clusters to deploy the virtual service
+  - name: gcr.io/cloud-builders/gcloud
+    id: "deploy-to-other-clusters"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo -e "_PROJECT_ID is ${_PROJECT_ID}"
+        echo -e "_SHORT_SHA is ${_SHORT_SHA}"
+        echo -e "_PIPELINE_LOCATION is ${_REGION}"
+        echo -e "_APP_NAME is ${_APP_NAME}"
+        echo -e "_SERVICE is ${_SERVICE}"
+
+        gcloud deploy releases create rel-${_SHORT_SHA} \
+        --delivery-pipeline ${_SERVICE}-vs-pipeline \
+        --region ${_REGION} \
+        --skaffold-file=./examples/nginx/app-repo/skaffold_other_clusters.yaml

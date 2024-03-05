@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 application_name=${1}
 github_org=${2}

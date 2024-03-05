@@ -32,10 +32,7 @@ steps:
     - "-xe"
     - "-c"
     - |
-      echo `pwd` >> /workspace/file
-      echo `ls -lrt` >> /workspace/file
-      cat "/workspace/file"
-      exit 0
+      ls -lrt
       terraform init -backend-config="bucket=${_PROJECT_ID}"
       terraform apply -var="project_id=${_PROJECT_ID}" \
       -var="application_name=${_APP_NAME}" -var="github_org=${_GITHUB_ORG}" -var="github_user=${_GITHUB_USER}" \

@@ -43,7 +43,7 @@ resource "null_resource" "set-repo" {
     id = github_repository.infra_repo.id
   }
   provisioner "local-exec" {
-    command = "${path.module}/prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} split('/',${github_repository.infra_repo.full_name})[1]"
+    command = "${path.module}/prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${split("/",${github_repository.infra_repo.full_name})[1]}"
   }
   depends_on = [github_repository.infra_repo]
 }
@@ -115,10 +115,10 @@ resource "google_apikeys_key" "api-key" {
     }
   }
 }
-
+//TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
 resource "github_repository_webhook" "gh-webhook" {
   provider   = github
-  repository = "${var.application_name}-infra"
+  repository = "${var.application_name}-infra-${timestamp()}"
   configuration {
     url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-infra-${var.application_name}:webhook?key=${google_apikeys_key.api-key.key_string}&secret=${random_password.pass-webhook.result}"
     content_type = "json"

@@ -97,7 +97,7 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
     ref       = "refs/heads/main"
     repo_type = "GITHUB"
   }
-  location = "us-central1"
+
   git_file_source {
     path      = "create-infra.yaml"
     uri       = "https://github.com/${github_repository.infra_repo.full_name}"

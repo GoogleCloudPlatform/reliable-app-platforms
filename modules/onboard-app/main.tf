@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-data "google_project" "project" {
-  project_id = var.project_id
-}
-
+//data "google_project" "project" {
+//  project_id = var.project_id
+//}
+//
 locals{
   repo_name = split("/",github_repository.infra_repo.full_name)[1]
 }
@@ -46,89 +46,89 @@ resource "null_resource" "set-repo" {
     id = github_repository.infra_repo.id
   }
   provisioner "local-exec" {
-    command = "./prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${local.repo_name}"
+    command = "prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${local.repo_name}"
   }
   depends_on = [github_repository.infra_repo]
 }
-
-// create a webhook cloudbuild trigger
-resource "random_password" "pass-webhook" {
-  length  = 16
-  special = false
-}
-
-resource "google_secret_manager_secret" "wh-sec" {
-  project   = var.project_id
-  secret_id = "${var.application_name}-infra-webhook-secret"
-  replication {
-    automatic = true
-  }
-}
-
-resource "google_secret_manager_secret_version" "wh-secv" {
-  secret      = google_secret_manager_secret.wh-sec.id
-  secret_data = "${random_password.pass-webhook.result}"
-}
-
-data "google_iam_policy" "wh-secv-access" {
-  binding {
-    role = "roles/secretmanager.secretAccessor"
-    members = [
-      "serviceAccount:service-${data.google_project.project.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com",
-    ]
-  }
-}
-
-resource "google_secret_manager_secret_iam_policy" "policy" {
-  project     = var.project_id
-  secret_id   = google_secret_manager_secret.wh-sec.id
-  policy_data = data.google_iam_policy.wh-secv-access.policy_data
-}
-
-resource "google_cloudbuild_trigger" "deploy-infra" {
-  name        = "deploy-infra-${var.application_name}"
-  description = "Webhook to deploy the infra"
-  project     = var.project_id
-  webhook_config {
-    secret = google_secret_manager_secret_version.wh-secv.id
-  }
-  source_to_build {
-    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
-    ref       = "refs/heads/main"
-    repo_type = "GITHUB"
-  }
-
-  git_file_source {
-    path      = "create-infra.yaml"
-    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
-    revision  = "refs/heads/main"
-    repo_type = "GITHUB"
-  }
-
-}
-
-//TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
-resource "google_apikeys_key" "api-key" {
-  name         = lower(replace("${var.application_name}-api-key-${timestamp()}",":","-"))
-  display_name = "${var.application_name} Infra webhook API ${timestamp()}"
-  project      = var.project_id
-  restrictions {
-    api_targets {
-      service = "cloudbuild.googleapis.com"
-    }
-  }
-}
-
-resource "github_repository_webhook" "gh-webhook" {
-  provider   = github
-  repository = "${var.application_name}"
-  configuration {
-    url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-infra-${var.application_name}:webhook?key=${google_apikeys_key.api-key.key_string}&secret=${random_password.pass-webhook.result}"
-    content_type = "json"
-    insecure_ssl = false
-  }
-  active     = true
-  events     = ["push"]
-  depends_on = [google_cloudbuild_trigger.deploy-infra]
-
-}
+//
+//// create a webhook cloudbuild trigger
+//resource "random_password" "pass-webhook" {
+//  length  = 16
+//  special = false
+//}
+//
+//resource "google_secret_manager_secret" "wh-sec" {
+//  project   = var.project_id
+//  secret_id = "${var.application_name}-infra-webhook-secret"
+//  replication {
+//    automatic = true
+//  }
+//}
+//
+//resource "google_secret_manager_secret_version" "wh-secv" {
+//  secret      = google_secret_manager_secret.wh-sec.id
+//  secret_data = "${random_password.pass-webhook.result}"
+//}
+//
+//data "google_iam_policy" "wh-secv-access" {
+//  binding {
+//    role = "roles/secretmanager.secretAccessor"
+//    members = [
+//      "serviceAccount:service-${data.google_project.project.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com",
+//    ]
+//  }
+//}
+//
+//resource "google_secret_manager_secret_iam_policy" "policy" {
+//  project     = var.project_id
+//  secret_id   = google_secret_manager_secret.wh-sec.id
+//  policy_data = data.google_iam_policy.wh-secv-access.policy_data
+//}
+//
+//resource "google_cloudbuild_trigger" "deploy-infra" {
+//  name        = "deploy-infra-${var.application_name}"
+//  description = "Webhook to deploy the infra"
+//  project     = var.project_id
+//  webhook_config {
+//    secret = google_secret_manager_secret_version.wh-secv.id
+//  }
+//  source_to_build {
+//    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
+//    ref       = "refs/heads/main"
+//    repo_type = "GITHUB"
+//  }
+//
+//  git_file_source {
+//    path      = "create-infra.yaml"
+//    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
+//    revision  = "refs/heads/main"
+//    repo_type = "GITHUB"
+//  }
+//
+//}
+//
+////TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
+//resource "google_apikeys_key" "api-key" {
+//  name         = lower(replace("${var.application_name}-api-key-${timestamp()}",":","-"))
+//  display_name = "${var.application_name} Infra webhook API ${timestamp()}"
+//  project      = var.project_id
+//  restrictions {
+//    api_targets {
+//      service = "cloudbuild.googleapis.com"
+//    }
+//  }
+//}
+//
+//resource "github_repository_webhook" "gh-webhook" {
+//  provider   = github
+//  repository = "${var.application_name}"
+//  configuration {
+//    url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-infra-${var.application_name}:webhook?key=${google_apikeys_key.api-key.key_string}&secret=${random_password.pass-webhook.result}"
+//    content_type = "json"
+//    insecure_ssl = false
+//  }
+//  active     = true
+//  events     = ["push"]
+//  depends_on = [google_cloudbuild_trigger.deploy-infra]
+//
+//}

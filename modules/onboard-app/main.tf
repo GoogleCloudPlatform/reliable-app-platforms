@@ -107,10 +107,10 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
 
 }
 
-
+//TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
 resource "google_apikeys_key" "api-key" {
-  name         = "${var.application_name}-infra-webhook-api-key-1"
-  display_name = "${var.application_name} Infra webhook API key-1"
+  name         = "${var.application_name}-api-key-${timestamp()}"
+  display_name = "${var.application_name} Infra webhook API ${timestamp()}"
   project      = var.project_id
   restrictions {
     api_targets {
@@ -118,10 +118,10 @@ resource "google_apikeys_key" "api-key" {
     }
   }
 }
-//TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
+
 resource "github_repository_webhook" "gh-webhook" {
   provider   = github
-  repository = "${var.application_name}-infra-${timestamp()}"
+  repository = "${var.application_name}"
   configuration {
     url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-infra-${var.application_name}:webhook?key=${google_apikeys_key.api-key.key_string}&secret=${random_password.pass-webhook.result}"
     content_type = "json"

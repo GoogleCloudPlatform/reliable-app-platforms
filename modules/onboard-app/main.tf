@@ -18,6 +18,9 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
+locals{
+  repo_name = split("/",github_repository.infra_repo.full_name)[1]
+}
 
 //Create infra repo
 resource "github_repository" "infra_repo" {
@@ -43,7 +46,7 @@ resource "null_resource" "set-repo" {
     id = github_repository.infra_repo.id
   }
   provisioner "local-exec" {
-    command = "${path.module}/prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} split("/",${github_repository.infra_repo.full_name})[1]"
+    command = "${path.module}/prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${local.repo_name}"
   }
   depends_on = [github_repository.infra_repo]
 }

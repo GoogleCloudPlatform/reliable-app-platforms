@@ -62,13 +62,13 @@ while [ -z ${GITHUB_USER} ]
 # Ensure github email is defined
 while [ -z ${GITHUB_EMAIL} ]
     do
-    read -p "$(echo -e "Please provide your github email: ")" GITHUB_ORG
+    read -p "$(echo -e "Please provide your github email: ")" GITHUB_EMAIL
     done
 
 # Ensure github personal access token is defined
-while [ -z ${GITHUB_ORG} ]
+while [ -z ${GITHUB_TOKEN} ]
     do
-    read -p "$(echo -e "Please provide your github personal access token: ")" TOKEN
+    read -p "$(echo -e "Please provide your github personal access token: ")" GITHUB_TOKEN
     done
 
 # Ensure github org is defined

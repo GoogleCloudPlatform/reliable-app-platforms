@@ -121,7 +121,7 @@ resource "google_apikeys_key" "api-key" {
 
 resource "github_repository_webhook" "gh-webhook" {
   provider   = github
-  repository = "${var.application_name}"
+  repository = local.repo_name
   configuration {
     url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-infra-${var.application_name}:webhook?key=${google_apikeys_key.api-key.key_string}&secret=${random_password.pass-webhook.result}"
     content_type = "json"

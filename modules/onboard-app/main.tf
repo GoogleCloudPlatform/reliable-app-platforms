@@ -46,7 +46,7 @@ resource "null_resource" "set-repo" {
     id = github_repository.infra_repo.id
   }
   provisioner "local-exec" {
-    command = "${path.module}/prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${local.repo_name}"
+    command = "./prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${local.repo_name}"
   }
   depends_on = [github_repository.infra_repo]
 }
@@ -109,7 +109,7 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
 
 //TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
 resource "google_apikeys_key" "api-key" {
-  name         = replace("${var.application_name}-api-key-${timestamp()}",":","-")
+  name         = lower(replace("${var.application_name}-api-key-${timestamp()}",":","-"))
   display_name = "${var.application_name} Infra webhook API ${timestamp()}"
   project      = var.project_id
   restrictions {

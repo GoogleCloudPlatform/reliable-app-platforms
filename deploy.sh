@@ -77,19 +77,19 @@ while [ -z ${GITHUB_ORG} ]
     read -p "$(echo -e "Please provide your github org: ")" GITHUB_ORG
     done
 
-USER_SECRET=$(gcloud secrets describe github-user --format=json | jq 'has("name")'
+USER_SECRET=$(gcloud secrets describe github-user --format=json | jq 'has("name")')
 if [[ ${USER_SECRET} != "true" ]]; then
     printf ${GITHUB_USER} | gcloud secrets create github-user --data-file=-
 fi
-EMAIL_SECRET=$(gcloud secrets describe github-email --format=json | jq 'has("name")'
+EMAIL_SECRET=$(gcloud secrets describe github-email --format=json | jq 'has("name")')
 if [[ ${EMAIL_SECRET} != "true" ]]; then
     printf ${GITHUB_EMAIL} | gcloud secrets create github-email --data-file=-
 fi
-TOKEN_SECRET=$(gcloud secrets describe github-token --format=json | jq 'has("name")'
+TOKEN_SECRET=$(gcloud secrets describe github-token --format=json | jq 'has("name")')
 if [[ ${TOKEN_SECRET} != "true" ]]; then
     printf ${GITHUB_TOKEN} | gcloud secrets create github-token --data-file=-
 fi
-ORG_SECRET=$(gcloud secrets describe github-org --format=json | jq 'has("name")'
+ORG_SECRET=$(gcloud secrets describe github-org --format=json | jq 'has("name")')
 if [[ ${ORG_SECRET} != "true" ]]; then
     printf ${GITHUB_ORG} | gcloud secrets create github-org --data-file=-
 fi

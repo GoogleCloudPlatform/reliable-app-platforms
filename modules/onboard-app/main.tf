@@ -94,9 +94,25 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
   }
   build {
     step {
+      id         = "clone-repo"
+      name       = "gcr.io/cloud-builders/git"
+      entrypoint = "sh"
+      args = [
+        "-c",
+        <<-EOF
+      git clone https://$$GITHUB_USER:$$GITHUB_TOKEN@github.com/$$GITHUB_ORG/${"$"}{_REPO}
+      cd ${"$"}{_REPO}
+  EOF
+      ]
+      secret_env = [
+        "GITHUB_USER",
+        "GITHUB_TOKEN",
+        "GITHUB_ORG"]
+    }
+    step {
       name       = "hashicorp/terraform:1.4.6"
       id         = "create-infra"
-      dir        =  "terraform"
+      #dir        =  "terraform"
       entrypoint = "sh"
       args = [
         "-c",
@@ -108,7 +124,7 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
       export TF_VAR_zone_index=${"$"}{_ZONEINDEX}
       export TF_VAR_region_index=${"$"}{_REGION_INDEX}
       export TF_VAR_pipeline_location=${"$"}{_PIPELINE_LOCATION}
-
+      cd ${"$"}{_REPO}/terraform/platform-infra
       terraform init -backend-config="bucket=${"$"}{_PROJECT_ID}"
       terraform apply --auto-approve
 
@@ -135,6 +151,20 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
   filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
   depends_on      = [google_secret_manager_secret_version.wh-secv]
 
+  available_secrets {
+    secret_manager {
+      version_name = "projects/${var.project_id}/secrets/github-user/versions/latest"
+      env = "GITHUB_USER"
+    }
+    secret_manager {
+      version_name = "projects/${var.project_id}/secrets/github-token/versions/latest"
+      env = "GITHUB_TOKEN"
+    }
+    secret_manager {
+      version_name = "projects/${var.project_id}/secrets/github-org/versions/latest"
+      env = "GITHUB_ORG"
+    }
+  }
 }
 
 //TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible

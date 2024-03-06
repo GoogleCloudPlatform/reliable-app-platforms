@@ -92,18 +92,6 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
   webhook_config {
     secret = google_secret_manager_secret_version.wh-secv.id
   }
-//  source_to_build {
-//    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
-//    ref       = "refs/heads/main"
-//    repo_type = "GITHUB"
-//  }
-//
-//  git_file_source {
-//    path      = "create-infra.yaml"
-//    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
-//    revision  = "refs/heads/main"
-//    repo_type = "GITHUB"
-//  }
   build {
     step {
       name       = "hashicorp/terraform:1.4.6"
@@ -113,8 +101,8 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
       args = [
         "-c",
         <<-EOF
-      export TF_VAR_project_id=${_PROJECT_ID}
-      export TF_VAR_service_name=${_SERVICE}
+      export TF_VAR_project_id=${"$"}{_PROJECT_ID}
+      export TF_VAR_service_name=${"$"}${_SERVICE}
       export TF_VAR_app_name=${_APP_NAME}
       export TF_VAR_archetype=${_ARCHETYPE}
       export TF_VAR_zone_index=${_ZONEINDEX}

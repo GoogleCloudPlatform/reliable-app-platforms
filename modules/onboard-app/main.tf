@@ -102,14 +102,14 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
         "-c",
         <<-EOF
       export TF_VAR_project_id=${"$"}{_PROJECT_ID}
-      export TF_VAR_service_name=${"$"}${_SERVICE}
-      export TF_VAR_app_name=${_APP_NAME}
-      export TF_VAR_archetype=${_ARCHETYPE}
-      export TF_VAR_zone_index=${_ZONEINDEX}
-      export TF_VAR_region_index=${_REGION_INDEX}
-      export TF_VAR_pipeline_location=${_PIPELINE_LOCATION}
+      export TF_VAR_service_name=${"$"}{_SERVICE}
+      export TF_VAR_app_name=${"$"}{_APP_NAME}
+      export TF_VAR_archetype=${"$"}{_ARCHETYPE}
+      export TF_VAR_zone_index=${"$"}{_ZONEINDEX}
+      export TF_VAR_region_index=${"$"}{_REGION_INDEX}
+      export TF_VAR_pipeline_location=${"$"}{_PIPELINE_LOCATION}
 
-      terraform init -backend-config="bucket=${_PROJECT_ID}"
+      terraform init -backend-config="bucket=${"$"}{_PROJECT_ID}"
       terraform apply --auto-approve
 
   EOF

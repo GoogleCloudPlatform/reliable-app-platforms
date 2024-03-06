@@ -96,7 +96,7 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
     step {
       name       = "hashicorp/terraform:1.4.6"
       id         = "create-infra"
-      #dir        =  "terraform"
+      dir        =  "terraform"
       entrypoint = "sh"
       args = [
         "-c",

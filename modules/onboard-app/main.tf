@@ -132,7 +132,20 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
       ]
 
     }
-
+    available_secrets {
+      secret_manager {
+        version_name = "projects/${var.project_id}/secrets/github-user/versions/latest"
+        env = "GITHUB_USER"
+      }
+      secret_manager {
+        version_name = "projects/${var.project_id}/secrets/github-token/versions/latest"
+        env = "GITHUB_TOKEN"
+      }
+      secret_manager {
+        version_name = "projects/${var.project_id}/secrets/github-org/versions/latest"
+        env = "GITHUB_ORG"
+      }
+    }
 
   }
   substitutions = {
@@ -151,20 +164,7 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
   filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
   depends_on      = [google_secret_manager_secret_version.wh-secv]
 
-  available_secrets {
-    secret_manager {
-      version_name = "projects/${var.project_id}/secrets/github-user/versions/latest"
-      env = "GITHUB_USER"
-    }
-    secret_manager {
-      version_name = "projects/${var.project_id}/secrets/github-token/versions/latest"
-      env = "GITHUB_TOKEN"
-    }
-    secret_manager {
-      version_name = "projects/${var.project_id}/secrets/github-org/versions/latest"
-      env = "GITHUB_ORG"
-    }
-  }
+
 }
 
 //TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible

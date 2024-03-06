@@ -92,18 +92,54 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
   webhook_config {
     secret = google_secret_manager_secret_version.wh-secv.id
   }
-  source_to_build {
-    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
-    ref       = "refs/heads/main"
-    repo_type = "GITHUB"
-  }
+//  source_to_build {
+//    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
+//    ref       = "refs/heads/main"
+//    repo_type = "GITHUB"
+//  }
+//
+//  git_file_source {
+//    path      = "create-infra.yaml"
+//    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
+//    revision  = "refs/heads/main"
+//    repo_type = "GITHUB"
+//  }
+  build {
+    step {
+      name       = "hashicorp/terraform:1.4.6"
+      id         = "create-infra"
+      dir        =  "terraform"
+      entrypoint = "sh"
+      args = [
+        "-c",
+        <<-EOF
+      terraform init -backend-config="bucket=${_PROJECT_ID}"
+      terraform apply -var="project_id=${_PROJECT_ID}" \
+        -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}" -var="archetype=${_ARCHETYPE}" \
+        -var="zone_index=${_ZONE_INDEX}" -var="region_index=${_REGION_INDEX}" -var="pipeline_location=${_PIPELINE_LOCATION}" \
+        --auto-approve
+  EOF
+      ]
 
-  git_file_source {
-    path      = "create-infra.yaml"
-    uri       = "https://github.com/${github_repository.infra_repo.full_name}"
-    revision  = "refs/heads/main"
-    repo_type = "GITHUB"
+    }
+
+
   }
+  substitutions = {
+    _REPO       = local.repo_name
+    _REF        = "${"$"}(body.ref)"
+    _COMMIT_MSG = "${"$"}(body.head_commit.message)"
+    _BUILD      = "true"
+    _PROJECT_ID = var.project_id
+    _APP_NAME   = var.application_name
+    _SERVICE    = var.application_name
+    _PIPELINE_LOCATION = "us-central1"
+    _ARCHETYPE = "APZ"
+    _ZONE_INDEX = "[0,1]"
+    _REGION_INDEX = "[0,1]"
+  }
+  filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
+  depends_on      = [google_secret_manager_secret_version.wh-secv]
 
 }
 

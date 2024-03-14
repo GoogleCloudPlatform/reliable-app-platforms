@@ -18,7 +18,7 @@ tags:
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
-  _APP_NAME: "nginx"
+  _: "nginx"
   _SERVICE: "nginx"
 
 steps:
@@ -32,4 +32,4 @@ steps:
       - |
         [[ "${_BUILD}" == "false" ]] && exit 0
         terraform init -backend-config="bucket=${_PROJECT_ID}"
-        terraform apply -var="project_id=${_PROJECT_ID}" -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}"  --auto-approve
+        terraform apply -var="project_id=${_PROJECT_ID}" -var="service_name=${_SERVICE}" -var="app_name=${_}"  --auto-approve

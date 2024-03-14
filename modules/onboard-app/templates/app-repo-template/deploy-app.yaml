@@ -18,7 +18,7 @@ tags:
 substitutions:
   _PROJECT_ID: ${_PROJECT_ID}
   _REGION: us-central1
-  _APP_NAME: "nginx"
+  _: "nginx"
   _SERVICE: "nginx"
 steps:
   # Create release in Google Cloud Deploy for App Clusters
@@ -31,7 +31,7 @@ steps:
         echo -e "_PROJECT_ID is ${_PROJECT_ID}"
         echo -e "_SHORT_SHA is ${_SHORT_SHA}"
         echo -e "_PIPELINE_LOCATION is ${_REGION}"
-        echo -e "_APP_NAME is ${_APP_NAME}"
+        echo -e "_ is ${_}"
         echo -e "_SERVICE is ${_SERVICE}"
 
         gcloud deploy releases create rel-${_SHORT_SHA} \
@@ -48,7 +48,7 @@ steps:
         echo -e "_PROJECT_ID is ${_PROJECT_ID}"
         echo -e "_SHORT_SHA is ${_SHORT_SHA}"
         echo -e "_PIPELINE_LOCATION is ${_REGION}"
-        echo -e "_APP_NAME is ${_APP_NAME}"
+        echo -e "_ is ${_}"
         echo -e "_SERVICE is ${_SERVICE}"
 
         gcloud deploy releases create rel-${_SHORT_SHA} \

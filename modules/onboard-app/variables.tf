@@ -31,7 +31,7 @@
 //}
 //
 
-variable "application_name" {
+variable "app_name" {
   description = "Name of the application being created."
 }
 

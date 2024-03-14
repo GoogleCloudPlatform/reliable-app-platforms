@@ -1,1 +1,5 @@
-# Backend defined in consuming module
+terraform {
+  backend "gcs" {
+    prefix = "//tfstate/platform-infra"
+  }
+}

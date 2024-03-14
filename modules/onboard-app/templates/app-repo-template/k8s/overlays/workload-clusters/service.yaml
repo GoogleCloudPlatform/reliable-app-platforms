@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: APP_NAME
-  namespace: APP_NAME
+  name: 
+  namespace: 
 spec:
   selector:
-    app: APP_NAME
+    app: 
   ports:
     - name: http
       port: 80

@@ -15,7 +15,7 @@
 timeout: 14400s # 2hr
 #substitutions:
 #  _PROJECT_ID: ${PROJECT_ID}
-#  _APP_NAME: ${APP_NAME}
+#  _: ${}
 #  _GITHUB_ORG: ${github_org}
 #  _GITHUB_USER: ${github_user}
 #  _GITHUB_EMAIL: ${github_email}
@@ -35,6 +35,6 @@ steps:
       ls -lrt
       terraform init -backend-config="bucket=${_PROJECT_ID}"
       terraform apply -var="project_id=${_PROJECT_ID}" \
-      -var="application_name=${_APP_NAME}" -var="github_org=${_GITHUB_ORG}" -var="github_user=${_GITHUB_USER}" \
+      -var="app_name=${_}" -var="github_org=${_GITHUB_ORG}" -var="github_user=${_GITHUB_USER}" \
       -var="github_email=${_GITHUB_EMAIL}" -var="github_token=${_GITHUB_TOKEN}" \
       --auto-approve

@@ -24,8 +24,8 @@ locals{
 
 //Create infra repo
 resource "github_repository" "infra_repo" {
-  name        = "${var.application_name}-infra"
-  description = "Application code repository for ${var.application_name}"
+  name        = "${var.app_name}-infra"
+  description = "IaC repository for ${var.app_name}"
 
   visibility   = "private"
   has_issues   = false
@@ -41,33 +41,33 @@ resource "github_repository" "infra_repo" {
 }
 
 // perform placeholder replacements in the repo
-resource "null_resource" "set-repo" {
+resource "null_resource" "set_repo" {
   triggers = {
     id = github_repository.infra_repo.id
   }
   provisioner "local-exec" {
-    command = "${path.cwd}/prep-app-repo.sh ${var.application_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${local.repo_name}"
+    command = "${path.cwd}/prep-infra-repo.sh ${var.app_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${local.repo_name}"
   }
   depends_on = [github_repository.infra_repo]
 }
 
 // create a webhook cloudbuild trigger
-resource "random_password" "pass-webhook" {
+resource "random_password" "pass_webhook" {
   length  = 16
   special = false
 }
 
-resource "google_secret_manager_secret" "wh-sec" {
+resource "google_secret_manager_secret" "wh_sec" {
   project   = var.project_id
-  secret_id = "${var.application_name}-infra-webhook-secret"
+  secret_id = "${var.app_name}-infra-webhook-secret"
   replication {
     automatic = true
   }
 }
 
-resource "google_secret_manager_secret_version" "wh-secv" {
-  secret      = google_secret_manager_secret.wh-sec.id
-  secret_data = "${random_password.pass-webhook.result}"
+resource "google_secret_manager_secret_version" "wh_secv" {
+  secret      = google_secret_manager_secret.wh_sec.id
+  secret_data = "${random_password.pass_webhook.result}"
 }
 
 data "google_iam_policy" "wh-secv-access" {
@@ -81,16 +81,16 @@ data "google_iam_policy" "wh-secv-access" {
 
 resource "google_secret_manager_secret_iam_policy" "policy" {
   project     = var.project_id
-  secret_id   = google_secret_manager_secret.wh-sec.id
+  secret_id   = google_secret_manager_secret.wh_sec.id
   policy_data = data.google_iam_policy.wh-secv-access.policy_data
 }
 
-resource "google_cloudbuild_trigger" "deploy-infra" {
-  name        = "deploy-infra-${var.application_name}"
+resource "google_cloudbuild_trigger" "deploy_infra" {
+  name        = "deploy-infra-${var.app_name}"
   description = "Webhook to deploy the infra"
   project     = var.project_id
   webhook_config {
-    secret = google_secret_manager_secret_version.wh-secv.id
+    secret = google_secret_manager_secret_version.wh_secv.id
   }
   build {
     step {
@@ -119,9 +119,9 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
         <<-EOF
       export TF_VAR_project_id=${"$"}{_PROJECT_ID}
       export TF_VAR_service_name=${"$"}{_SERVICE}
-      export TF_VAR_app_name=${"$"}{_APP_NAME}
+      export TF_VAR_app_name=${"$"}{_}
       export TF_VAR_archetype=${"$"}{_ARCHETYPE}
-      export TF_VAR_zone_index=${"$"}{_ZONEINDEX}
+      export TF_VAR_zone_index=${"$"}{_ZONE_INDEX}
       export TF_VAR_region_index=${"$"}{_REGION_INDEX}
       export TF_VAR_pipeline_location=${"$"}{_PIPELINE_LOCATION}
       cd ${"$"}{_REPO}/terraform/platform-infra
@@ -145,6 +145,11 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
         version_name = "projects/${var.project_id}/secrets/github-org/versions/latest"
         env = "GITHUB_ORG"
       }
+      secret_manager {
+        version_name = "projects/${var.project_id}/secrets/github-email/versions/latest"
+        env = "GITHUB_EMAIL"
+      }
+
     }
 
   }
@@ -154,23 +159,23 @@ resource "google_cloudbuild_trigger" "deploy-infra" {
     _COMMIT_MSG = "${"$"}(body.head_commit.message)"
     _BUILD      = "true"
     _PROJECT_ID = var.project_id
-    _APP_NAME   = var.application_name
-    _SERVICE    = var.application_name
+    _   = var.app_name
+    _SERVICE    = var.app_name
     _PIPELINE_LOCATION = "us-central1"
     _ARCHETYPE = "APZ"
     _ZONE_INDEX = "[0,1]"
     _REGION_INDEX = "[0,1]"
   }
   filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
-  depends_on      = [google_secret_manager_secret_version.wh-secv]
+  depends_on      = [google_secret_manager_secret_version.wh_secv]
 
 
 }
 
 //TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
-resource "google_apikeys_key" "api-key" {
-  name         = lower(replace("${var.application_name}-api-key-${timestamp()}",":","-"))
-  display_name = "${var.application_name} Infra webhook API ${timestamp()}"
+resource "google_apikeys_key" "api_key" {
+  name         = lower(replace("${var.app_name}-api-key-${timestamp()}",":","-"))
+  display_name = "${var.app_name} Infra webhook API ${timestamp()}"
   project      = var.project_id
   restrictions {
     api_targets {
@@ -179,16 +184,16 @@ resource "google_apikeys_key" "api-key" {
   }
 }
 
-resource "github_repository_webhook" "gh-webhook" {
+resource "github_repository_webhook" "gh_webhook" {
   provider   = github
   repository = local.repo_name
   configuration {
-    url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-infra-${var.application_name}:webhook?key=${google_apikeys_key.api-key.key_string}&secret=${random_password.pass-webhook.result}"
+    url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-infra-${var.app_name}:webhook?key=${google_apikeys_key.api_key.key_string}&secret=${random_password.pass_webhook.result}"
     content_type = "json"
     insecure_ssl = false
   }
   active     = true
   events     = ["push"]
-  depends_on = [google_cloudbuild_trigger.deploy-infra]
+  depends_on = [google_cloudbuild_trigger.deploy_infra]
 
 }

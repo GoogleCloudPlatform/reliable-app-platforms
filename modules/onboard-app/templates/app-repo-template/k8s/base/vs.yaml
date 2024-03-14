@@ -1,8 +1,8 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-    name: APP_NAME-virtualservice
-    namespace: APP_NAME
+    name: -virtualservice
+    namespace: 
 spec:
     hosts:
     - "nginxservice.endpoints.<project-id>.cloud.goog"

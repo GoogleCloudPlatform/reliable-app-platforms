@@ -10,6 +10,7 @@ git clone  https://${github_user}:${github_token}@github.com/${github_org}/${git
 echo `ls -lrt`
 cp -r templates/infra-repo-template/* repo
 cd repo
+find . -type f  -exec  sed -i "s??${application_name}?g" {} +
 git config --global user.name ${github_user}
 git config --global user.email ${github_email}
 git add .

@@ -79,19 +79,19 @@ while [ -z ${GITHUB_ORG} ]
 
 USER_SECRET=$(gcloud secrets describe github-user --format=json | jq 'has("name")' > /dev/null)
 if [[ ${USER_SECRET} != "true" ]]; then
-    printf ${GITHUB_USER} | gcloud secrets create github-user --data-file=-
+    printf ${GITHUB_USER} | gcloud secrets create github-user --data-file=- > /dev/null
 fi
 EMAIL_SECRET=$(gcloud secrets describe github-email --format=json | jq 'has("name")' > /dev/null)
 if [[ ${EMAIL_SECRET} != "true" ]]; then
-    printf ${GITHUB_EMAIL} | gcloud secrets create github-email --data-file=-
+    printf ${GITHUB_EMAIL} | gcloud secrets create github-email --data-file=- > /dev/null
 fi
 TOKEN_SECRET=$(gcloud secrets describe github-token --format=json | jq 'has("name")' > /dev/null)
 if [[ ${TOKEN_SECRET} != "true" ]]; then
-    printf ${GITHUB_TOKEN} | gcloud secrets create github-token --data-file=-
+    printf ${GITHUB_TOKEN} | gcloud secrets create github-token --data-file=- > /dev/null
 fi
 ORG_SECRET=$(gcloud secrets describe github-org --format=json | jq 'has("name")' > /dev/null)
 if [[ ${ORG_SECRET} != "true" ]]; then
-    printf ${GITHUB_ORG} | gcloud secrets create github-org --data-file=-
+    printf ${GITHUB_ORG} | gcloud secrets create github-org --data-file=- > /dev/null
 fi
 gcloud builds submit --config=modules/onboard-app/cloudbuild.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_APP_NAME=${APPLICATION},_GITHUB_ORG=${GITHUB_ORG},_GITHUB_EMAIL=${GITHUB_EMAIL},_GITHUB_USER=${GITHUB_USER},_GITHUB_TOKEN=${GITHUB_TOKEN}  --async
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

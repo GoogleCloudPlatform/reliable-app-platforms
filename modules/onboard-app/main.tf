@@ -119,7 +119,7 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
         <<-EOF
       export TF_VAR_project_id=${"$"}{_PROJECT_ID}
       export TF_VAR_service_name=${"$"}{_SERVICE}
-      export TF_VAR_app_name=${"$"}{_}
+      export TF_VAR_app_name=${"$"}{_APP_NAME}
       export TF_VAR_archetype=${"$"}{_ARCHETYPE}
       export TF_VAR_zone_index=${"$"}{_ZONE_INDEX}
       export TF_VAR_region_index=${"$"}{_REGION_INDEX}
@@ -159,7 +159,7 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
     _COMMIT_MSG = "${"$"}(body.head_commit.message)"
     _BUILD      = "true"
     _PROJECT_ID = var.project_id
-    _   = var.app_name
+    _APP_NAME   = var.app_name
     _SERVICE    = var.app_name
     _PIPELINE_LOCATION = "us-central1"
     _ARCHETYPE = "APZ"

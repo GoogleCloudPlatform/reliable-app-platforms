@@ -75,7 +75,7 @@ resource "null_resource" "set_repo" {
         id = github_repository.app_repo.id
     }
     provisioner "local-exec" {
-        command = "${path.cwd}/prep-app-repo.sh ${var.app_name} ${local.github_org} ${local.github_user} ${local.github_email} ${local.github_token} ${local.repo_name}"
+        command = "${path.cwd}/../../scripts/prep-app-repo.sh ${var.app_name} ${local.github_org} ${local.github_user} ${local.github_email} ${local.github_token} ${local.repo_name}"
     }
     depends_on = [github_repository.app_repo]
 }
@@ -139,23 +139,22 @@ resource "google_cloudbuild_trigger" "deploy_app" {
                 "GITHUB_ORG"]
         }
         step {
-            name       = "hashicorp/terraform:1.4.6"
-            id         = "create-infra"
+            name       = "gcr.io/cloud-builders/gcloud"
+            id         = "deploy-to-app-clusters"
             #dir        =  "terraform"
-            entrypoint = "sh"
+            entrypoint = "bash"
             args = [
                 "-c",
                 <<-EOF
-      export TF_VAR_project_id=${"$"}{_PROJECT_ID}
-      export TF_VAR_service_name=${"$"}{_SERVICE}
-      export TF_VAR_app_name=${"$"}{_}
-      export TF_VAR_archetype=${"$"}{_ARCHETYPE}
-      export TF_VAR_zone_index=${"$"}{_ZONE_INDEX}
-      export TF_VAR_region_index=${"$"}{_REGION_INDEX}
-      export TF_VAR_pipeline_location=${"$"}{_PIPELINE_LOCATION}
-      cd ${"$"}{_REPO}/terraform/platform-infra
-      terraform init -backend-config="bucket=${"$"}{_PROJECT_ID}"
-      terraform apply --auto-approve
+        echo -e "_PROJECT_ID is ${_PROJECT_ID}"
+        echo -e "_SHORT_SHA is ${_SHORT_SHA}"
+        echo -e "_PIPELINE_LOCATION is ${_REGION}"
+        echo -e "_APP_NAME is ${_APP_NAME}"
+        echo -e "_SERVICE is ${_SERVICE}"
+        gcloud deploy releases create rel-${_SHORT_SHA} \
+        --delivery-pipeline ${_SERVICE}-pipeline \
+        --region ${_REGION} \
+        --skaffold-file=./skaffold_workload_clusters.yaml
 
   EOF
             ]
@@ -183,12 +182,13 @@ resource "google_cloudbuild_trigger" "deploy_app" {
         _COMMIT_MSG = "${"$"}(body.head_commit.message)"
         _BUILD      = "true"
         _PROJECT_ID = var.project_id
-        _   = var.app_name
+        _APP_NAME   = var.app_name
         _SERVICE    = var.app_name
-        _PIPELINE_LOCATION = "us-central1"
-        _ARCHETYPE = "APZ"
-        _ZONE_INDEX = "[0,1]"
-        _REGION_INDEX = "[0,1]"
+        #_PIPELINE_LOCATION = "us-central1"
+        #_ARCHETYPE = "APZ"
+        #_ZONE_INDEX = "[0,1]"
+        #_REGION_INDEX = "[0,1]"
+        _REGION: us-central1
     }
     filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
     depends_on      = [google_secret_manager_secret_version.wh_secv]

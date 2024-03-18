@@ -145,10 +145,10 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
         version_name = "projects/${var.project_id}/secrets/github-org/versions/latest"
         env = "GITHUB_ORG"
       }
-      secret_manager {
-        version_name = "projects/${var.project_id}/secrets/github-email/versions/latest"
-        env = "GITHUB_EMAIL"
-      }
+//      secret_manager {
+//        version_name = "projects/${var.project_id}/secrets/github-email/versions/latest"
+//        env = "GITHUB_EMAIL"
+//      }
 
     }
 

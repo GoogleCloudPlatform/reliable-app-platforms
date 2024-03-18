@@ -28,28 +28,29 @@ locals{
     github_org = data.google_secret_manager_secret_version.github_org.*.secret_data
     github_token = data.google_secret_manager_secret_version.github_token.*.secret_data
 }
-//module "artifact_registry"{
-//    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/artifact-registry?ref=tf"
-//    project_id = var.project_id
-//    app_name = var.app_name
-//    service_name = var.service_name
-//}
-//
-//module "deploy-pipeline"{
-//    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/deploy-pipeline?ref=tf"
-//    project_id = var.project_id
-//    service_name = var.service_name
-//    pipeline_location = var.pipeline_location
-//    archetype = var.archetype
-//    zone_index = var.zone_index
-//    region_index = var.region_index
-//}
-//
-//module "endpoint" {
-//    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/endpoints?ref=tf"
-//    project_id = var.project_id
-//    service_name = "${var.service_name}service"
-//}
+
+module "artifact_registry"{
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/artifact-registry?ref=tf"
+    project_id = var.project_id
+    app_name = var.app_name
+    service_name = var.service_name
+}
+
+module "deploy-pipeline"{
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/deploy-pipeline?ref=tf"
+    project_id = var.project_id
+    service_name = var.service_name
+    pipeline_location = var.pipeline_location
+    archetype = var.archetype
+    zone_index = var.zone_index
+    region_index = var.region_index
+}
+
+module "endpoint" {
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/endpoints?ref=tf"
+    project_id = var.project_id
+    service_name = "${var.service_name}service"
+}
 
 // Create a application source code repo and a Cloudbuild webhook trigger attached to it.
 resource "github_repository" "app_repo" {

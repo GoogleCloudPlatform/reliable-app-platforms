@@ -23,10 +23,10 @@ data "google_secret_manager_secret_version" "github_org" {
 }
 locals{
     repo_name = split("/",github_repository.app_repo.full_name)[1]
-    github_user = data.google_secret_manager_secret_version.github_user.*.secret_data
-    github_email = data.google_secret_manager_secret_version.github_email.*.secret_data
-    github_org = data.google_secret_manager_secret_version.github_org.*.secret_data
-    github_token = data.google_secret_manager_secret_version.github_token.*.secret_data
+    github_user = data.google_secret_manager_secret_version.github_user.secret_data
+    github_email = data.google_secret_manager_secret_version.github_email.secret_data
+    github_org = data.google_secret_manager_secret_version.github_org.secret_data
+    github_token = data.google_secret_manager_secret_version.github_token.secret_data
 }
 
 module "artifact_registry"{
@@ -189,7 +189,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
         #_ARCHETYPE = "APZ"
         #_ZONE_INDEX = "[0,1]"
         #_REGION_INDEX = "[0,1]"
-        _REGION: us-central1
+        _REGION: "us-central1"
     }
     filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
     depends_on      = [google_secret_manager_secret_version.wh_secv]

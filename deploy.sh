@@ -79,19 +79,19 @@ while [ -z ${GITHUB_ORG} ]
 
 gcloud services enable secretmanager.googleapis.com && sleep 30
 
-USER_SECRET=$(gcloud secrets describe github-user --format=json | jq 'has("name")') &> /dev/null
+USER_SECRET=$(gcloud secrets describe github-user --format=json --verbosity=error 2>/dev/null | jq 'has("name")')
 if [[ ${USER_SECRET} != "true" ]]; then
     printf ${GITHUB_USER} | gcloud secrets create github-user --data-file=- > /dev/null
 fi
-EMAIL_SECRET=$(gcloud secrets describe github-email --format=json | jq 'has("name")') &> /dev/null
+EMAIL_SECRET=$(gcloud secrets describe github-email --format=json --verbosity=error 2>/dev/null | jq 'has("name")')
 if [[ ${EMAIL_SECRET} != "true" ]]; then
     printf ${GITHUB_EMAIL} | gcloud secrets create github-email --data-file=- > /dev/null
 fi
-TOKEN_SECRET=$(gcloud secrets describe github-token --format=json | jq 'has("name")') &> /dev/null
+TOKEN_SECRET=$(gcloud secrets describe github-token --format=json --verbosity=error 2>/dev/null| jq 'has("name")')
 if [[ ${TOKEN_SECRET} != "true" ]]; then
     printf ${GITHUB_TOKEN} | gcloud secrets create github-token --data-file=- > /dev/null
 fi
-ORG_SECRET=$(gcloud secrets describe github-org --format=json | jq 'has("name")') &> /dev/null
+ORG_SECRET=$(gcloud secrets describe github-org --format=json --verbosity=error 2>/dev/null | jq 'has("name")')
 if [[ ${ORG_SECRET} != "true" ]]; then
     printf ${GITHUB_ORG} | gcloud secrets create github-org --data-file=- > /dev/null
 fi

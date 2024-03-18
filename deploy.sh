@@ -77,7 +77,7 @@ while [ -z ${GITHUB_ORG} ]
     read -p "$(echo -e "Please provide your github org: ")" GITHUB_ORG
     done
 
-gcloud services enable secretmanager.googleapis.com && sleep 30
+gcloud services enable secretmanager.googleapis.com apikeys.googleapis.com && sleep 30
 
 USER_SECRET=$(gcloud secrets describe github-user --format=json --verbosity=error 2>/dev/null | jq 'has("name")')
 if [[ ${USER_SECRET} != "true" ]]; then

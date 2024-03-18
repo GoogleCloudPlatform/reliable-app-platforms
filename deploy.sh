@@ -93,5 +93,8 @@ ORG_SECRET=$(gcloud secrets describe github-org --format=json | jq 'has("name")'
 if [[ ${ORG_SECRET} != "true" ]]; then
     printf ${GITHUB_ORG} | gcloud secrets create github-org --data-file=- > /dev/null
 fi
-gcloud builds submit --config=modules/onboard-app/cloudbuild.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_APP_NAME=${APPLICATION},_GITHUB_ORG=${GITHUB_ORG},_GITHUB_EMAIL=${GITHUB_EMAIL},_GITHUB_USER=${GITHUB_USER},_GITHUB_TOKEN=${GITHUB_TOKEN}  --async
+
+[[ ${APPLICATION} == "nginx" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=modules/onboard-app/cloudbuild.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_APP_NAME=${APPLICATION},_GITHUB_ORG=${GITHUB_ORG},_GITHUB_EMAIL=${GITHUB_EMAIL},_GITHUB_USER=${GITHUB_USER},_GITHUB_TOKEN=${GITHUB_TOKEN}  --async
+[[ ${APPLICATION} == "whereami" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/whereami/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
+[[ ${APPLICATION} == "shop" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/shop/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

@@ -1,9 +1,0 @@
-namespace: "shop-shipping"
-commonLabels:
-  app: shipping
-  env: prod
-  org: shop
-bases:
-- ../../base
-- destrule.yaml
-- virtualservice.yaml

@@ -1,5 +1,0 @@
-namespace: "bank-loadgenerator"
-commonLabels:
-  app: loadgenerator
-bases:
-- ../../base

@@ -1,5 +1,0 @@
-namespace: "bank-user"
-commonLabels:
-  app: user
-bases:
-- ../../base

@@ -1,9 +1,0 @@
-namespace: "shop-productcatalog"
-commonLabels:
-  app: productcatalog
-  env: dev
-  org: shop
-bases:
-- ../../base
-- destrule.yaml
-- virtualservice.yaml

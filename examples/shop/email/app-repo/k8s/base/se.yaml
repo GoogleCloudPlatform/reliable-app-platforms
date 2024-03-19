@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: email
+spec:
+  hosts:
+  - email.email.svc.cluster.local
+  ports:
+  - name: email
+    number: 5000
+    protocol: GRPC
+  resolution: DNS

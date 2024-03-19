@@ -1,9 +1,0 @@
-namespace: "shop-payment"
-commonLabels:
-  app: payment
-  env: prod
-  org: shop
-bases:
-- ../../base
-- destrule.yaml
-- virtualservice.yaml

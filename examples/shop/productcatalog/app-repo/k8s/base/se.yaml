@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: productcatalog
+spec:
+  hosts:
+  - productcatalog.productcatalog.svc.cluster.local
+  ports:
+  - name: productcatalog
+    number: 3550
+    protocol: GRPC
+  resolution: DNS

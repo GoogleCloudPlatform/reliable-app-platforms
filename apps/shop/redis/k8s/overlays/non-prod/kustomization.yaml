@@ -1,9 +1,0 @@
-namespace: "shop-redis"
-commonLabels:
-  app: redis
-  env: dev
-  org: shop
-bases:
-- ../../base
-- destrule.yaml
-- virtualservice.yaml

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: productcatalog
+  labels:
+    app: productcatalog
+spec:
+  type: ClusterIP
+  selector:
+    app: productcatalog
+  ports:
+  - name: grpc
+    port: 3550
+    targetPort: 3550

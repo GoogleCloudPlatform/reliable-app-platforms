@@ -1,0 +1,12 @@
+aapiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: ad
+spec:
+  hosts:
+  - ad.ad.svc.cluster.local
+  ports:
+  - name: ad
+    number: 9555
+    protocol: GRPC
+  resolution: DNS

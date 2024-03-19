@@ -1,4 +1,0 @@
-resources:
-- namespace.yaml
-- ksa.yaml
-- deployment.yaml

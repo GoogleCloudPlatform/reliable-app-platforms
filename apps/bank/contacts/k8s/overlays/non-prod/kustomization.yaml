@@ -1,5 +1,0 @@
-namespace: "bank-contacts"
-commonLabels:
-  app: contacts
-bases:
-- ../../base

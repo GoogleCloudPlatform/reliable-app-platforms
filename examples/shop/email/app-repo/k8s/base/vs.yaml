@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: email-virtualservice
+    namespace: email
+spec:
+    hosts:
+    - email.email.cluster.local.svc
+    http:
+    - route:
+      - destination:
+          host: email
+          port:
+            number: 5000

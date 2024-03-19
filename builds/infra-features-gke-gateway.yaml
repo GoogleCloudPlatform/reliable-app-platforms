@@ -1,0 +1,54 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 7200s # 2hr
+tags:
+  - infra-features-gke-gateways
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _GW_NAMESPACE: asm-ingress-gw
+  _GW_NAME: external-http 
+steps:
+- name: "gcr.io/cloud-builders/gke-deploy"
+  id: "infra-features-gke-gateway-config-cluster"
+  entrypoint: bash
+  dir: infra
+  args:
+   - -c
+   - |
+      source vars.sh
+      echo -e "Setting GKE Gateway config cluster as $${GKE_CONFIG_NAME}..."
+      gcloud container fleet ingress enable --config-membership=$${GKE_CONFIG_NAME} --location=global
+
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-gke-get-gateway-address"
+  entrypoint: bash
+  dir: infra
+  args:
+    - -c
+    - |
+      source vars.sh
+      gcloud container clusters get-credentials $${GKE_CONFIG_NAME} --zone $${GKE_CONFIG_REGION} --project ${_PROJECT_ID}
+      echo -e "Checking Gateways status for $${GKE_CONFIG_NAME}..."
+      while [[ $(kubectl --context=gke_${_PROJECT_ID}_$${GKE_CONFIG_REGION}_$${GKE_CONFIG_NAME} get gateway ${_GW_NAME} -n ${_GW_NAMESPACE} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+        echo -e "Waiting for Gateway ${_GW_NAME} to be READY..."
+        sleep 5
+      done
+
+      export GCLB_IP=$(kubectl --context=gke_${_PROJECT_ID}_$${GKE_CONFIG_REGION}_$${GKE_CONFIG_NAME} get gateway ${_GW_NAME} -n ${_GW_NAMESPACE} -o jsonpath='{.status.addresses[0].value}') 
+      echo -e "The ip address is $$GCLB_IP..."
+      echo -e "Uploading the ip address to a cloud bucket"
+      echo "$(echo "\"$$GCLB_IP\"")" > /tmp/ip-address
+      gsutil -m -h "Content-Type: text/plain; charset=utf-8" cp /tmp/ip-address gs://${_PROJECT_ID}/platform-values/ip-address.json
+      rm /tmp/ip-address

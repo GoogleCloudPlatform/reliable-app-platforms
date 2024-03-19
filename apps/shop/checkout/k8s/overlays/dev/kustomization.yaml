@@ -1,4 +1,0 @@
-commonLabels:
-  app: checkout
-bases:
-- ../../base

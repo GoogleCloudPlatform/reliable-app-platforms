@@ -1,8 +1,0 @@
-nameSuffix: "-backend"
-commonLabels:
-  app: whereami-backend
-bases:
-- ../../base
-patches:
-  - path: cm-flag.yaml
-  - path: service-type.yaml

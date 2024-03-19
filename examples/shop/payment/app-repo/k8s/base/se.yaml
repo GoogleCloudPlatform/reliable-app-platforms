@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: payment
+spec:
+  hosts:
+  - payment.payment.svc.cluster.local
+  ports:
+  - name: payment
+    number: 50051
+    protocol: GRPC
+  resolution: DNS

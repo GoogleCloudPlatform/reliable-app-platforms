@@ -6,9 +6,16 @@ _Last tested on 06/05/2023 by @ameer00_
 <!-- ![image.png](./image.png) -->
 <img src="./img/arch52.png" width=70% height=70%>
 
-_Figure: Global Anycast with regional isolated stacks and global database deployment model._
+_Figure: An Archetype: Global Anycast with regional isolated stacks and global database deployment model._
 
-[Deployment Archetypes for Cloud Applcations](https://arxiv.org/pdf/2105.00560.pdf)
+<img src="img/arch-diagram.png" width=70% height=70%>
+
+_Figure: An Architecture: The same archetype as deployed on Google Cloud._
+
+
+This is derived from the whitepaper: [Deployment Archetypes for Cloud Applcations](https://arxiv.org/pdf/2105.00560.pdf)
+
+Also explained here: <https://cloud.google.com/architecture/deployment-archetypes>
 
 ## Getting started
 
@@ -18,11 +25,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    git clone https://github.com/ameer00/Building-Reliable-Platforms-on-GCP-with-Google-SRE.git
    cd Building-Reliable-Platforms-on-GCP-with-Google-SRE
    ```
-1. Checkout the *tf* branch
 
-   ```bash
-   git checkout tf
-   ```
 **NOTE** If you want to change any of the infrastructure defaults used in this repo, please follow instructions in the **Deploy the platform infrastructure** section and return to the next step.
 
 1. Define your GCP project ID.
@@ -35,7 +38,7 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
 1. Kick off build with terraform
 
    ```bash
-   ./build.sh --build terraform
+   ./build.sh
    ```
 
 1. View build in the Console.

@@ -12,6 +12,11 @@ terraform {
       source  = "hashicorp/github"
       version = ">= 4.3.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 2.2"
+    }
+
   }
 }
 

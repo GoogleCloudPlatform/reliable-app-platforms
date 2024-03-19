@@ -29,6 +29,12 @@ locals{
     github_token = data.google_secret_manager_secret_version.github_token.secret_data
 }
 
+resource "random_string" "random" {
+    length           = 8
+    special          = true
+    override_special = "/@£$="
+}
+
 module "artifact_registry"{
     source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/artifact-registry?ref=tf"
     project_id = var.project_id
@@ -191,6 +197,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
         #_ZONE_INDEX = "[0,1]"
         #_REGION_INDEX = "[0,1]"
         _REGION = "us-central1"
+        _SHORT_SHA = random_string.random.result
     }
     filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
     depends_on      = [google_secret_manager_secret_version.wh_secv]

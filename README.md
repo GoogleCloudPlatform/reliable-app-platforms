@@ -16,6 +16,11 @@ This is derived from the whitepaper: [Deployment Archetypes for Cloud Applcation
 
 Also explained here: <https://cloud.google.com/architecture/deployment-archetypes>
 
+See more from Ameer and Steve here:
+
+[![Ameer and Steve talking at KubeconEU 2023](https://img.youtube.com/vi/OdLnC8sjPCI/0.jpg)](https://www.youtube.com/watch?v=OdLnC8sjPCI)
+
+
 ## Getting started
 
 1. Clone this repo.

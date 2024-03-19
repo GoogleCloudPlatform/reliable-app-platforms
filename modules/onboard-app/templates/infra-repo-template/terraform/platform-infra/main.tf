@@ -124,7 +124,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
     }
     build {
         step {
-            id         = "clone-repo"
+            id         = "clone-app-repo"
             name       = "gcr.io/cloud-builders/git"
             entrypoint = "sh"
             args = [
@@ -147,15 +147,16 @@ resource "google_cloudbuild_trigger" "deploy_app" {
             args = [
                 "-c",
                 <<-EOF
-        echo -e "_PROJECT_ID is ${"$"}{_PROJECT_ID}"
-        echo -e "_SHORT_SHA is ${"$"}{_SHORT_SHA}"
-        echo -e "_PIPELINE_LOCATION is ${"$"}{_REGION}"
-        echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
-        echo -e "_SERVICE is ${"$"}{_SERVICE}"
-        gcloud deploy releases create rel-${"$"}{_SHORT_SHA} \
-        --delivery-pipeline ${"$"}{_SERVICE}-pipeline \
-        --region ${"$"}{_REGION} \
-        --skaffold-file=./skaffold_workload_clusters.yaml
+      echo -e "_PROJECT_ID is ${"$"}{_PROJECT_ID}"
+      echo -e "_SHORT_SHA is ${"$"}{_SHORT_SHA}"
+      echo -e "_PIPELINE_LOCATION is ${"$"}{_REGION}"
+      echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
+      echo -e "_SERVICE is ${"$"}{_SERVICE}"
+      cd ${"$"}{_REPO}
+      gcloud deploy releases create rel-${"$"}{_SHORT_SHA} \
+      --delivery-pipeline ${"$"}{_SERVICE}-pipeline \
+      --region ${"$"}{_REGION} \
+      --skaffold-file=./skaffold_workload_clusters.yaml
 
   EOF
             ]
@@ -189,7 +190,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
         #_ARCHETYPE = "APZ"
         #_ZONE_INDEX = "[0,1]"
         #_REGION_INDEX = "[0,1]"
-        _REGION: "us-central1"
+        _REGION = "us-central1"
     }
     filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
     depends_on      = [google_secret_manager_secret_version.wh_secv]

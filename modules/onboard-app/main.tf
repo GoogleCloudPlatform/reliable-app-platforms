@@ -94,7 +94,7 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
   }
   build {
     step {
-      id         = "clone-app-repo"
+      id         = "clone-infra-repo"
       name       = "gcr.io/cloud-builders/git"
       entrypoint = "sh"
       args = [
@@ -111,7 +111,7 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
     }
     step {
       name       = "hashicorp/terraform:1.4.6"
-      id         = "create-app-pipeline"
+      id         = "create-app-infra"
       #dir        =  "terraform"
       entrypoint = "sh"
       args = [

@@ -13,9 +13,7 @@ usage()
 {
    echo ""
    echo "Usage: $0"
-   echo -e "\t--build | -b Must be one of 'kcc' or 'terraform'. Default is 'terraform'."
-   echo -e "\tExample usage:"
-   echo -e "\t./build.sh -b terraform"
+   echo -e "\tExample usage: /build.sh"
    exit 1 # Exit script after printing help
 }
 
@@ -32,9 +30,6 @@ BUILD=terraform
 # Define bash args
 while [ "$1" != "" ]; do
     case $1 in
-        --build | -b )        shift
-                                BUILD=$1
-                                ;;
         --destroy | -d )      shift
                                 terraform_destroy
                                 ;;

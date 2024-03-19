@@ -19,8 +19,6 @@ usage()
    exit 1 # Exit script after printing help
 }
 
-
-
 # Setting default value
 APPLICATION=nginx
 

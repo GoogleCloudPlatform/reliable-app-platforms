@@ -1,5 +1,5 @@
 terraform {
   backend "gcs" {
-    prefix = "//tfstate/platform-infra"
+    prefix = "/onboarding/tfstate/"
   }
 }

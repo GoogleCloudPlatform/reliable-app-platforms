@@ -2,6 +2,6 @@
 
 terraform {
   backend "gcs" {
-    prefix = "//tfstate/platform-infra"
+    prefix = "/APP_NAME/APP_NAME/platform-infra"
   }
 }

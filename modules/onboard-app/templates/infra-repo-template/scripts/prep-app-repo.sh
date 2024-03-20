@@ -23,7 +23,7 @@ if  [ "${application_name}" = "nginx" ]; then
 fi
 cp -r ${template_path}/app-repo-template/* ${source_repo}
 cd ${source_repo}
-find . -type f  -exec  sed -i "s?^APP_NAME?${application_name}?g" {} +
+find . -type f  -exec  sed -i "s?APP_NAME?${application_name}?g" {} +
 find . -type f  -exec  sed -i "s?APP_VERSION?${app_version}?g" {} +
 git config --global user.name ${github_user}
 git config --global user.email ${github_email}

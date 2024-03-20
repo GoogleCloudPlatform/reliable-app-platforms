@@ -6,6 +6,7 @@ github_user=${3}
 github_email=${4}
 github_token=${5}
 github_repo="${6}"
+project_id=${7}
 template_repo="/tmp/reliable-app-platforms"
 template_path="${template_repo}/modules/onboard-app/templates"
 source_repo="/tmp/${github_repo}"
@@ -25,6 +26,7 @@ cp -r ${template_path}/app-repo-template/* ${source_repo}
 cd ${source_repo}
 find . -type f  -exec  sed -i "s?APP_NAME?${application_name}?g" {} +
 find . -type f  -exec  sed -i "s?APP_VERSION?${app_version}?g" {} +
+find . -type f  -exec  sed -i "s?PROJECT_ID?${project_id}?g" {} +
 git config --global user.name ${github_user}
 git config --global user.email ${github_email}
 git add .

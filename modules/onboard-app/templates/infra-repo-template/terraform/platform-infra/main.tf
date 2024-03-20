@@ -81,7 +81,7 @@ resource "null_resource" "set_repo" {
         id = github_repository.app_repo.id
     }
     provisioner "local-exec" {
-        command = "${path.cwd}/../../scripts/prep-app-repo.sh ${var.app_name} ${local.github_org} ${local.github_user} ${local.github_email} ${local.github_token} ${local.repo_name}"
+        command = "${path.cwd}/../../scripts/prep-app-repo.sh ${var.app_name} ${local.github_org} ${local.github_user} ${local.github_email} ${local.github_token} ${local.repo_name} ${var.project_id}"
     }
     depends_on = [github_repository.app_repo]
 }
@@ -153,16 +153,40 @@ resource "google_cloudbuild_trigger" "deploy_app" {
                 "-c",
                 <<-EOF
       echo -e "_PROJECT_ID is ${"$"}{_PROJECT_ID}"
-      echo -e "_SHORT_SHA is ${"$"}{_SHORT_SHA}"
       echo -e "_PIPELINE_LOCATION is ${"$"}{_REGION}"
       echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
       echo -e "_SERVICE is ${"$"}{_SERVICE}"
-      cd ${"$"}{_REPO}
       sha=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
+      echo -e "SHA is $sha"
+      cd ${"$"}{_REPO}
       gcloud deploy releases create rel-$sha \
       --delivery-pipeline ${"$"}{_SERVICE}-pipeline \
       --region ${"$"}{_REGION} \
       --skaffold-file=./skaffold_workload_clusters.yaml
+
+  EOF
+            ]
+
+        }
+        step {
+            name       = "gcr.io/cloud-builders/gcloud"
+            id         = "deploy-to-other-clusters"
+            #dir        =  "terraform"
+            entrypoint = "bash"
+            args = [
+                "-c",
+                <<-EOF
+      echo -e "_PROJECT_ID is ${"$"}{_PROJECT_ID}"
+      echo -e "_PIPELINE_LOCATION is ${"$"}{_REGION}"
+      echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
+      echo -e "_SERVICE is ${"$"}{_SERVICE}"
+      sha=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
+      echo -e "SHA is $sha"
+      cd ${"$"}{_REPO}
+      gcloud deploy releases create rel-$sha \
+      --delivery-pipeline ${"$"}{_SERVICE}-pipeline \
+      --region ${"$"}{_REGION} \
+      --skaffold-file=./skaffold_other_clusters.yaml
 
   EOF
             ]

@@ -5,7 +5,7 @@ metadata:
     namespace: APP_NAME
 spec:
     hosts:
-    - "APP_NAMEservice.endpoints.<project-id>.cloud.goog"
+    - "APP_NAMEservice.endpoints.PROJECT_ID.cloud.goog"
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

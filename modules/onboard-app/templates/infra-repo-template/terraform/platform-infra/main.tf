@@ -29,11 +29,10 @@ locals{
     github_token = data.google_secret_manager_secret_version.github_token.secret_data
 }
 
-resource "random_string" "random" {
-    length           = 8
-    special          = true
-    override_special = "/@£$="
-}
+//resource "random_string" "random" {
+//    length           = 8
+//    special          = false
+//}
 
 module "artifact_registry"{
     source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/artifact-registry?ref=tf"
@@ -159,7 +158,8 @@ resource "google_cloudbuild_trigger" "deploy_app" {
       echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
       echo -e "_SERVICE is ${"$"}{_SERVICE}"
       cd ${"$"}{_REPO}
-      gcloud deploy releases create rel-${"$"}{_SHORT_SHA} \
+      sha=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
+      gcloud deploy releases create rel-$sha \
       --delivery-pipeline ${"$"}{_SERVICE}-pipeline \
       --region ${"$"}{_REGION} \
       --skaffold-file=./skaffold_workload_clusters.yaml
@@ -197,7 +197,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
         #_ZONE_INDEX = "[0,1]"
         #_REGION_INDEX = "[0,1]"
         _REGION = "us-central1"
-        _SHORT_SHA = random_string.random.result
+        #_SHORT_SHA = random_string.random.result
     }
     filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
     depends_on      = [google_secret_manager_secret_version.wh_secv]
@@ -208,7 +208,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
 //TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
 resource "google_apikeys_key" "api_key" {
     name         = "${var.app_name}-api-key"
-    display_name = "${var.app_name} Infra webhook API ${timestamp()}"
+    display_name = "${var.app_name} Infra webhook API"
     project      = var.project_id
     restrictions {
         api_targets {

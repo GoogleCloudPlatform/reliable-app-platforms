@@ -17,7 +17,7 @@ tags:
   - infra-destroy-gke
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _KUBE_VERSION: 1.27.9-gke.1092000
+  _KUBE_VERSION: 1.28.7-gke.1226000
 
 steps:
 # Destroy GKE infrastructure

@@ -12,21 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-timeout: 7200s # 2hr
+timeout: 14400s # 2hr
+#substitutions:
+#  _PROJECT_ID: ${PROJECT_ID}
+#  _: ${}
+#  _GITHUB_ORG: ${github_org}
+#  _GITHUB_USER: ${github_user}
+#  _GITHUB_EMAIL: ${github_email}
+#  _GITHUB_TOKEN: ${github_token}
+
 tags:
-  - infra-create-gke
-substitutions:
-  _PROJECT_ID: ${PROJECT_ID}
-  _KUBE_VERSION: 1.28.7-gke.1026000
+  - onboard-app
 steps:
-# Create GKE infrastructure
-- name: "hashicorp/terraform:1.4.6"
-  id: "create-gke"
-  entrypoint: "sh"
-  dir: "infra/terraform/gke"
-  args:
+  - name: "hashicorp/terraform:1.4.6"
+    id: "create-infra"
+    entrypoint: "sh"
+    dir: "modules/onboard-app/"
+    args:
     - "-xe"
     - "-c"
     - |
       terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform apply -var="project_id=${_PROJECT_ID}" -var="kubernetes_version=${_KUBE_VERSION}" --auto-approve
+      terraform apply -var="project_id=${_PROJECT_ID}" \
+      -var="app_name=${_APP_NAME}" -var="github_org=${_GITHUB_ORG}" -var="github_user=${_GITHUB_USER}" \
+      -var="github_email=${_GITHUB_EMAIL}" -var="github_token=${_GITHUB_TOKEN}" \
+      --auto-approve

@@ -14,19 +14,22 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-create-gke
+  - infra-cicd-nginx-nginx
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _KUBE_VERSION: 1.28.7-gke.1026000
+  _BUILD: "true"
+  _: "nginx"
+  _SERVICE: "nginx"
+
 steps:
-# Create GKE infrastructure
-- name: "hashicorp/terraform:1.4.6"
-  id: "create-gke"
-  entrypoint: "sh"
-  dir: "infra/terraform/gke"
-  args:
-    - "-xe"
-    - "-c"
-    - |
-      terraform init -backend-config="bucket=${_PROJECT_ID}"
-      terraform apply -var="project_id=${_PROJECT_ID}" -var="kubernetes_version=${_KUBE_VERSION}" --auto-approve
+  - name: "hashicorp/terraform:1.4.6"
+    id: "create-infra"
+    entrypoint: "sh"
+    dir: "examples/nginx/infra-repo/terraform/slos"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        [[ "${_BUILD}" == "false" ]] && exit 0
+        terraform init -backend-config="bucket=${_PROJECT_ID}"
+        terraform apply -var="project_id=${_PROJECT_ID}" -var="service_name=${_SERVICE}" -var="app_name=${_}"  --auto-approve

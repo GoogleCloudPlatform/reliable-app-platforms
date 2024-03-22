@@ -51,7 +51,52 @@ echo -e "\e[95mAPPLICATION is set to ${APPLICATION}\e[0m"
 echo -e "\e[95mSHORT_SHA is set to ${SHORT_SHA}\e[0m"
 
 gcloud config set core/project ${PROJECT_ID}
-[[ ${APPLICATION} == "nginx" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/nginx/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
+#[[ ${APPLICATION} == "nginx" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/nginx/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
+#[[ ${APPLICATION} == "whereami" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/whereami/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
+#[[ ${APPLICATION} == "shop" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/shop/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
+while [ -z ${GITHUB_USER} ]
+    do
+    read -p "$(echo -e "Please provide your github user: ")" GITHUB_USER
+    done
+
+# Ensure github email is defined
+while [ -z ${GITHUB_EMAIL} ]
+    do
+    read -p "$(echo -e "Please provide your github email: ")" GITHUB_EMAIL
+    done
+
+# Ensure github personal access token is defined
+while [ -z ${GITHUB_TOKEN} ]
+    do
+    read -p "$(echo -e "Please provide your github personal access token: ")" GITHUB_TOKEN
+    done
+
+# Ensure github org is defined
+while [ -z ${GITHUB_ORG} ]
+    do
+    read -p "$(echo -e "Please provide your github org: ")" GITHUB_ORG
+    done
+
+gcloud services enable secretmanager.googleapis.com apikeys.googleapis.com && sleep 30
+
+USER_SECRET=$(gcloud secrets describe github-user --format=json --verbosity=error 2>/dev/null | jq 'has("name")')
+if [[ ${USER_SECRET} != "true" ]]; then
+    printf ${GITHUB_USER} | gcloud secrets create github-user --data-file=- > /dev/null
+fi
+EMAIL_SECRET=$(gcloud secrets describe github-email --format=json --verbosity=error 2>/dev/null | jq 'has("name")')
+if [[ ${EMAIL_SECRET} != "true" ]]; then
+    printf ${GITHUB_EMAIL} | gcloud secrets create github-email --data-file=- > /dev/null
+fi
+TOKEN_SECRET=$(gcloud secrets describe github-token --format=json --verbosity=error 2>/dev/null| jq 'has("name")')
+if [[ ${TOKEN_SECRET} != "true" ]]; then
+    printf ${GITHUB_TOKEN} | gcloud secrets create github-token --data-file=- > /dev/null
+fi
+ORG_SECRET=$(gcloud secrets describe github-org --format=json --verbosity=error 2>/dev/null | jq 'has("name")')
+if [[ ${ORG_SECRET} != "true" ]]; then
+    printf ${GITHUB_ORG} | gcloud secrets create github-org --data-file=- > /dev/null
+fi
+
+[[ ${APPLICATION} == "nginx" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=modules/onboard-app/cloudbuild.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_APP_NAME=${APPLICATION},_GITHUB_ORG=${GITHUB_ORG},_GITHUB_EMAIL=${GITHUB_EMAIL},_GITHUB_USER=${GITHUB_USER},_GITHUB_TOKEN=${GITHUB_TOKEN}  --async
 [[ ${APPLICATION} == "whereami" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/whereami/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
 [[ ${APPLICATION} == "shop" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/shop/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

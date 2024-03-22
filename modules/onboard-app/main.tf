@@ -179,7 +179,7 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
 //TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
 resource "google_apikeys_key" "api_key" {
   name         = "${var.app_name}-api-key-${random_id.key_suffix.hex}"
-  display_name = "${var.app_name} Infra webhook API"
+  display_name = "${var.app_name} Infra webhook API ${random_id.key_suffix.hex}"
   project      = var.project_id
   restrictions {
     api_targets {

@@ -57,10 +57,6 @@ resource "random_password" "pass_webhook" {
   special = false
 }
 
-resource "random_id" "key_suffix" {
-  byte_length = 8
-}
-
 resource "google_secret_manager_secret" "wh_sec" {
   project   = var.project_id
   secret_id = "${var.app_name}-infra-webhook-secret"
@@ -178,8 +174,8 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
 
 //TODO: remove timestamp from the name. It was added while doing the development to make rerunning possible
 resource "google_apikeys_key" "api_key" {
-  name         = lower(replace("${var.app_name}-api-key-${timestamp()}",":","-"))
-  display_name = "${var.app_name} Infra webhook API ${timestamp()}"
+  name         = "${var.app_name}-api-key"
+  display_name = "${var.app_name} Infra webhook API"
   project      = var.project_id
   restrictions {
     api_targets {

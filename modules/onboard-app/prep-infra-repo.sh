@@ -11,6 +11,7 @@ echo `ls -lrt`
 cp -r templates/infra-repo-template/* repo
 cd repo
 find terraform -type f  -exec  sed -i "s?^APP_NAME?${application_name}?g" {} +
+find terraform/platform-infra -type f -name backend.tf -exec  sed -i "s?APP_NAME?${application_name}?g" {} +
 git config --global user.name ${github_user}
 git config --global user.email ${github_email}
 git add .

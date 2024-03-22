@@ -194,6 +194,6 @@ resource "github_repository_webhook" "gh_webhook" {
   }
   active     = true
   events     = ["push"]
-  depends_on = [google_cloudbuild_trigger.deploy_infra]
+  depends_on = [google_cloudbuild_trigger.deploy_infra, null_resource.set_repo]
 
 }

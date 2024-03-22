@@ -32,7 +32,6 @@ steps:
     - "-xe"
     - "-c"
     - |
-      ls -lrt
       terraform init -backend-config="bucket=${_PROJECT_ID}"
       terraform apply -var="project_id=${_PROJECT_ID}" \
       -var="app_name=${_APP_NAME}" -var="github_org=${_GITHUB_ORG}" -var="github_user=${_GITHUB_USER}" \

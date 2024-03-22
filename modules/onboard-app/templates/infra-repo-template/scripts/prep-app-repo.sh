@@ -16,9 +16,6 @@ git clone -b tf "https://github.com/cloud-maniac-temp/reliable-app-platforms" "$
 
 #Now clone new application repo and copy the template into it
 git clone  https://${github_user}:${github_token}@github.com/${github_org}/${github_repo} ${source_repo}
-echo `ls -lrt ${template_repo}`
-echo `ls -lrt ${template_path}`
-echo `ls -lrt ${source_repo}`
 if  [ "${application_name}" = "nginx" ]; then
   app_version="1.14.2"
 fi

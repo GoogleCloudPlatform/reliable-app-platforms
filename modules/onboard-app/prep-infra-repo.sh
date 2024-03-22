@@ -14,5 +14,5 @@ find terraform/platform-infra -type f -name backend.tf -exec  sed -i "s?APP_NAME
 git config --global user.name ${github_user}
 git config --global user.email ${github_email}
 git add .
-git commit -m "Setting up ${github_repo}"
+git commit -m "IGNORE : Setting up ${github_repo}"
 git push origin main

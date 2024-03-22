@@ -27,7 +27,7 @@ find . -type f  -exec  sed -i "s?PROJECT_ID?${project_id}?g" {} +
 git config --global user.name ${github_user}
 git config --global user.email ${github_email}
 git add .
-git commit -m "Setting up ${github_repo}"
+git commit -m "IGNORE : Setting up ${github_repo}"
 git push origin main
 rm -rf "${template_repo}"
 rm -rf "${source_repo}"

@@ -25,11 +25,19 @@ _Figure: Global Anycast with regional isolated stacks and global database deploy
    ```
 **NOTE** If you want to change any of the infrastructure defaults used in this repo, please follow instructions in the **Deploy the platform infrastructure** section and return to the next step.
 
-1. Define your GCP project ID.
+1. Define the configuration.
 
    ```bash
    export PROJECT_ID=<YOUR PROJECT ID>
+   export GITHUB_EMAIL=<YOUR GITHUB USER EMAIL>
+   export GITHUB_USER=<YOUR GITHUB USER NAME>
+   export GITHUB_TOKEN=<YOUR PERSONAL ACCESS TOKEN>
+   export GITHUB_ORG=<YOUR GITHUB ORGANIZATION>>
    ```
+   See [How to generate Personal Access Token][personal-access-token]. The token should have the following scopes: 
+   - repo - Full control of private repositories
+   - delete_repo - Delete repositories
+   - admin:repo_hook - Full control of repository hooks
 
 1. Kick off build with terraform
 
@@ -92,15 +100,7 @@ Please read *examples/Examples.md* for more info on the structure of the example
 
 ### Deploy `nginx`.
 
-The **nginx** application is a single service application which by default uses the *Active Passive Zone (APZ)* archetype. 
-
-**NOTE**: Make sure you update the virtual service file found in */examples/nginx/app-repo/k8s/base/vs.yaml* to point to the endpoint for your application's frontend.
-
-```
-spec:
-   hosts:
-   - "whereami.endpoints.$PROJECT_ID.cloud.goog"
-```
+The **nginx** application is a single service application which by default uses the *Active Passive Zone (APZ)* archetype.
 
    ```bash
    
@@ -109,15 +109,28 @@ spec:
    ```
    This will kick of a script that first creates the necessary infrastructure for the application using terraform. 
    The infrastructure created at this step are:
-   1. GCP deployment pipelines
-   1. Endpoints
+   1. A repository named `nginx-infra` in GitHub also known as infrastructure repository.
+   1. A Cloud Build trigger also knows as infrastructure pipeline.
+   
+   Go to your GitHub organization and you will see a repository named `nginx-infra`
+   
+   Go to Cloud Build in GCP console and you will see a new trigger named deploy-infra-nginx. This trigger is listening to the push events coming from the `nginx-infra` repo.
+   When invoked, the trigger runs Terraform as defined under `terraform` folder in the repository.
+ 
+   When the infrastructure pipeline runs, it creates the following resources:
+
+   1. A repository named `nginx` in GitHub also known as application repository. This hosts the source code and configurations.
+   1. A Cloud Build trigger also known as application CI/CD pipeline.
+   1. Cloud Deploy pipelines.These pipelines are invoked by application CI/CD pipeline based on the archetypes and the regions/zones specified.
+   1. Endpoints.
    1. Artifact Registry (although unused in this application)
    1. and SLOs.
 
-   The platform-terraform modules used in this step are found in the *modules* directory
-   The GCP deployment pipelines select and configure the required GKE cluster targets based on the archetypes and the regions/zones specified. 
-   After the creation of this basic infrastructure, the script then creates a new release on the *Cloud Deploy* pipeline the k8s manifests to the relevant GKE clusters.
+   Go to your GitHub organization and you will see a repository named `nginx`
 
+   Go to Cloud Build in GCP console and you will see a new trigger named deploy-app-nginx. 
+   This trigger is listening to the push events on `nginx` repository. When invoked, the trigger creates releases in Cloud Deploy
+that deploys the nginx on GKE clusters.
 
 
 ### Deploy `whereami`.
@@ -197,4 +210,5 @@ This module creates 2 SLOs per service deployed.
 1. terraform module deploy-pipelines: Use zone names and region names instead of indices
 1. infra/asm: parameterise names of clusters in configsync annotation.
 
-   
+<!-- LINKS: https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[personal-access-token]: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens   

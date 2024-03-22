@@ -156,10 +156,8 @@ resource "google_cloudbuild_trigger" "deploy_app" {
       echo -e "_PIPELINE_LOCATION is ${"$"}{_REGION}"
       echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
       echo -e "_SERVICE is ${"$"}{_SERVICE}"
-      sha=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
-      echo -e "SHA is $sha"
       cd ${"$"}{_REPO}
-      gcloud deploy releases create rel-$sha --delivery-pipeline ${"$"}{_SERVICE}-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_workload_clusters.yaml
+      gcloud deploy releases create "rel-$(date '+%Y%m%d%H%M%S')" --delivery-pipeline ${"$"}{_SERVICE}-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_workload_clusters.yaml
 
   EOF
             ]
@@ -177,10 +175,8 @@ resource "google_cloudbuild_trigger" "deploy_app" {
       echo -e "_PIPELINE_LOCATION is ${"$"}{_REGION}"
       echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
       echo -e "_SERVICE is ${"$"}{_SERVICE}"
-      sha=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
-      echo -e "SHA is $sha"
       cd ${"$"}{_REPO}
-      gcloud deploy releases create rel-$sha --delivery-pipeline ${"$"}{_SERVICE}-vs-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_other_clusters.yaml
+      gcloud deploy releases create "rel-$(date '+%Y%m%d%H%M%S')" --delivery-pipeline ${"$"}{_SERVICE}-vs-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_other_clusters.yaml
 
   EOF
             ]

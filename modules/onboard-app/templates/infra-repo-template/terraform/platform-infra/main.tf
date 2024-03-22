@@ -159,10 +159,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
       sha=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
       echo -e "SHA is $sha"
       cd ${"$"}{_REPO}
-      gcloud deploy releases create rel-$sha \
-      --delivery-pipeline ${"$"}{_SERVICE}-pipeline \
-      --region ${"$"}{_REGION} \
-      --skaffold-file=./skaffold_workload_clusters.yaml
+      gcloud deploy releases create rel-$sha --delivery-pipeline ${"$"}{_SERVICE}-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_workload_clusters.yaml
 
   EOF
             ]
@@ -183,10 +180,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
       sha=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
       echo -e "SHA is $sha"
       cd ${"$"}{_REPO}
-      gcloud deploy releases create rel-$sha \
-      --delivery-pipeline ${"$"}{_SERVICE}-pipeline \
-      --region ${"$"}{_REGION} \
-      --skaffold-file=./skaffold_other_clusters.yaml
+      gcloud deploy releases create rel-$sha --delivery-pipeline ${"$"}{_SERVICE}-vs-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_other_clusters.yaml
 
   EOF
             ]
@@ -245,7 +239,7 @@ resource "github_repository_webhook" "gh-webhook" {
     provider   = github
     repository = local.repo_name
     configuration {
-        url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-infra-${var.app_name}:webhook?key=${google_apikeys_key.api_key.key_string}&secret=${random_password.pass_webhook.result}"
+        url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/deploy-app-${var.app_name}:webhook?key=${google_apikeys_key.api_key.key_string}&secret=${random_password.pass_webhook.result}"
         content_type = "json"
         insecure_ssl = false
     }

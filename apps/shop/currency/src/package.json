@@ -8,7 +8,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/debug-agent": "7.1.0",
+    "@google-cloud/debug-agent": "9.0.1",
     "@google-cloud/profiler": "5.0.3",
     "@google-cloud/trace-agent": "7.1.2",
     "@grpc/grpc-js": "1.7.1",
@@ -17,6 +17,6 @@
     "google-protobuf": "3.21.1",
     "pino": "8.6.1",
     "request": "2.88.2",
-    "xml2js": "0.4.23"
+    "xml2js": "0.5.0"
   }
 }

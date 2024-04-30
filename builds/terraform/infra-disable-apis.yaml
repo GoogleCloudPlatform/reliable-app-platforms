@@ -19,7 +19,7 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 steps:
 # Disable APIs
-- name: "hashicorp/terraform:1.4.6"
+- name: "hashicorp/terraform:1.8.2"
   id: "disable-apis"
   entrypoint: "sh"
   dir: "infra/terraform/enable-apis"

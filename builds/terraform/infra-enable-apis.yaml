@@ -20,7 +20,7 @@ substitutions:
   _BUILD: "true"
 steps:
 # Enable APIs
-- name: "hashicorp/terraform:1.4.6"
+- name: "hashicorp/terraform:1.8.2"
   id: "enable-apis"
   entrypoint: "sh"
   dir: "infra/terraform/enable-apis"

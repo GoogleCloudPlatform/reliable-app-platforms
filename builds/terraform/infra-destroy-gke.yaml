@@ -21,7 +21,7 @@ substitutions:
 
 steps:
 # Destroy GKE infrastructure
-- name: "hashicorp/terraform:1.4.6"
+- name: "hashicorp/terraform:1.8.2"
   id: "destroy-gke"
   entrypoint: "sh"
   dir: "infra/terraform/gke"

@@ -18,7 +18,7 @@ tags:
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 steps:
-- name: "hashicorp/terraform:1.4.6"
+- name: "hashicorp/terraform:1.8.2"
   id: 'delete-acm-repos'
   dir: infra/terraform/acm-repos
   entrypoint: sh

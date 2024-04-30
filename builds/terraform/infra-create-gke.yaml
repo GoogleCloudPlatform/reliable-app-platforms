@@ -20,7 +20,7 @@ substitutions:
   _KUBE_VERSION: 1.27.3-gke.100
 steps:
 # Create GKE infrastructure
-- name: "hashicorp/terraform:1.4.6"
+- name: "hashicorp/terraform:1.8.2"
   id: "create-gke"
   entrypoint: "sh"
   dir: "infra/terraform/gke"

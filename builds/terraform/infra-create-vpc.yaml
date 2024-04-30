@@ -20,7 +20,7 @@ substitutions:
   _BUILD: "true"
 steps:
 # Create VPC infrastructure
-- name: "hashicorp/terraform:1.4.6"
+- name: "hashicorp/terraform:1.8.2"
   id: "create-vpc"
   entrypoint: "sh"
   dir: "infra/terraform/vpc"

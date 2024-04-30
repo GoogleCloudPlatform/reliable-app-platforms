@@ -1,7 +1,7 @@
 # Reliable App Platforms - on GCP
 
 
-_Last tested on 06/05/2023 by @ameer00_
+_Last tested on 04/30/2024 by @stevemcghee
 
 <!-- ![image.png](./image.png) -->
 <img src="./img/arch52.png" width=70% height=70%>

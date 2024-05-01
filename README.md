@@ -3,10 +3,12 @@
 
 _Last tested on 04/30/2024 by @stevemcghee
 
-Watch the video of our talk from Google Cloud Next 2024:
-[![Watch the video](https://img.youtube.com/vi/FkIqA9Pt7Hc/sd3.jpg)](https://youtu.be/FkIqA9Pt7Hc)
+Watch the video of our talk from Google Cloud Next 2024: https://youtu.be/FkIqA9Pt7Hc
 
 Slides are also available as a [pdf](docs/DEV227-Next24.pdf)
+
+[![Watch the video](https://img.youtube.com/vi/FkIqA9Pt7Hc/sd3.jpg)](https://youtu.be/FkIqA9Pt7Hc)
+
 
 <!-- ![image.png](./image.png) -->
 <img src="./img/arch52.png" width=70% height=70%>

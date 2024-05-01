@@ -17,7 +17,9 @@ tags:
   - infra-create-gke
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
-  _KUBE_VERSION: 1.27.3-gke.100
+
+  # via: https://cloud.google.com/kubernetes-engine/docs/release-notes
+  _KUBE_VERSION: 1.28.7-gke.1026000
 steps:
 # Create GKE infrastructure
 - name: "hashicorp/terraform:1.8.2"

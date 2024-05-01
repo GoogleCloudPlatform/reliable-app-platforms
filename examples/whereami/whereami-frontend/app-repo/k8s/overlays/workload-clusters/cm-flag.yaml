@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whereami
+data:
+  BACKEND_ENABLED: "True"
+  BACKEND_SERVICE: "http://whereami-backend.whereami-backend.svc.cluster.local"

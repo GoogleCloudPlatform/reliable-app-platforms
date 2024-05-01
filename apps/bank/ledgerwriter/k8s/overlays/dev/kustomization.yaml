@@ -1,4 +1,0 @@
-commonLabels:
-  app: ledgerwriter
-bases:
-- ../../base

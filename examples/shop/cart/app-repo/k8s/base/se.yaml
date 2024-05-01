@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: cart
+spec:
+  hosts:
+  - cart.cart.svc.cluster.local
+  ports:
+  - name: cart
+    number: 7070
+    protocol: GRPC
+  resolution: DNS

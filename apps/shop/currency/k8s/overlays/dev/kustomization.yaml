@@ -1,4 +1,0 @@
-commonLabels:
-  app: currency
-bases:
-- ../../base

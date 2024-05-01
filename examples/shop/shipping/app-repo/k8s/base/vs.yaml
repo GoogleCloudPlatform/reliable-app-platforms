@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: shipping-virtualservice
+    namespace: shipping
+spec:
+    hosts:
+    - shipping.shipping.svc.cluster.local
+    http:
+    - route:
+      - destination:
+          host: shipping
+          port:
+            number: 50051

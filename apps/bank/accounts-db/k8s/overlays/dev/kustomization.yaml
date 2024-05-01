@@ -1,4 +1,0 @@
-commonLabels:
-  app: accounts-db
-bases:
-- ../../base

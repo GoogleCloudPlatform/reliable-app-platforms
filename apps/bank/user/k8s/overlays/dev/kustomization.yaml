@@ -1,4 +1,0 @@
-commonLabels:
-  app: user
-bases:
-- ../../base

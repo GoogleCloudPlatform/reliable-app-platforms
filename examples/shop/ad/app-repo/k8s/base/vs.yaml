@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: ad-virtualservice
+    namespace: ad
+spec:
+    hosts:
+    - ad.ad.svc.cluster.local
+    http:
+    - route:
+      - destination:
+          host: ad
+          port:
+            number: 9555

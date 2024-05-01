@@ -1,9 +1,0 @@
-namespace: "shop-loadgenerator"
-commonLabels:
-  app: shop-loadgenerator
-  env: dev
-  org: shop
-bases:
-- ../../base
-- destrule.yaml
-- virtualservice.yaml

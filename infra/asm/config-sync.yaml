@@ -1,0 +1,185 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: prod-us-central1-0
+  labels:
+    env: prod
+    region: us-central1
+    zone: us-central1-0
+    config: "false"
+---
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: prod-us-central1-1
+  labels:
+    env: prod
+    region: us-central1
+    zone: us-central1-1
+    config: "false"
+---
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: prod-us-central1-2
+  labels:
+    env: prod
+    region: us-central1
+    zone: us-central1-2
+    config: "false"
+---
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: prod-us-west2-0
+  labels:
+    env: prod
+    region: us-west2
+    zone: us-west2-0
+    config: "false"
+
+---
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: prod-us-west2-1
+  labels:
+    env: prod
+    region: us-west2
+    zone: us-west2-1
+    config: "false"
+---
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: prod-us-west2-1
+  labels:
+    env: prod
+    region: us-west2
+    zone: us-west2-1
+    config: "false"
+
+---
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: prod-us-west2-2
+  labels:
+    env: prod
+    region: us-west2
+    zone: us-west2-2
+    config: "false"
+---
+kind: Cluster
+apiVersion: clusterregistry.k8s.io/v1alpha1
+metadata:
+  name: config-us-central1
+  labels:
+    env: shared
+    region: us-central1
+    zone: us-central1-1
+    config: "true"
+--- 
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: selector-prod-workload
+spec:
+  selector:
+    matchLabels:
+      config: "false"
+      env: prod
+--- 
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: selector-config
+spec:
+  selector:
+    matchLabels:
+      config: "true"
+      env: shared
+
+# ---
+# apiVersion: configmanagement.gke.io/v1
+# kind: ConfigManagement
+# metadata:
+#   name: config-management-prod-us-central1-0
+# spec:
+#   # clusterName is required and must be unique among all managed clusters
+#   clusterName: c
+#   enableMultiRepo: true
+
+# ---
+# apiVersion: configmanagement.gke.io/v1
+# kind: ConfigManagement
+# metadata:
+#   name: config-management-prod-us-central1-1
+# spec:
+#   # clusterName is required and must be unique among all managed clusters
+#   clusterName: prod-us-central1-1
+#   enableMultiRepo: true
+
+# ---
+# apiVersion: configmanagement.gke.io/v1
+# kind: ConfigManagement
+# metadata:
+#   name: config-management-prod-us-central1-2
+# spec:
+#   # clusterName is required and must be unique among all managed clusters
+#   clusterName: prod-us-central1-2
+#   enableMultiRepo: true
+
+# ---
+# apiVersion: configmanagement.gke.io/v1
+# kind: ConfigManagement
+# metadata:
+#   name: config-management-prod-us-west2-0
+# spec:
+#   # clusterName is required and must be unique among all managed clusters
+#   clusterName: prod-us-west2-0
+#   enableMultiRepo: true
+
+# ---
+# apiVersion: configmanagement.gke.io/v1
+# kind: ConfigManagement
+# metadata:
+#   name: config-management-prod-us-west2-1
+# spec:
+#   # clusterName is required and must be unique among all managed clusters
+#   clusterName: prod-us-west2-1
+#   enableMultiRepo: true
+
+# ---
+# apiVersion: configmanagement.gke.io/v1
+# kind: ConfigManagement
+# metadata:
+#   name: config-management-prod-us-west2-2
+# spec:
+#   # clusterName is required and must be unique among all managed clusters
+#   clusterName: prod-us-west2-2
+#   enableMultiRepo: true
+
+# ---
+# apiVersion: configmanagement.gke.io/v1
+# kind: ConfigManagement
+# metadata:
+#   name: config-management-config-us-central1
+# spec:
+#   # clusterName is required and must be unique among all managed clusters
+#   clusterName: config-us-central1
+#   enableMultiRepo: true

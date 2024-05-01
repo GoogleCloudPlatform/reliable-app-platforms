@@ -1,9 +1,0 @@
-namespace: "shop-frontend"
-commonLabels:
-  app: shop-frontend
-  env: prod
-  org: shop
-bases:
-- ../../base
-- destrule.yaml
-- virtualservice.yaml

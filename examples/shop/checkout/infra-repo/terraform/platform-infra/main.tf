@@ -1,5 +1,5 @@
 module "deploy-pipeline"{
-    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/deploy-pipeline?ref=tf"
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/deploy-pipeline?ref=cloud-maniac-temp-tf"
     project_id = var.project_id
     service_name = var.service_name
     pipeline_location = var.pipeline_location
@@ -9,7 +9,7 @@ module "deploy-pipeline"{
 }
 
 module "artifact_registry"{
-    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/artifact-registry?ref=tf"
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/artifact-registry?ref=cloud-maniac-temp-tf"
     project_id = var.project_id
     app_name = var.app_name
     service_name = var.service_name

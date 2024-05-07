@@ -55,7 +55,7 @@ steps:
         --auto-approve
 
   - name: "hashicorp/terraform:1.4.6"
-    id: "create-infra"
+    id: "create-slos"
     entrypoint: "sh"
     dir: "examples/nginx/infra-repo/terraform/slos"
     args:

@@ -12,7 +12,7 @@ template_path="${template_repo}/modules/onboard-app/templates"
 source_repo="/tmp/${github_repo}"
 #Copy the template from reliable-app-platforms
 #TODO: change the branch and orgname in the below clone command
-git clone -b tf "https://github.com/cloud-maniac-temp/reliable-app-platforms" "${template_repo}"
+git clone "https://github.com/GoogleCloudPlatform/reliable-app-platforms" "${template_repo}"
 
 #Now clone new application repo and copy the template into it
 git clone  https://${github_user}:${github_token}@github.com/${github_org}/${github_repo} ${source_repo}

@@ -110,7 +110,7 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
         "GITHUB_ORG"]
     }
     step {
-      name       = "hashicorp/terraform:1.4.6"
+      name       = "hashicorp/terraform:1.8.2"
       id         = "create-app-infra"
       #dir        =  "terraform"
       entrypoint = "sh"

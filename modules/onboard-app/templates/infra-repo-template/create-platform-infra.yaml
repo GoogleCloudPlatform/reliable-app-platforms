@@ -39,7 +39,7 @@ substitutions:
   _REGION_INDEX: "[0,1]"
 
 steps:
-  - name: "hashicorp/terraform:1.4.6"
+  - name: "hashicorp/terraform:1.8.2"
     id: "create-infra"
     entrypoint: "sh"
     dir: "examples/nginx/infra-repo/terraform/platform-infra"

@@ -182,7 +182,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
             ]
         }
         step {
-            name       = "hashicorp/terraform:1.4.6"
+            name       = "hashicorp/terraform:1.8.2"
             id         = "create-slos"
             #dir        =  "terraform"
             entrypoint = "sh"

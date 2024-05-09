@@ -61,7 +61,7 @@ resource "google_secret_manager_secret" "wh_sec" {
   project   = var.project_id
   secret_id = "${var.app_name}-infra-webhook-secret"
   replication {
-    automatic = true
+    auto{}
   }
 }
 

@@ -117,6 +117,9 @@ The **nginx** application is a single service application which by default uses 
 
 ```
 
+1. once you've onboarded the app, you'll have a new repo named "$APP-infra". make a single change in that repo (eg: author the README.md) to keep going, creating the next repo named just "$APP".
+1. once the "$APP" repo exists, make a small change there to do the first deployment.
+
 (See more in [`modules/onboard-app/README.md`](/modules/onboard-app/README.md) )
 
 **NOTE**: Make sure you update the virtual service file found in */examples/nginx/app-repo/k8s/base/vs.yaml* to point to the endpoint for your application's frontend.  (But: if you use the `onboard.sh` method, this is done for you.)

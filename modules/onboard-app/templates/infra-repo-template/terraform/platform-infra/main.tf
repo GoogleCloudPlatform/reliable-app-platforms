@@ -194,28 +194,28 @@ resource "google_cloudbuild_trigger" "deploy_app" {
   EOF
             ]
         }
-        step {
-            name       = "hashicorp/terraform:1.8.2"
-            id         = "create-slos"
-            #dir        =  "terraform"
-            entrypoint = "sh"
-            args = [
-                "-c",
-                <<-EOF
-            export TF_VAR_project_id=${"$"}{_PROJECT_ID}
-            export TF_VAR_service_name=${"$"}{_SERVICE}
-            export TF_VAR_app_name=${"$"}{_APP_NAME}
-            export TF_VAR_archetype=${"$"}{_ARCHETYPE}
-            export TF_VAR_zone_index=${"$"}{_ZONE_INDEX}
-            export TF_VAR_region_index=${"$"}{_REGION_INDEX}
-            export TF_VAR_pipeline_location=${"$"}{_PIPELINE_LOCATION}
-            cd ${"$"}{_REPO}/slos
-            terraform init -backend-config="bucket=${"$"}{_PROJECT_ID}"
-            terraform apply --auto-approve
-
-        EOF
-            ]
-    }
+#        step {
+#            name       = "hashicorp/terraform:1.8.2"
+#            id         = "create-slos"
+#            #dir        =  "terraform"
+#            entrypoint = "sh"
+#            args = [
+#                "-c",
+#                <<-EOF
+#            export TF_VAR_project_id=${"$"}{_PROJECT_ID}
+#            export TF_VAR_service_name=${"$"}{_SERVICE}
+#            export TF_VAR_app_name=${"$"}{_APP_NAME}
+#            export TF_VAR_archetype=${"$"}{_ARCHETYPE}
+#            export TF_VAR_zone_index=${"$"}{_ZONE_INDEX}
+#            export TF_VAR_region_index=${"$"}{_REGION_INDEX}
+#            export TF_VAR_pipeline_location=${"$"}{_PIPELINE_LOCATION}
+#            cd ${"$"}{_REPO}/slos
+#            terraform init -backend-config="bucket=${"$"}{_PROJECT_ID}"
+#            terraform apply --auto-approve
+#
+#        EOF
+#            ]
+#    }
         available_secrets {
             secret_manager {
                 version_name = "projects/${var.project_id}/secrets/github-user/versions/latest"

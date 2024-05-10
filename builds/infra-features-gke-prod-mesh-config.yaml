@@ -30,24 +30,19 @@ steps:
     - |
       source vars.sh
       while [[ $(gcloud container clusters list --project ${_PROJECT_ID} --filter "STATUS=RUNNING AND resourceLabels.env:prod" --format="value(name)"| wc -l | awk '{print $1}') != "6" ]]; do
-        echo "Waiting for all dev the cluster to be RUNNING."
+        echo "Waiting for all the cluster to be RUNNING."
         sleep 5
       done
-      gcloud container clusters get-credentials $${GKE_PROD1_NAME} --zone $${GKE_PROD1_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD2_NAME} --zone $${GKE_PROD2_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD3_NAME} --zone $${GKE_PROD3_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD4_NAME} --zone $${GKE_PROD4_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD5_NAME} --zone $${GKE_PROD5_LOCATION} --project ${_PROJECT_ID}
-      gcloud container clusters get-credentials $${GKE_PROD6_NAME} --zone $${GKE_PROD6_LOCATION} --project ${_PROJECT_ID}
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD1_LOCATION}_$${GKE_PROD1_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD2_LOCATION}_$${GKE_PROD2_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD3_LOCATION}_$${GKE_PROD3_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD4_LOCATION}_$${GKE_PROD4_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD5_LOCATION}_$${GKE_PROD5_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD6_LOCATION}_$${GKE_PROD6_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD1_LOCATION}_$${GKE_PROD1_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD2_LOCATION}_$${GKE_PROD2_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD3_LOCATION}_$${GKE_PROD3_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD4_LOCATION}_$${GKE_PROD4_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD5_LOCATION}_$${GKE_PROD5_NAME} apply -f asm/asm-telemetry.yaml
-      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD6_LOCATION}_$${GKE_PROD6_NAME} apply -f asm/asm-telemetry.yaml
+      gcloud container clusters get-credentials $${GKE_PROD1_NAME} --zone $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD2_NAME} --zone $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD3_NAME} --zone $${GKE_PROD_REGION_1} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD4_NAME} --zone $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD5_NAME} --zone $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
+      gcloud container clusters get-credentials $${GKE_PROD6_NAME} --zone $${GKE_PROD_REGION_2} --project ${_PROJECT_ID}
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD1_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD2_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD3_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD4_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD5_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      kubectl --context=gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD6_NAME} patch configmap/asm-options -n istio-system --type merge -p '{"data":{"multicluster_mode":"connected"}}'
+      

@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: recommendations
+spec:
+  hosts:
+  - recommendations.recommendations.svc.cluster.local
+  ports:
+  - name: recommendations
+    number: 8080
+    protocol: GRPC
+  resolution: DNS

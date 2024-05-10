@@ -1,0 +1,46 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 14400s # 2hr
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _FRONTEND: "true"
+  _BACKEND: "true"
+  _DEPLOY_SLO_ONLY: "false"
+
+
+tags:
+  - deploy-whereami
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "backend-deploy"
+    entrypoint: bash
+    dir: ./examples/whereami/whereami-backend
+    args:
+      - -c
+      - |
+        [[ "${_BACKEND}" == "false" ]] && exit 0
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="whereami",_SERVICE="whereami-backend",_SLO=true,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="whereami",_SERVICE="whereami-backend",_SLO=false,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "frontend-deploy"
+    entrypoint: bash
+    dir: ./examples/whereami/whereami-frontend
+    args:
+      - -c
+      - |
+        [[ "${_FRONTEND}" == "false" ]] && exit 0
+        [[ "${_DEPLOY_SLO_ONLY}" == "true" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="whereami",_SERVICE="whereami-frontend",_SLO=true,_APP=false,_INFRA=false
+        [[ "${_DEPLOY_SLO_ONLY}" == "false" ]] && exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="whereami",_SERVICE="whereami-frontend",_SLO=false,_APP=true,_INFRA=true
+   

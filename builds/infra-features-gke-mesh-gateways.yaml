@@ -18,9 +18,20 @@ tags:
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 steps:
-# ASM gateways installation
-# Docs:
-# 1. Enabling multi-cluster Gateways -> https://cloud.google.com/kubernetes-engine/docs/how-to/enabling-multi-cluster-gateways
+# Install workload identity for the service account for the root sync repo.
+# The KSA is created after installing configmanagement, and the GSA is created in the GKE module by terraform
+# https://cloud.google.com/anthos-config-management/docs/how-to/installing-config-sync#workload-identity-enabled
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-features-create-workload-identity-asm"
+  dir: "infra/asm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+        gcloud iam service-accounts add-iam-policy-binding \
+        --role roles/iam.workloadIdentityUser \
+        --member "serviceAccount:${_PROJECT_ID}.svc.id.goog[config-management-system/root-reconciler]" \
+        configsync-sa@${_PROJECT_ID}.iam.gserviceaccount.com
 - name: "gcr.io/cloud-builders/gcloud"
   id: "infra-features-gke-mesh-gateways"
   dir: "infra/asm"
@@ -28,15 +39,16 @@ steps:
   args:
     - -c
     - |
-      export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
-      echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
-      gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos
-      chmod +x nomos
-      git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
-      git config --global user.name "cloudbuild-ci"
-      gcloud source repos clone config --project=${_PROJECT_ID}
-      mkdir -p config/asm
-      cp -r asm-gateways.yaml config/asm
-      cd config
-      git add . && git commit -am "Deploy ASM gateways"
-      git push
+        export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+        echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+        gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos
+        chmod +x nomos
+        git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
+        git config --global user.name "cloudbuild-ci"
+        gcloud source repos clone config --project=${_PROJECT_ID}
+        rm -rf config/asm/*
+        mkdir -p config/asm
+        cp -r ./*.yaml config/asm
+        cd config
+        git add . && git commit -am "Deploy ASM gateways"
+        git push

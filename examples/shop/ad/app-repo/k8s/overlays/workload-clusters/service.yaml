@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ad
+  labels:
+    app: ad
+spec:
+  type: ClusterIP
+  selector:
+    app: ad
+  ports:
+  - name: grpc
+    port: 9555
+    targetPort: 9555

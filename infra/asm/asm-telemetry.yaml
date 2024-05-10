@@ -16,6 +16,8 @@ kind: ConfigMap
 metadata:
   name: istio-asm-managed
   namespace: istio-system
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-prod-workload
 data:
   mesh: |-
     accessLogFile: /dev/stdout

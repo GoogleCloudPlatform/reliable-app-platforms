@@ -1,7 +1,0 @@
-nameSuffix: "-frontend"
-commonLabels:
-  app: whereami-frontend
-bases:
-- ../../base
-patches:
-  - path: cm-flag.yaml

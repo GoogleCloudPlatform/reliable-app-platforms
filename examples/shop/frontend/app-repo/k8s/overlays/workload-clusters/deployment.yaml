@@ -1,0 +1,107 @@
+# Copyright 2018 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+      annotations:
+        proxy.istio.io/config: |
+          proxyMetadata:
+            ISTIO_META_DNS_CAPTURE: "true"
+            ISTIO_META_DNS_AUTO_ALLOCATE: "true"
+    spec:
+      serviceAccountName: default
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: server
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+          image: frontendservice
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/_healthz"
+              port: 8080
+              httpHeaders:
+              - name: "Cookie"
+                value: "shop_session-id=x-readiness-probe"
+          livenessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/_healthz"
+              port: 8080
+              httpHeaders:
+              - name: "Cookie"
+                value: "shop_session-id=x-liveness-probe"
+          env:
+          - name: PORT
+            value: "8080"
+          - name: PRODUCT_CATALOG_SERVICE_ADDR
+            value: "productcatalog.productcatalog.svc.cluster.local:3550"
+          - name: CURRENCY_SERVICE_ADDR
+            value: "currency.currency.svc.cluster.local:7000"
+          - name: CART_SERVICE_ADDR
+            value: "cart.cart.svc.cluster.local:7070"
+          - name: RECOMMENDATION_SERVICE_ADDR
+            value: "recommendations.recommendations.svc.cluster.local:8080"
+          - name: SHIPPING_SERVICE_ADDR
+            value: "shipping.shipping.svc.cluster.local:50051"
+          - name: CHECKOUT_SERVICE_ADDR
+            value: "checkout.checkout.svc.cluster.local:5050"
+          - name: AD_SERVICE_ADDR
+            value: "ad.ad.svc.cluster.local:9555"
+          # # ENV_PLATFORM: One of: local, gcp, aws, azure, onprem, alibaba
+          # # When not set, defaults to "local" unless running in GKE, otherwies auto-sets to gcp
+          # - name: ENV_PLATFORM
+          #   value: "aws"
+          - name: ENABLE_PROFILER
+            value: "0"
+          - name: ENABLE_TRACING
+            value: "0"
+          # - name: CYMBAL_BRANDING
+          #   value: "true"
+          # - name: FRONTEND_MESSAGE
+          #   value: "Replace this with a message you want to display on all pages."
+          # As part of an optional Google Cloud demo, you can run an optional microservice called the "packaging service".
+          # - name: PACKAGING_SERVICE_URL
+          #   value: "" # This value would look like "http://123.123.123"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

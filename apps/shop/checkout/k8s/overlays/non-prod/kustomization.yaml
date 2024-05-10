@@ -1,9 +1,0 @@
-namespace: "shop-checkout"
-commonLabels:
-  app: checkout
-  env: dev
-  org: shop
-bases:
-- ../../base
-- destrule.yaml
-- virtualservice.yaml

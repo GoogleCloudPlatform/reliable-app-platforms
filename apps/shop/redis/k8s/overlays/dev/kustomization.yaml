@@ -1,4 +1,0 @@
-commonLabels:
-  app: redis
-bases:
-- ../../base

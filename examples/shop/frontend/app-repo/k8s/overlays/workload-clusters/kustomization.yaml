@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: frontend-workload
+namespace: frontend
+commonLabels:
+  app: frontend
+resources:
+- ../../base
+- deployment.yaml
+- service.yaml
+images:
+- name: frontendservice
+  newName: us-central1-docker.pkg.dev/arch001/shop-frontend/service
+  newTag: latest

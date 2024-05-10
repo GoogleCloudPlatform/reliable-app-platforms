@@ -65,7 +65,7 @@ module "deploy-pipeline"{
 }
 
 module "endpoint" {
-    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/endpoints"
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/endpoints?ref=modern-cicd-manual"
     project_id = var.project_id
     service_name = "${var.service_name}service"
 }

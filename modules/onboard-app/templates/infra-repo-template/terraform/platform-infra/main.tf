@@ -197,7 +197,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
             export TF_VAR_region_index=${"$"}{_REGION_INDEX}
             export TF_VAR_pipeline_location=${"$"}{_PIPELINE_LOCATION}
             cd ${"$"}{_REPO}/slos
-            terraform init -backend-config=\"bucket=${"$"}{_PROJECT_ID}\"
+            terraform init -backend-config="bucket=${"$"}{_PROJECT_ID}"
             terraform apply --auto-approve
 
         EOF

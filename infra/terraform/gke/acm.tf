@@ -34,7 +34,7 @@ resource "google_gke_hub_feature_membership" "acm_feature_member" {
   membership = each.value.cluster_membership_id
   project    = var.project_id
   configmanagement {
-    version = "1.15.1"
+    version = "1.16.3"
     config_sync {
       source_format = "unstructured"
       git {

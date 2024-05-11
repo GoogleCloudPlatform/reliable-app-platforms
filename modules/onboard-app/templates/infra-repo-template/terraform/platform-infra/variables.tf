@@ -43,3 +43,19 @@ variable "zone_index" {
   description = "Zone index to deploy service to. Needs to be set for SZ, APZ, MZ"
   type = list(number)
 }
+
+//variable "github_org" {
+//  description = "GitHub org."
+//}
+//
+//variable "github_user" {
+//  description = "GitHub username."
+//}
+//
+//variable "github_email" {
+//  description = "GitHub user email."
+//}
+//
+//variable "github_token" {
+//  description = "GitHub user email."
+//}

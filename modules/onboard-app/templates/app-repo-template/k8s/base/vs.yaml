@@ -12,10 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# terraform init -backend-config="bucket=${PROJECT_ID}"
-
-terraform {
-  backend "gcs" {
-    prefix = "nginx/nginx/tfstate/platform-infra"
-  }
-}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+    name: APP_NAME-virtualservice
+    namespace: APP_NAME
+spec:
+    hosts:
+    - "APP_NAMEservice.endpoints.PROJECT_ID.cloud.goog"
+    gateways:
+    - asm-ingress-gw/asm-ingressgateway
+    http:
+    - route:
+      - destination:
+          host: APP_NAME
+          port:
+            number: 80

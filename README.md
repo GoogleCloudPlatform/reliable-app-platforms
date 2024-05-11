@@ -39,6 +39,10 @@ Also explained here: <https://cloud.google.com/architecture/deployment-archetype
 
    ```bash
    export PROJECT_ID=<YOUR PROJECT ID>
+   export GITHUB_ORG=<mycorp>
+   export GITHUB_USER=<myusername>
+   export GITHUB_TOKEN=<long-token-goes-here>
+   export GITHUB_EMAIL=<user@example.com>
    ```
 1. Set the k8s version for your GKE cluster. 
    Go to build/terraform/infra-create-gke.yaml. Select an approriate version from [this](https://cloud.google.com/kubernetes-engine/docs/release-notes) page and set it as the *_KUBE_VERSION* variable.
@@ -63,7 +67,7 @@ To deploy the platform infrastructure, you change some of the default values for
    1. The variable "gke_config" defines the GKE subnet locations, name, subnet cidrs for the config clusters. These values can be changed to suit your needs. The GKE config cluster will later be deployed in this vpc using the subnets created by this module.
 
 1. infra/terraform/gke/variables.tf: 
-   1. The variable *kubernetes_version* is fixed at *1.27.3-gke.100*. This is the version that the repo is tested at. You can change this hard-coded version, but do not use *latest* as a value. This is because the clusters will be torn down and re-created by terraform if the *latest* version changes. 
+   1. The variable *kubernetes_version* is fixed at *1.28.5-gke.1217000*. This is the version that the repo is tested at. You can change this hard-coded version, but do not use *latest* as a value. This is because the clusters will be torn down and re-created by terraform if the *latest* version changes. 
 
 ### Deploy an application to the platform
 This repo assumes that your application is made up of 1 or more services that may be owned by multiple teams.
@@ -105,7 +109,22 @@ Please read *examples/Examples.md* for more info on the structure of the example
 
 The **nginx** application is a single service application which by default uses the *Active Passive Zone (APZ)* archetype. 
 
-**NOTE**: Make sure you update the virtual service file found in */examples/nginx/app-repo/k8s/base/vs.yaml* to point to the endpoint for your application's frontend.
+#### Easiest path (requires a GitHub Org):
+
+```bash
+
+  onboard.sh nginx
+
+```
+
+1. once you've onboarded the app, you'll have a new repo named "$APP-infra". make a single change in that repo (eg: author the README.md) to keep going, creating the next repo named just "$APP".
+1. once the "$APP" repo exists, make a small change there to do the first deployment.
+
+(See more in [`modules/onboard-app/README.md`](/modules/onboard-app/README.md) )
+
+**NOTE**: Make sure you update the virtual service file found in */examples/nginx/app-repo/k8s/base/vs.yaml* to point to the endpoint for your application's frontend.  (But: if you use the `onboard.sh` method, this is done for you.)
+
+If you don't use `onboard.sh` you can still deploy  apps manually, see below:
 
 ```
 spec:

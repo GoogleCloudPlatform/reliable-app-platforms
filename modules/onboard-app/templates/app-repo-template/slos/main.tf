@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# terraform init -backend-config="bucket=${PROJECT_ID}"
-
-terraform {
-  backend "gcs" {
-    prefix = "nginx/nginx/tfstate/platform-infra"
-  }
+module "slos" {
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/slos?ref=modern-cicd-manual"
+    project_id = var.project_id
+    service_name = "${var.service_name}service"
 }

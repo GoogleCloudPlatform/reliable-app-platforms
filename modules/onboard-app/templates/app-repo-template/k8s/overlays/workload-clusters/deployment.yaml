@@ -11,11 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# terraform init -backend-config="bucket=${PROJECT_ID}"
-
-terraform {
-  backend "gcs" {
-    prefix = "nginx/nginx/tfstate/platform-infra"
-  }
-}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: APP_NAME
+  namespace: APP_NAME
+spec:
+  selector:
+    matchLabels:
+      app: APP_NAME
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: APP_NAME
+    spec:
+      containers:
+      - name: APP_NAME
+        image: APP_NAME:APP_VERSION
+        ports:
+        - containerPort: 80

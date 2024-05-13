@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# terraform init -backend-config="bucket=${PROJECT_ID}"
-
-terraform {
-  backend "gcs" {
-    prefix = "nginx/nginx/tfstate/platform-infra"
-  }
-}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: APP_NAME
+  labels:
+    istio.io/rev: asm-managed

@@ -14,12 +14,12 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-cicd-nginx-nginx
+  - infra-cicd-
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
-  _APP_NAME: "nginx"
-  _SERVICE: "nginx"
+  _: ""
+  _SERVICE: ""
   _PIPELINE_LOCATION: "us-central1"
   _ARCHETYPE: "APZ"
   _ZONE_INDEX: "[0,1]"
@@ -37,6 +37,18 @@ steps:
         [[ "${_BUILD}" == "false" ]] && exit 0
         terraform init -backend-config="bucket=${_PROJECT_ID}"
         terraform apply -var="project_id=${_PROJECT_ID}" \
-        -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}" -var="archetype=${_ARCHETYPE}" \
+        -var="service_name=${_SERVICE}" -var="app_name=${_}" -var="archetype=${_ARCHETYPE}" \
         -var="zone_index=${_ZONE_INDEX}" -var="region_index=${_REGION_INDEX}" -var="pipeline_location=${_PIPELINE_LOCATION}" \
         --auto-approve
+
+  - name: "hashicorp/terraform:1.8.2"
+    id: "create-slos"
+    entrypoint: "sh"
+    dir: "examples/nginx/infra-repo/terraform/slos"
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      [[ "${_BUILD}" == "false" ]] && exit 0
+      terraform init -backend-config="bucket=${_PROJECT_ID}"
+      terraform apply -var="project_id=${_PROJECT_ID}" -var="service_name=${_SERVICE}" -var="app_name=${_}"  --auto-approve

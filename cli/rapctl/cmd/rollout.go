@@ -60,7 +60,7 @@ var rolloutCmd = &cobra.Command{
 			fmt.Println(err)
 		}
 
-		fmt.Println("rollout called")
+		fmt.Println("** NOT IMPLEMENTED YET *** rollout called")
 	},
 }
 

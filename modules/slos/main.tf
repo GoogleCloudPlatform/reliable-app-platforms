@@ -7,6 +7,22 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
+# Creates the canonical service and start tracking it
+resource "google_monitoring_service" "default" {
+  service_id = var.service_name
+  display_name = var.service_name
+
+  basic_service {
+    service_type  = "ISTIO_CANONICAL_SERVICE"
+    service_labels = {
+      project = var.project_id
+      mesh_uid = "proj-${data.google_project.project.number}"
+      canonical_service_namespace = var.service_name 
+      canonical_service = var.service_name
+    }
+  }
+}
+
 # Monitors the default MeshIstio service
 data "google_monitoring_istio_canonical_service" "default" {
     project = var.project_id

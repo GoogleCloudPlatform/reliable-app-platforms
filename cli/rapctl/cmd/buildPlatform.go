@@ -34,8 +34,9 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("buildPlatform called")
-		app := "build.sh"
-		command := exec.Command(app)
+		script := "../../build.sh"
+		command := exec.Command(script)
+		// handle args in Cobra way here
 		stdout, err := command.Output()
 
 		if err != nil {

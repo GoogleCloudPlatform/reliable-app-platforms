@@ -25,13 +25,8 @@ import (
 // deployAppCmd represents the deployApp command
 var deployAppCmd = &cobra.Command{
 	Use:   "deployApp",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Basic deployment of an app",
+	Long:  `A quick way to deploy an app without creating a CI/CD pipeline and hooks.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("deployApp called")
 		script := "../../deploy.sh"

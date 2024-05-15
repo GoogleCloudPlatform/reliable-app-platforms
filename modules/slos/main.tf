@@ -8,7 +8,7 @@ data "google_project" "project" {
 }
 
 # Creates the canonical service and start tracking it
-resource "google_monitoring_service" "default" {
+resource "google_monitoring_service" "default-service" {
   service_id = var.service_name
   display_name = var.service_name
 

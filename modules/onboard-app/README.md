@@ -50,3 +50,56 @@ This runs:
         1. deploy-to-app-clusters
         1. deploy-to-other-clusters
     1. it then sets up SLOs (still WIP) as pulled from `modules/slos`
+
+
+# Module Details
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_github"></a> [github](#requirement\_github) | >= 4.3.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.27 |
+| <a name="requirement_google-beta"></a> [google-beta](#requirement\_google-beta) | ~> 5.27 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_github"></a> [github](#provider\_github) | >= 4.3.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.27 |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [github_repository.infra_repo](https://registry.terraform.io/providers/hashicorp/github/latest/docs/resources/repository) | resource |
+| [github_repository_webhook.gh_webhook](https://registry.terraform.io/providers/hashicorp/github/latest/docs/resources/repository_webhook) | resource |
+| [google_apikeys_key.api_key](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apikeys_key) | resource |
+| [google_cloudbuild_trigger.deploy_infra](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuild_trigger) | resource |
+| [google_secret_manager_secret.wh_sec](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
+| [google_secret_manager_secret_iam_policy.policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_policy) | resource |
+| [google_secret_manager_secret_version.wh_secv](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_version) | resource |
+| [null_resource.set_repo](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [random_password.pass_webhook](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
+| [google_iam_policy.wh-secv-access](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iam_policy) | data source |
+| [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_app_name"></a> [app\_name](#input\_app\_name) | Name of the application being created. | `any` | n/a | yes |
+| <a name="input_github_email"></a> [github\_email](#input\_github\_email) | GitHub user email. | `any` | n/a | yes |
+| <a name="input_github_org"></a> [github\_org](#input\_github\_org) | GitHub org. | `any` | n/a | yes |
+| <a name="input_github_token"></a> [github\_token](#input\_github\_token) | GitHub user email. | `any` | n/a | yes |
+| <a name="input_github_user"></a> [github\_user](#input\_github\_user) | GitHub username. | `any` | n/a | yes |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID | `any` | n/a | yes |
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->

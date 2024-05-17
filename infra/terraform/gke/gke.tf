@@ -15,7 +15,8 @@ module "gke" {
   create_service_account     = true
   grant_registry_access      = true
   kubernetes_version         = var.kubernetes_version
-  cluster_resource_labels    = {"env": each.value.env, "zone": each.value.cluster_zone }
+  cluster_resource_labels    = { "env" : each.value.env, "zone" : each.value.cluster_zone }
+  deletion_protection        = !var.allow_deletion
 
 }
 
@@ -32,4 +33,5 @@ module "gke-config-cluster" {
   ip_range_services          = local.config_cluster_info.svc_cidr_name
   kubernetes_version         = var.kubernetes_version
   horizontal_pod_autoscaling = true
+  deletion_protection        = !var.allow_deletion
 }

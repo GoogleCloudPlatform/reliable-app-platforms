@@ -8,7 +8,5 @@ resource "google_gke_hub_feature" "gke-config-mci" {
       config_membership = "projects/${var.project_id}/locations/global/memberships/${module.gke-config-cluster.name}"
     }
   }
-  depends_on = [
-    module.gke-config-cluster, module.fleet-hub
-  ]
+  depends_on = [module.fleet-hub]
 }

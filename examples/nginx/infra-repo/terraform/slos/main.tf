@@ -1,7 +1,7 @@
 module "slos" {
-    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/slos?ref=tf"
+   source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/slos"
     project_id = var.project_id
     service_name = "${var.service_name}"
-    availability_goal = "0.99" # not a high priority service
+    availability_goal = "0.999"
     latency_goal = "0.9"
 }

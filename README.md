@@ -129,7 +129,7 @@ If you don't use `onboard.sh` you can still deploy  apps manually, see below:
 ```
 spec:
    hosts:
-   - "whereami.endpoints.$PROJECT_ID.cloud.goog"
+   - "nginxservice.endpoints.$PROJECT_ID.cloud.goog"
 ```
 
    ```bash
@@ -182,7 +182,6 @@ This example multi-cluster setup uses GatewayAPI to define ingress rules and man
 A total of 7 Autopilot GKE enterprise clusters are used in this setup. There are 6 clusters where workloads can be deployed, and 1 configuration cluster where the *gateway* resources and the *httproute* resources (for individual services) are deployed.
 
 ### Modules
-
 The *modules* directory contains terraform modules for application teams to use in their application repos (applications are made up of 1 or more services)  to be able to deploy their application to this platform with each service using one of the archetypes. The intention is that the application teams use these terraform modules in their own CI/CD pipelines. They specify per service:
 1. The Archetype for the service.
 1. The Zone(s) in which the service will be deployed for zonal archetypes. OR
@@ -202,8 +201,6 @@ Cloud deploy pipeline that:
 External services use this module to create an external endpoint for users to their front-end services.
 
 #### SLOs
-*NOTE* There is currently a bug in GCP monitoring that prevents istio-canonical services from being auto imported into the monitoring SLOs dashboard. This prevents terraform from automatically finding the necessary canonical services when the SLOs terraform module is run. To prevent this error, first go to the GKE enterprise/ASM page and create a (any) SLO from it for each service. This makes the monitoring dashboard import the canonical service. You can delete the manually create SLO afterwards.
-
 This module creates 2 SLOs per service deployed. 
 1. A latency SLO with alerting policies. 
 1. An availability SLO with alerting policies. 

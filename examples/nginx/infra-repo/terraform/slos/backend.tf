@@ -2,6 +2,6 @@
 
 terraform {
   backend "gcs" {
-    prefix = "whereami/whereami-backend/tfstate/slos"
+    prefix = "nginx/nginx/tfstate/slos"
   }
 }

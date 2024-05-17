@@ -45,11 +45,21 @@ Also explained here: <https://cloud.google.com/architecture/deployment-archetype
    export GITHUB_EMAIL=<user@example.com>
    ```
 1. Set the k8s version for your GKE cluster. 
-   Go to build/terraform/infra-create-gke.yaml. Select an approriate version from [this](https://cloud.google.com/kubernetes-engine/docs/release-notes) page and set it as the *_KUBE_VERSION* variable.
+   Go to build/terraform/infra-create-gke.yaml. Select an approriate version from [this](https://cloud.google.com/kubernetes-engine/docs/release-notes) page and pass it along to the startup script.
+   If you want to customize the regions and zones you are deploying your infrastructure to, or the subnet ranges used in the cluster, perform the next step. Otherwise jump straight ahead to the kicking off the build with terraform. 
+
+### Customize the platform infrastructure.
+To deploy the platform infrastructure, you change some of the default values for the infrastructure deployment to suit the needs of your environment.
+1. infra/terraform/vpc/variables.tf:
+   1. The variable "fleets" defines the GKE subnet locations, name-prefixes, subnet cidrs. These values can be changed to suit your needs. The 6 GKE workload clusters will later be deployed in this vpc using the subnets created by this module.
+   1. The variable "gke_config" defines the GKE subnet locations, name, subnet cidrs for the config cluster(s). These values can be changed to suit your needs. The GKE config cluster will later be deployed in this vpc using the subnets created by this module.
+
+### Kick off the build with terraform
+
 1. Kick off build with terraform
 
    ```bash
-   ./build.sh
+   ./build.sh --k8s <k8s_version>
    ```
 
 1. View build in the Console.
@@ -60,14 +70,7 @@ Also explained here: <https://cloud.google.com/architecture/deployment-archetype
 
    > This step can take 20-30 minutes to complete.
 
-### Deploy the platform infrastructure.
-To deploy the platform infrastructure, you change some of the default values for the infrastructure deployment to suit the needs of your environment.
-1. infra/terraform/vpc/variables.tf:
-   1. The variable "fleets" defines the GKE subnet locations, name-prefixes, subnet cidrs. These values can be changed to suit your needs. The 6 GKE workload clusters will later be deployed in this vpc using the subnets created by this module.
-   1. The variable "gke_config" defines the GKE subnet locations, name, subnet cidrs for the config clusters. These values can be changed to suit your needs. The GKE config cluster will later be deployed in this vpc using the subnets created by this module.
 
-1. infra/terraform/gke/variables.tf: 
-   1. The variable *kubernetes_version* is fixed at *1.28.5-gke.1217000*. This is the version that the repo is tested at. You can change this hard-coded version, but do not use *latest* as a value. This is because the clusters will be torn down and re-created by terraform if the *latest* version changes. 
 
 ### Deploy an application to the platform
 This repo assumes that your application is made up of 1 or more services that may be owned by multiple teams.

@@ -9,5 +9,4 @@ resource "google_gke_hub_feature" "gke-config-mci" {
     }
   }
   depends_on = [module.fleet-hub]
-
 }

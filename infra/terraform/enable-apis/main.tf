@@ -1,7 +1,7 @@
 module "project-services" {
-  source  = "terraform-google-modules/project-factory/google//modules/project_services"
-#   version = 
-  project_id                  = var.project_id
+  source = "terraform-google-modules/project-factory/google//modules/project_services"
+  version = "~> 15.0"
+  project_id = var.project_id
   activate_apis = [
     "compute.googleapis.com",
     "iam.googleapis.com",
@@ -15,6 +15,7 @@ module "project-services" {
     "artifactregistry.googleapis.com",
     "sourcerepo.googleapis.com",
     "anthos.googleapis.com",
+    "gkeconnect.googleapis.com",
     "gkehub.googleapis.com",
     "clouddeploy.googleapis.com",
     "spanner.googleapis.com",
@@ -23,4 +24,5 @@ module "project-services" {
     "binaryauthorization.googleapis.com",
     "anthosconfigmanagement.googleapis.com"
   ]
+  disable_dependent_services = true
 }

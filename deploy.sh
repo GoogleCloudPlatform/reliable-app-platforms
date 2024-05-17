@@ -63,7 +63,7 @@ done
 
 # Create a short SHA until this is tied to a git repo and can use a commit sha
 while true; do
-    SHORT_SHA=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9-' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
+    SHORT_SHA=$(head -c 64 /dev/urandom | tr -dc 'a-z0-9' | grep -E '^[a-z]' | head -n 1 | cut -c1-63)
     if [[ -n $SHORT_SHA ]]; then  # Check if SHORT_SHA is not empty
         break
     fi

@@ -14,15 +14,31 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-features-gke-mesh-gateways-prod
+  - infra-destroy-acm-resources
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
+
 steps:
-# ASM gateways installation
-# Docs:
-# 1. Enabling multi-cluster Gateways -> https://cloud.google.com/kubernetes-engine/docs/how-to/enabling-multi-cluster-gateways
+# Deleting the ASM gateways resources installed through ACM
 - name: "gcr.io/cloud-builders/gcloud"
-  id: "infra-features-gke-mesh-gateways-prod"
+  id: "delete-infra-features-gke-mesh-gateways"
+  dir: "infra/asm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+        export PROJECT_NUMBER=$(gcloud projects describe ${_PROJECT_ID} --format 'value(projectNumber)')
+        echo -e "PROJECT_NUMBER is $${PROJECT_NUMBER}"
+        git config --global user.email "cloudbuild-ci@cloudbuild.gserviceaccount.com"
+        git config --global user.name "cloudbuild-ci"
+        gcloud source repos clone config --project=${_PROJECT_ID}
+        cd config
+        rm -rf *
+        git add . && git commit -am "Deleting ASM gateways"
+        git push
+# Checking if ACM resource changes are synced to cluster
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "infra-verify-delete-features-gke-mesh-gateways-prod"
   dir: "infra"
   entrypoint: bash
   args:
@@ -93,8 +109,12 @@ steps:
         echo -e "CONFIG_NOMOS_STATUS is $$CONFIG_NOMOS_STATUS"
         sleep 5
       done
-      for CTX in gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD1_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD2_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_1}_$${GKE_PROD3_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD4_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD5_NAME} gke_${_PROJECT_ID}_$${GKE_PROD_REGION_2}_$${GKE_PROD6_NAME}
-      do
-        echo -e "Checking ASM gateways status for $$CTX..."
-        kubectl --context=$$CTX wait --for=condition=Available deployment asm-ingressgateway -n asm-ingress-gw --timeout 5m
-      done
+# Disable multicluster ingress feature
+- name: "gcr.io/cloud-builders/gke-deploy"
+  id: "infra-features-gke-gateway-config-cluster"
+  entrypoint: bash
+  dir: infra
+  args:
+   - -c
+   - |
+      gcloud container fleet ingress disable --project=${_PROJECT_ID}

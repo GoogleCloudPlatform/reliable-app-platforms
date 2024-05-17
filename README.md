@@ -1,6 +1,5 @@
 # Reliable App Platforms - on GCP
 
-
 _Last tested on 04/30/2024 by @stevemcghee
 
 Watch the video of our talk from Google Cloud Next 2024: https://youtu.be/FkIqA9Pt7Hc
@@ -134,7 +133,7 @@ spec:
    hosts:
    - "nginxservice.endpoints.$PROJECT_ID.cloud.goog"
 ```
-
+Run the nginx deploy pipeline:
    ```bash
    
    cd $HOME
@@ -164,14 +163,37 @@ spec:
    hosts:
    - "whereami.endpoints.$PROJECT_ID.cloud.goog"
 ```
+Run the whereami deploy pipeline:
 
 ```bash
    
    cd $HOME
    ./deploy.sh --app whereami
    ```
-   This will kick of a script that first creates the necessary infrastructure for the two services using terraform. 
+   This will kick of a script that first creates the necessary infrastructure for the two services using terraform and deploy the services using cloud-deploy.
    The whereami frontend will be reachable at *http://whereami.endpoints.${PROJECT_ID}.cloud.goog/*
+
+### Deploy `shop`.
+
+The **shop** application is a 10-service application. Each service in the application may use a different archetype. In this example, by default the *frontend* uses the *Global* archetype. You can change the archetypes of all the 10 services by editing the */examples/shop/ci.yaml* file.
+
+**NOTE**:
+1. Make sure you update the virtual service file found in */examples/shop/frontend/app-repo/k8s/base/vs.yaml* to point to the endpoint for your application's frontend.
+```
+spec:
+   hosts:
+   - "shop-frontend.endpoints.$PROJECT_ID.cloud.goog"
+```
+2. Since the shop ci pipeline builds and pushes the container images for all the services into the artifact registry in this project, you will need to update the registry address for all the services in shop. You can do this by editing the */examples/shop/SERVICE-NAME/app-repo/k8s/overlays/workload-clusters/kustomization.yaml* file. Replace the **PROJECT_ID** in *newName: us-central1-docker.pkg.dev/PROJECT_ID/shop-frontend/service* with the appropriate value.
+
+Run the shop deploy pipeline:
+```bash
+   
+   cd $HOME
+   ./deploy.sh --app shop
+   ```
+   This will kick of a script that first creates the necessary infrastructure for the services using terraform and  deploy the services using cloud-deploy. This can take about 20-30 minutes to complete.
+   The shop frontend will be reachable at *http://shop-frontend.endpoints.${PROJECT_ID}.cloud.goog/*
    
 ## Deploy an example application from an external repo
 

@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: checkoutservice
-  newName: us-central1-docker.pkg.dev/arch001/shop-checkout/service
+  newName: us-central1-docker.pkg.dev/<project-id>/shop-checkout/service
   newTag: latest

@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: paymentservice
-  newName: us-central1-docker.pkg.dev/arch001/shop-payment/service
+  newName: us-central1-docker.pkg.dev/<project-id>/shop-payment/service
   newTag: latest

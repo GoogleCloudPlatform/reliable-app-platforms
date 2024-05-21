@@ -32,4 +32,4 @@ steps:
       - |
         [[ "${_BUILD}" == "false" ]] && exit 0
         terraform init -backend-config="bucket=${_PROJECT_ID}"
-        terraform delete -var="project_id=${_PROJECT_ID}" -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}"  --auto-approve
+        terraform destroy -var="project_id=${_PROJECT_ID}" -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}"  --auto-approve

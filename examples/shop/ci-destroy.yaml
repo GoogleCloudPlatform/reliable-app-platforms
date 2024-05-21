@@ -37,7 +37,7 @@ steps:
       - -c
       - |
         [[ "${_FRONTEND}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="frontend",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="frontend"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "cart-destroy"
     entrypoint: bash
@@ -46,7 +46,7 @@ steps:
       - -c
       - |
         [[ "${_CART}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="cart",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="cart"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "ad-destroy"
     entrypoint: bash
@@ -55,7 +55,7 @@ steps:
       - -c
       - |
         [[ "${_AD}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="ad",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="ad"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "currency-destroy"
     entrypoint: bash
@@ -64,7 +64,7 @@ steps:
       - -c
       - |
         [[ "${_CURRENCY}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="currency",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="currency"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "email-destroy"
     dir: ./examples/shop/email
@@ -73,7 +73,7 @@ steps:
       - -c
       - |
         [[ "${_EMAIL}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="email",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="email"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "catalog-destroy"
     dir: ./examples/shop/productcatalog
@@ -82,7 +82,7 @@ steps:
       - -c
       - |
         [[ "${_CATALOG}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="productcatalog",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="productcatalog"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "shipping-destroy"
     dir: ./examples/shop/shipping
@@ -91,7 +91,7 @@ steps:
       - -c
       - |
         [[ "${_SHIPPING}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="shipping",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="shipping"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "payment-destroy"
     dir: ./examples/shop/payment
@@ -100,7 +100,7 @@ steps:
       - -c
       - |
         [[ "${_PAYMENT}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="payment",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="payment"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "recommendations-destroy"
     dir: ./examples/shop/recommendations
@@ -109,7 +109,7 @@ steps:
       - -c
       - |
         [[ "${_RECOMMENDATIONS}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="recommendations",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="recommendations"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "checkout-destroy"
     dir: ./examples/shop/checkout
@@ -118,5 +118,5 @@ steps:
       - -c
       - |
         [[ "${_CHECKOUT}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="checkout",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="checkout"
  

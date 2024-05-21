@@ -33,12 +33,22 @@ usage()
    exit 1 # Exit script after printing help
 }
 
+terraform_destroy()
+{
+    echo -e "\e[95mSetting DESTROY var to 'true'...\e[0m"
+    DESTROY=true
+}
+
 # Setting default value
 APPLICATION=nginx
+unset DESTROY
 
 # Define bash args
 while [ "$1" != "" ]; do
     case $1 in
+        --destroy | -d )      shift
+                              terraform_destroy
+                            ;;
         --app | -a )        shift
                                 APPLICATION=$1
                                 ;;
@@ -65,5 +75,7 @@ echo -e "\e[95mSHORT_SHA is set to ${SHORT_SHA}\e[0m"
 gcloud config set core/project ${PROJECT_ID}
 [[ ${APPLICATION} == "nginx" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/nginx/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}   --async
 [[ ${APPLICATION} == "whereami" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/whereami/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
-[[ ${APPLICATION} == "shop" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/shop/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
+[[ ${APPLICATION} == "shop"  && DESTROY != "true"]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/shop/ci.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
+[[ ${APPLICATION} == "shop"  && DESTROY == "true"]] && echo -e "\e[95mStarting to destroy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=examples/shop/ci-destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_SHORT_SHA=${SHORT_SHA}  --async
+
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

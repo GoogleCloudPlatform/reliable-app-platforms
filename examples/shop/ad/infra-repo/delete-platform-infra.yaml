@@ -14,16 +14,17 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-delete-cicd-shop-currency
+  - infra-delete-cicd-shop-ad
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
-  _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "APZ"
-  _ZONE_INDEX: "[0,1]"
-  _REGION_INDEX: "[1]"
-  _SERVICE: "currency"
   _APP_NAME: "shop"
+  _SERVICE: "ad"
+  _PIPELINE_LOCATION: "us-central1"
+  _ARCHETYPE: "SZ"
+  _ZONE_INDEX: "[4]"
+  _REGION_INDEX: "[]"
+
 steps:
   - name: "hashicorp/terraform:1.8.2"
     id: "delete-infra"

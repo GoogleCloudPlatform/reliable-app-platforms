@@ -22,8 +22,9 @@ substitutions:
   _ARCHETYPE: "APZ"
   _ZONE_INDEX: "[0,1]"
   _REGION_INDEX: "[1]"
-  _SERVICE: "currency"
   _APP_NAME: "shop"
+  _SERVICE: "currency"
+
 steps:
   - name: "hashicorp/terraform:1.8.2"
     id: "delete-infra"

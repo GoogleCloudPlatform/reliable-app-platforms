@@ -14,28 +14,22 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-delete-cicd-shop-currency
+  - infra-delete-slos-shop-ad
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
-  _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "APZ"
-  _ZONE_INDEX: "[0,1]"
-  _REGION_INDEX: "[1]"
-  _SERVICE: "currency"
   _APP_NAME: "shop"
+  _SERVICE: "ad"
+
 steps:
   - name: "hashicorp/terraform:1.8.2"
-    id: "delete-infra"
+    id: "delete-slos"
     entrypoint: "sh"
-    dir: "./infra-repo/terraform/platform-infra"
+    dir: "./infra-repo/terraform/slos"
     args:
       - "-xe"
       - "-c"
       - |
         [[ "${_BUILD}" == "false" ]] && exit 0
         terraform init -backend-config="bucket=${_PROJECT_ID}"
-        terraform delete -var="project_id=${_PROJECT_ID}" \
-        -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}" -var="archetype=${_ARCHETYPE}" \
-        -var="zone_index=${_ZONE_INDEX}" -var="region_index=${_REGION_INDEX}" -var="pipeline_location=${_PIPELINE_LOCATION}" \
-        --auto-approve
+        terraform destroy -var="project_id=${_PROJECT_ID}" -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}"  --auto-approve

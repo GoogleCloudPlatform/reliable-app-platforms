@@ -14,7 +14,7 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-cicd-shop-currency
+  - infra-cicd-shop-cart
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"

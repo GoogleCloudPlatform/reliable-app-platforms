@@ -14,16 +14,17 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-delete-cicd-shop-currency
+  - infra-delete-cicd-shop-productcatalog
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
-  _PIPELINE_LOCATION: "us-central1"
-  _ARCHETYPE: "APZ"
-  _ZONE_INDEX: "[0,1]"
-  _REGION_INDEX: "[1]"
-  _SERVICE: "currency"
   _APP_NAME: "shop"
+  _SERVICE: "productcatalog"
+  _PIPELINE_LOCATION: "us-central1"
+  _ARCHETYPE: "APR"
+  _ZONE_INDEX: "[]"
+  _REGION_INDEX: "[0,1]"
+
 steps:
   - name: "hashicorp/terraform:1.8.2"
     id: "delete-infra"
@@ -35,7 +36,7 @@ steps:
       - |
         [[ "${_BUILD}" == "false" ]] && exit 0
         terraform init -backend-config="bucket=${_PROJECT_ID}"
-        terraform delete -var="project_id=${_PROJECT_ID}" \
+        terraform destroy -var="project_id=${_PROJECT_ID}" \
         -var="service_name=${_SERVICE}" -var="app_name=${_APP_NAME}" -var="archetype=${_ARCHETYPE}" \
         -var="zone_index=${_ZONE_INDEX}" -var="region_index=${_REGION_INDEX}" -var="pipeline_location=${_PIPELINE_LOCATION}" \
         --auto-approve

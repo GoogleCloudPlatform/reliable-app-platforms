@@ -1,0 +1,122 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 14400s # 2hr
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _CART: "true"
+  _AD: "true"
+  _CURRENCY: "true"
+  _EMAIL: "true"
+  _CATALOG: "true"
+  _SHIPPING: "true"
+  _PAYMENT: "true"
+  _RECOMMENDATIONS: "true"
+  _CHECKOUT: "true"
+  _FRONTEND: "true"
+
+tags:
+  - destroy-shop
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "shop-frontend-destroy"
+    dir: ./examples/shop/frontend
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_FRONTEND}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="frontend",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "cart-destroy"
+    entrypoint: bash
+    dir: ./examples/shop/cart
+    args:
+      - -c
+      - |
+        [[ "${_CART}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="cart",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "ad-destroy"
+    entrypoint: bash
+    dir: ./examples/shop/ad
+    args:
+      - -c
+      - |
+        [[ "${_AD}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="ad",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "currency-destroy"
+    entrypoint: bash
+    dir: ./examples/shop/currency
+    args:
+      - -c
+      - |
+        [[ "${_CURRENCY}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="currency",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "email-destroy"
+    dir: ./examples/shop/email
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_EMAIL}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="email",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "catalog-destroy"
+    dir: ./examples/shop/productcatalog
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CATALOG}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="productcatalog",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "shipping-destroy"
+    dir: ./examples/shop/shipping
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_SHIPPING}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="shipping",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "payment-destroy"
+    dir: ./examples/shop/payment
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_PAYMENT}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="payment",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "recommendations-destroy"
+    dir: ./examples/shop/recommendations
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_RECOMMENDATIONS}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="recommendations",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "checkout-destroy"
+    dir: ./examples/shop/checkout
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        [[ "${_CHECKOUT}" == "false" ]] && exit 0
+        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="checkout",_SLO=true,_BUILD=true,_APP=true,_INFRA=true
+ 

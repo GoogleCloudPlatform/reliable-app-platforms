@@ -44,6 +44,7 @@ resource "google_compute_backend_service" "default" {
       group = data.google_compute_network_endpoint_group.backend_negs[backend.key].id
       balancing_mode = "RATE"
       max_rate_per_endpoint = 100
+      description = format("Kubernetes service %s/%s", backend.value.service_obj.metadata[0].namespace, backend.value.service_obj.metadata[0].name)
     }
   }
 }
@@ -78,4 +79,8 @@ resource "google_compute_global_forwarding_rule" "default" {
 
 output "loadbalancer_url" {
   value = "http://${google_compute_global_forwarding_rule.default.ip_address}/"
+}
+
+output "backends" {
+  value = {for be in google_compute_backend_service.default.backend: be.group => be.description}
 }

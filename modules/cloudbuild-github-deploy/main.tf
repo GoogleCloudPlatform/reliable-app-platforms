@@ -101,55 +101,14 @@ resource "google_cloudbuild_trigger" "deploy" {
   webhook_config {
     secret = google_secret_manager_secret_version.wh_secv.id
   }
-  build {
-    step {
-      id         = "clone-repo"
-      name       = "gcr.io/cloud-builders/git"
-      entrypoint = "sh"
-      args = [
-        "-c",
-        <<-EOF
-      git clone https://$$GITHUB_USER:$$GITHUB_TOKEN@github.com/${var.github_repo}
-      cd ${local.repo_name}
-  EOF
-      ]
-      secret_env = [
-        "GITHUB_USER",
-        "GITHUB_TOKEN",
-      ]
-    }
-    step {
-      name       = "hashicorp/terraform:1.8.2"
-      id         = "build"
-      entrypoint = "sh"
-      args = [
-        "-c", "make build"
-      ]
-
-    }
-    step {
-      name       = "hashicorp/terraform:1.8.2"
-      id         = "deploy"
-      entrypoint = "sh"
-      args = [
-        "-c", "make deploy"
-      ]
-
-    }
-    available_secrets {
-      secret_manager {
-        version_name = google_secret_manager_secret_version.github_user.id
-        env = "GITHUB_USER"
-      }
-      secret_manager {
-        version_name = google_secret_manager_secret_version.github_token.id
-        env = "GITHUB_TOKEN"
-      }
-    }
-
+  source_to_build {
+    uri = "https://github.com/${var.github_repo}"
+    ref = "refs/heads/main"
+    repo_type = "GITHUB"
   }
+  filename = "cloudbuild/build-deploy.yaml"
+
   substitutions = {
-    # _REF        = "${"$"}(body.ref)"
     _PROJECT_ID = var.project_id
     _APP_NAME   = var.app_name
   }

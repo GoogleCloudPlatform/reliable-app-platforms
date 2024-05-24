@@ -8,8 +8,8 @@ variable "github_repo" {
 
 variable "github_token" {
   description = "GitHub user access token."
-  sensitive = true
-  default = ""
+  sensitive   = true
+  default     = ""
 }
 
 variable "project_id" {
@@ -18,5 +18,5 @@ variable "project_id" {
 
 variable "cloudbuild_file" {
   description = "relative path from repo root to a cloudbuild.yaml file to run on push to main"
-  default = "cloudbuild.yaml"
+  default     = "cloudbuild.yaml"
 }

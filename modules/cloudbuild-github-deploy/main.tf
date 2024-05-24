@@ -29,9 +29,9 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
-locals{
-  repo_owner = split("/",var.github_repo)[0]
-  repo_name = split("/",var.github_repo)[1]
+locals {
+  repo_owner = split("/", var.github_repo)[0]
+  repo_name  = split("/", var.github_repo)[1]
 }
 
 resource "random_password" "pass_webhook" {
@@ -43,13 +43,13 @@ resource "google_secret_manager_secret" "gh_webhook" {
   project   = var.project_id
   secret_id = "${var.app_name}-github-webhook-secret"
   replication {
-    auto{}
+    auto {}
   }
 }
 
 resource "google_secret_manager_secret_version" "wh_secv" {
   secret      = google_secret_manager_secret.gh_webhook.id
-  secret_data = "${random_password.pass_webhook.result}"
+  secret_data = random_password.pass_webhook.result
 }
 
 data "google_iam_policy" "wh-secv-access" {
@@ -75,8 +75,8 @@ resource "google_cloudbuild_trigger" "deploy" {
     secret = google_secret_manager_secret_version.wh_secv.id
   }
   source_to_build {
-    uri = "https://github.com/${var.github_repo}"
-    ref = "refs/heads/main"
+    uri       = "https://github.com/${var.github_repo}"
+    ref       = "refs/heads/main"
     repo_type = "GITHUB"
   }
   filename = "cloudbuild/build-deploy.yaml"
@@ -87,7 +87,7 @@ resource "google_cloudbuild_trigger" "deploy" {
     _APP_NAME   = var.app_name
   }
   # filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
-  depends_on      = [google_secret_manager_secret_version.wh_secv]
+  depends_on = [google_secret_manager_secret_version.wh_secv]
 
 
 }
@@ -110,7 +110,7 @@ resource "github_repository_webhook" "gh_webhook" {
     url          = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/triggers/${google_cloudbuild_trigger.deploy.name}:webhook?key=${google_apikeys_key.api_key.key_string}&secret=${random_password.pass_webhook.result}"
     content_type = "json"
     insecure_ssl = false
-    secret = random_password.pass_webhook.result
+    secret       = random_password.pass_webhook.result
   }
   active     = true
   events     = ["push"]

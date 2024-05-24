@@ -241,3 +241,8 @@ This destroys the app infrastructure and the deployment pipelines. This doesn't 
 kubectl delete all --all -n <namespace>
 kubectl delete ns <namespace>
 ```
+After destroying the infrastructure of all the applications running on platform you can destroy the platform by running the following command:
+
+```sh
+./build.sh --destroy
+```

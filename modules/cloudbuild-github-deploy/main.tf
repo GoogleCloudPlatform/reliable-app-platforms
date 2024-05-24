@@ -1,3 +1,14 @@
+/**
+ * Module `cloudbuild-github-deploy`
+ *
+ * This module creates Cloud Build triggers to run when the provided github repo
+ * is updated.
+ *
+ * It handles the complexity of connecting cloud build and github together.
+ *
+ * TODO: enable secretmanager api.
+ */
+
 /*
  * Copyright 2024 Google LLC
  *
@@ -14,16 +25,6 @@
  * limitations under the License.
  */
 
-/**
- * Module `cloudbuild-github-deploy`
- * 
- * This module creates Cloud Build triggers to run when the provided github repo
- * is updated.
- *
- * It handles the complexity of connecting cloud build and github together.
- *
- * TODO: enable secretmanager api.
- */
 data "google_project" "project" {
   project_id = var.project_id
 }
@@ -36,34 +37,6 @@ locals{
 resource "random_password" "pass_webhook" {
   length  = 16
   special = false
-}
-
-// secret to store github user for reading github repo
-// TODO: github creds should be managed at platform level, not app.
-resource "google_secret_manager_secret" "github_user" {
-  project   = var.project_id
-  secret_id = "${var.app_name}-github-user"
-  replication {
-    auto{}
-  }
-}
-
-resource "google_secret_manager_secret_version" "github_user" {
-  secret      = google_secret_manager_secret.github_user.id
-  secret_data = var.github_user
-}
-
-resource "google_secret_manager_secret" "github_token" {
-  project   = var.project_id
-  secret_id = "${var.app_name}-github-token"
-  replication {
-    auto{}
-  }
-}
-
-resource "google_secret_manager_secret_version" "github_token" {
-  secret      = google_secret_manager_secret.github_token.id
-  secret_data = var.github_token
 }
 
 resource "google_secret_manager_secret" "gh_webhook" {
@@ -109,6 +82,7 @@ resource "google_cloudbuild_trigger" "deploy" {
   filename = "cloudbuild/build-deploy.yaml"
 
   substitutions = {
+    # TODO: plumb this through to the $PROJECT_ID env var at build time.
     _PROJECT_ID = var.project_id
     _APP_NAME   = var.app_name
   }

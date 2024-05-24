@@ -230,3 +230,14 @@ This module creates 2 SLOs per service deployed.
 1. A latency SLO with alerting policies. 
 1. An availability SLO with alerting policies. 
 
+### Cleanup
+To destroy the application infrastructure run
+
+```sh
+./deploy.sh --destroy --app <app-name>
+```
+This destroys the app infrastructure and the deployment pipelines. This doesn't remove the application resources on the clusters. At this point of time, that needs to be done manually by running this command for all the app namespaces in all of the clusters.
+```sh
+kubectl delete all --all -n <namespace>
+kubectl delete ns <namespace>
+```

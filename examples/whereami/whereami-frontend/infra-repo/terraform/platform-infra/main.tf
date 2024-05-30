@@ -1,5 +1,5 @@
 module "deploy-pipeline"{
-    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/deploy-pipeline?ref=tf"
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/deploy-pipeline"
     project_id = var.project_id
     service_name = var.service_name
     pipeline_location = var.pipeline_location
@@ -9,7 +9,7 @@ module "deploy-pipeline"{
 }
 
 module "endpoint" {
-    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/endpoints?ref=tf"
+    source = "git::https://github.com/GoogleCloudPlatform/reliable-app-platforms.git//modules/endpoints"
     project_id = var.project_id
     service_name = "${var.app_name}"
 }

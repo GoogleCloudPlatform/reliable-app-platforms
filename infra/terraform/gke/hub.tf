@@ -21,7 +21,7 @@ locals{
 module "fleet-hub" {
   for_each        = {for i,v in local.all-clusters: i=>v}
   source          = "terraform-google-modules/kubernetes-engine/google//modules/fleet-membership"
-  version         = "30.2.0"
+  version         = "31.0.0"
   project_id      = var.project_id
   location        = each.value.region
   cluster_name    = each.value.name

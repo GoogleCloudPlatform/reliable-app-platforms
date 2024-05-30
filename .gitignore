@@ -39,7 +39,3 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-
-# ignore checksums
-cli/rapctl/go.sum
-go.work.sum

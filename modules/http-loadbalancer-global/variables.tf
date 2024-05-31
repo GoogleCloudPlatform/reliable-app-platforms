@@ -13,7 +13,7 @@
 # limitations under the License.
 
 variable "lb_name" {
-  type = string
+  type        = string
   description = "name prefix for generated loadbalancer objects"
 }
 

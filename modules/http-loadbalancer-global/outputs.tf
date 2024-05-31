@@ -17,5 +17,5 @@ output "loadbalancer_url" {
 }
 
 output "backends" {
-  value = {for be in google_compute_backend_service.default.backend: be.group => be.description}
+  value = { for be in google_compute_backend_service.default.backend : be.group => be.description }
 }

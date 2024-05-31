@@ -29,15 +29,15 @@ resource "terraform_data" "neg-helpers" {
   input = {
     svc_port = tostring(each.value.service_obj.spec.0.port.0.port)
     negnotes = jsondecode(each.value.service_obj.metadata[0].annotations["cloud.google.com/neg-status"])
-    negname = jsondecode(each.value.service_obj.metadata[0].annotations["cloud.google.com/neg-status"])["network_endpoint_groups"][tostring(each.value.service_obj.spec.0.port.0.port)]
+    negname  = jsondecode(each.value.service_obj.metadata[0].annotations["cloud.google.com/neg-status"])["network_endpoint_groups"][tostring(each.value.service_obj.spec.0.port.0.port)]
     negzones = jsondecode(each.value.service_obj.metadata[0].annotations["cloud.google.com/neg-status"])["zones"]
   }
 }
 
 data "google_compute_network_endpoint_group" "backend_negs" {
   for_each = terraform_data.neg-helpers
-  name = each.value.output.negname
-  zone = each.value.output.negzones[0]
+  name     = each.value.output.negname
+  zone     = each.value.output.negzones[0]
 }
 
 resource "google_compute_backend_service" "default" {
@@ -52,22 +52,22 @@ resource "google_compute_backend_service" "default" {
   dynamic "backend" {
     for_each = var.backends
     content {
-      group = data.google_compute_network_endpoint_group.backend_negs[backend.key].id
-      balancing_mode = "RATE"
+      group                 = data.google_compute_network_endpoint_group.backend_negs[backend.key].id
+      balancing_mode        = "RATE"
       max_rate_per_endpoint = 100
       description = format("Kubernetes service %s/%s",
-          backend.value.service_obj.metadata[0].namespace,
-          backend.value.service_obj.metadata[0].name)
+        backend.value.service_obj.metadata[0].namespace,
+      backend.value.service_obj.metadata[0].name)
     }
   }
 }
 
 // Health check, using the serving port on the kubernetes service object.
 resource "google_compute_health_check" "default" {
-  name = "${var.lb_name}-healthcheck"
+  name               = "${var.lb_name}-healthcheck"
   check_interval_sec = 3
-  timeout_sec = 2
-  healthy_threshold = 1
+  timeout_sec        = 2
+  healthy_threshold  = 1
   http_health_check {
     port = 8080
   }

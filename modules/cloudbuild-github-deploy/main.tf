@@ -6,7 +6,6 @@
  *
  * It handles the complexity of connecting cloud build and github together.
  *
- * TODO: enable secretmanager api.
  */
 
 /*
@@ -26,12 +25,15 @@
  */
 
 data "google_project" "project" {
-  project_id = var.project_id
 }
 
 locals {
   repo_owner = split("/", var.github_repo)[0]
   repo_name  = split("/", var.github_repo)[1]
+}
+
+resource "google_project_service" "secretmgr" {
+  service = "secretmanager.googleapis.com"
 }
 
 resource "random_password" "pass_webhook" {
@@ -40,7 +42,6 @@ resource "random_password" "pass_webhook" {
 }
 
 resource "google_secret_manager_secret" "gh_webhook" {
-  project   = var.project_id
   secret_id = "${var.app_name}-github-webhook-secret"
   replication {
     auto {}
@@ -62,7 +63,6 @@ data "google_iam_policy" "wh-secv-access" {
 }
 
 resource "google_secret_manager_secret_iam_policy" "policy" {
-  project     = var.project_id
   secret_id   = google_secret_manager_secret.gh_webhook.id
   policy_data = data.google_iam_policy.wh-secv-access.policy_data
 }
@@ -83,7 +83,7 @@ resource "google_cloudbuild_trigger" "deploy" {
 
   substitutions = {
     # TODO: plumb this through to the $PROJECT_ID env var at build time.
-    _PROJECT_ID = var.project_id
+    _PROJECT_ID = data.google_project.project.project_id
     _APP_NAME   = var.app_name
   }
   # filter          = "(!_COMMIT_MSG.matches('IGNORE'))"

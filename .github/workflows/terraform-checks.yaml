@@ -11,11 +11,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform init
-      - run: terraform fmt --check --recursive
       - run: go install github.com/terraform-docs/terraform-docs@v0.18.0
-      - run: make update-tf-docs
-      - name: helpful error
-        if: ${{ failure() }}
-        run: echo "::error::Some lint checks failed. Try running `make lint` to resolve."
+      - run: make lint
+      - name: diff check
+        run: |
+          if [ -n $(git status --porcelain) ]; then
+            echo "::error::Lint checks modified the following files. Run `make lint` to resolve."
+            git status
+            exit 1
+          fi
 

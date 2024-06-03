@@ -43,10 +43,6 @@ It handles the complexity of connecting cloud build and github together.
 | <a name="provider_google"></a> [google](#provider\_google) | 5.30.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.6.2 |
 
-## Modules
-
-No modules.
-
 ## Resources
 
 | Name | Type |
@@ -61,6 +57,7 @@ No modules.
 | [random_password.pass_webhook](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [google_iam_policy.wh-secv-access](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iam_policy) | data source |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
+| [google_secret_manager_secret_version.gh_access](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/secret_manager_secret_version) | data source |
 
 ## Inputs
 
@@ -71,6 +68,7 @@ No modules.
 | <a name="input_github_repo"></a> [github\_repo](#input\_github\_repo) | github repository as $owner/$repo\_name | `any` | n/a | yes |
 | <a name="input_github_token"></a> [github\_token](#input\_github\_token) | GitHub user access token. | `string` | `""` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID to use for Cloud Build execution | `any` | n/a | yes |
+| <a name="input_token_secret"></a> [token\_secret](#input\_token\_secret) | secret manager secret to use instead of github\_token | `string` | `""` | no |
 
 ## Outputs
 

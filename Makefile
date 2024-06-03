@@ -16,3 +16,4 @@ update-tf-docs:
 	terraform-docs markdown table modules/onboard-app --output-file README.md --hide modules,header
 	terraform-docs markdown table modules/slos --output-file README.md --hide modules
 	terraform-docs markdown table modules/http-loadbalancer-global --output-file README.md --hide modules
+	terraform-docs markdown table modules/cloudbuild-github-deploy --output-file README.md --hide modules

@@ -28,7 +28,7 @@ variable "github_token" {
 
 variable "token_secret" {
   description = "secret manager secret to use instead of github_token"
-  default = ""
+  default     = ""
 }
 
 variable "project_id" {

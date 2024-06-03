@@ -37,8 +37,8 @@ locals {
 }
 
 resource "google_project_service" "required_apis" {
-  for_each = toset([ "secretmanager", "apikeys" ])
-  service = "${each.value}.googleapis.com"
+  for_each = toset(["secretmanager", "apikeys"])
+  service  = "${each.value}.googleapis.com"
 }
 
 resource "random_password" "pass_webhook" {
@@ -106,7 +106,7 @@ resource "google_apikeys_key" "api_key" {
       service = "cloudbuild.googleapis.com"
     }
   }
-  depends_on = [ "google_project_service.required_apis" ]
+  depends_on = [google_project_service.required_apis]
 }
 
 resource "github_repository_webhook" "gh_webhook" {

@@ -24,13 +24,11 @@ variable "github_token" {
   description = "GitHub user access token."
   sensitive   = true
   default     = ""
-  required = false
 }
 
 variable "token_secret" {
   description = "secret manager secret to use instead of github_token"
   default = ""
-  required = false
 }
 
 variable "project_id" {

@@ -36,8 +36,9 @@ locals {
   repo_name  = split("/", var.github_repo)[1]
 }
 
-resource "google_project_service" "secretmgr" {
-  service = "secretmanager.googleapis.com"
+resource "google_project_service" "required_apis" {
+  for_each = toset([ "secretmanager", "apikeys" ])
+  service = "${each.value}.googleapis.com"
 }
 
 resource "random_password" "pass_webhook" {

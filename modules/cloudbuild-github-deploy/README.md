@@ -50,7 +50,7 @@ It handles the complexity of connecting cloud build and github together.
 | [github_repository_webhook.gh_webhook](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_webhook) | resource |
 | [google_apikeys_key.api_key](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apikeys_key) | resource |
 | [google_cloudbuild_trigger.deploy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuild_trigger) | resource |
-| [google_project_service.secretmgr](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
 | [google_secret_manager_secret.gh_webhook](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
 | [google_secret_manager_secret_iam_policy.policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_policy) | resource |
 | [google_secret_manager_secret_version.wh_secv](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_version) | resource |

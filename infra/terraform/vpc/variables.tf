@@ -4,7 +4,7 @@ variable "project_id" {
 
 variable "network_name" {
   description = "VPC name"
-  default = "vpc"
+  default     = "vpc"
 }
 
 variable "fleets" {
@@ -61,11 +61,11 @@ variable "gke_config" {
     name    = "gke-config"
     region  = "us-central1"
     zone    = "us-central1-f" #TODO: This one is unused. 
-    env     = "config" #TODO: This one is unused. 
-    network = "vpc-prod" #TODO: This one is unused. 
+    env     = "config"        #TODO: This one is unused. 
+    network = "vpc-prod"      #TODO: This one is unused. 
     subnet = {
       name               = "us-central1-config"
-      ip_range           = "10.10.0.0/20" 
+      ip_range           = "10.10.0.0/20"
       ip_range_pods_name = "us-central1-config-pods"
       ip_range_pods      = "10.11.0.0/18"
       ip_range_svcs_name = "us-central1-config-svcs"

@@ -1,5 +1,5 @@
-locals{
-  fleet-clusters =   [
+locals {
+  fleet-clusters = [
     for cluster in module.gke : {
       name   = cluster.name
       id     = cluster.cluster_id
@@ -13,13 +13,13 @@ locals{
     region = module.gke-config-cluster.region
     zones  = module.gke-config-cluster.zones
   }]
- 
- all-clusters = concat(local.fleet-clusters, local.config-clusters)
+
+  all-clusters = concat(local.fleet-clusters, local.config-clusters)
 
 }
 
 module "fleet-hub" {
-  for_each        = {for i,v in local.all-clusters: i=>v}
+  for_each        = { for i, v in local.all-clusters : i => v }
   source          = "terraform-google-modules/kubernetes-engine/google//modules/fleet-membership"
   version         = "30.2.0"
   project_id      = var.project_id

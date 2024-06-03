@@ -7,5 +7,5 @@ output "endpoints" {
 }
 
 output "ip" {
-  value = local.gclb_ip_address 
+  value = local.gclb_ip_address
 }

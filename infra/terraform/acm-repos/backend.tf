@@ -2,6 +2,6 @@
 
 terraform {
   backend "gcs" {
-    prefix="tfstate/source-repos"
+    prefix = "tfstate/source-repos"
   }
 }

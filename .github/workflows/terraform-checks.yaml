@@ -16,7 +16,7 @@ jobs:
       - name: diff check
         run: |
           if [ -n "$(git status --porcelain)" ]; then
-            echo "::error::Lint checks modified the following files. Run `make lint` to resolve."
+            echo "::error::Lint checks modified the following files. Run 'make lint' to resolve."
             git status
             exit 1
           fi

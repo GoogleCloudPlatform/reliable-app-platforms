@@ -31,5 +31,5 @@ terraform {
 
 provider "github" {
   owner = local.repo_owner
-  token = coalesce(var.github_token, data.google_secret_manager_secret_version.gh_access.secret_data)
+  token = coalesce(var.github_token, chomp(data.google_secret_manager_secret_version.gh_access.secret_data))
 }

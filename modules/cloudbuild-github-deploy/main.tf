@@ -27,6 +27,10 @@
 data "google_project" "project" {
 }
 
+data "google_secret_manager_secret_version" "gh_access" {
+  secret = var.token_secret
+}
+
 locals {
   repo_owner = split("/", var.github_repo)[0]
   repo_name  = split("/", var.github_repo)[1]

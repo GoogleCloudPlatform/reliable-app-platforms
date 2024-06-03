@@ -4,11 +4,18 @@ on:
     branches:
       - main
 jobs:
-  build:
+  tf-format:
     name: Format Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
       - uses: hashicorp/setup-terraform@v3
       - run: terraform init
       - run: terraform fmt --check --recursive
+      - run: go install github.com/terraform-docs/terraform-docs@v0.18.0
+      - run: make update-tf-docs
+      - name: helpful error
+        if: ${{ failure() }}
+        run: echo "::error::Some lint checks failed. Try running `make lint` to resolve."
+

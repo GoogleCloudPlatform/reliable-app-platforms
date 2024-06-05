@@ -14,12 +14,12 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-cicd-shop-frontend
+  - infra-cicd-shop-recommendations
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"
   _APP_NAME: "shop"
-  _SERVICE: "shipping"
+  _SERVICE: "recommendations"
   _PIPELINE_LOCATION: "us-central1"
   _ARCHETYPE: "SZ"
   _ZONE_INDEX: "[2]"

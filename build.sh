@@ -38,8 +38,7 @@ terraform_destroy()
 
 # Setting default value
 unset DESTROY
-BUILD=terraform
-
+unset KUBE_VERSION
 # Define bash args
 while [ "$1" != "" ]; do
     case $1 in
@@ -48,6 +47,11 @@ while [ "$1" != "" ]; do
                                 ;;
         --help | -h )           usage
                                 exit
+                                ;;
+        --k8s)                  shift
+                                KUBE_VERSION=$1
+                                ;;
+        
     esac
     shift
 done
@@ -68,9 +72,9 @@ export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format 'value(p
 gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/owner
 
 # Start main build
-[[ "${DESTROY}" != "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to CREATE infrastructure using ${BUILD}...\e[0m"
-[[ "${DESTROY}" == "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to DELETE infrastructure using ${BUILD}...\e[0m"
+[[ "${DESTROY}" != "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to CREATE infrastructure using terraform...\e[0m"
+[[ "${DESTROY}" == "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to DELETE infrastructure using terraform...\e[0m"
 
-[[ "${BUILD}" == "terraform" ]] && [[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_terraform.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
-[[ "${BUILD}" == "terraform" ]] && [[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
+[[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_terraform.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_KUBE_VERSION=${K8SVERSION} --async
+[[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

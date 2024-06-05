@@ -39,9 +39,9 @@ It handles the complexity of connecting cloud build and github together.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_github"></a> [github](#provider\_github) | 6.2.1 |
-| <a name="provider_google"></a> [google](#provider\_google) | 5.30.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.6.2 |
+| <a name="provider_github"></a> [github](#provider\_github) | >= 6.2.1 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.27 |
+| <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
 ## Resources
 

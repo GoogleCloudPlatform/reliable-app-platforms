@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: frontendservice
-  newName: us-central1-docker.pkg.dev/arch001/shop-frontend/service
+  newName: us-central1-docker.pkg.dev/<project-id>/shop-frontend/service
   newTag: latest

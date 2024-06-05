@@ -1,6 +1,5 @@
 # Reliable App Platforms - on GCP
 
-
 _Last tested on 04/30/2024 by @stevemcghee
 
 Watch the video of our talk from Google Cloud Next 2024: https://youtu.be/FkIqA9Pt7Hc
@@ -45,11 +44,21 @@ Also explained here: <https://cloud.google.com/architecture/deployment-archetype
    export GITHUB_EMAIL=<user@example.com>
    ```
 1. Set the k8s version for your GKE cluster. 
-   Go to build/terraform/infra-create-gke.yaml. Select an approriate version from [this](https://cloud.google.com/kubernetes-engine/docs/release-notes) page and set it as the *_KUBE_VERSION* variable.
+   Go to build/terraform/infra-create-gke.yaml. Select an approriate version from [this](https://cloud.google.com/kubernetes-engine/docs/release-notes) page and pass it along to the startup script.
+   If you want to customize the regions and zones you are deploying your infrastructure to, or the subnet ranges used in the cluster, perform the next step. Otherwise jump straight ahead to the kicking off the build with terraform. 
+
+### Customize the platform infrastructure.
+To deploy the platform infrastructure, you change some of the default values for the infrastructure deployment to suit the needs of your environment.
+1. infra/terraform/vpc/variables.tf:
+   1. The variable "fleets" defines the GKE subnet locations, name-prefixes, subnet cidrs. These values can be changed to suit your needs. The 6 GKE workload clusters will later be deployed in this vpc using the subnets created by this module.
+   1. The variable "gke_config" defines the GKE subnet locations, name, subnet cidrs for the config cluster(s). These values can be changed to suit your needs. The GKE config cluster will later be deployed in this vpc using the subnets created by this module.
+
+### Kick off the build with terraform
+
 1. Kick off build with terraform
 
    ```bash
-   ./build.sh
+   ./build.sh --k8s <k8s_version>
    ```
 
 1. View build in the Console.
@@ -60,14 +69,7 @@ Also explained here: <https://cloud.google.com/architecture/deployment-archetype
 
    > This step can take 20-30 minutes to complete.
 
-### Deploy the platform infrastructure.
-To deploy the platform infrastructure, you change some of the default values for the infrastructure deployment to suit the needs of your environment.
-1. infra/terraform/vpc/variables.tf:
-   1. The variable "fleets" defines the GKE subnet locations, name-prefixes, subnet cidrs. These values can be changed to suit your needs. The 6 GKE workload clusters will later be deployed in this vpc using the subnets created by this module.
-   1. The variable "gke_config" defines the GKE subnet locations, name, subnet cidrs for the config clusters. These values can be changed to suit your needs. The GKE config cluster will later be deployed in this vpc using the subnets created by this module.
 
-1. infra/terraform/gke/variables.tf: 
-   1. The variable *kubernetes_version* is fixed at *1.28.5-gke.1217000*. This is the version that the repo is tested at. You can change this hard-coded version, but do not use *latest* as a value. This is because the clusters will be torn down and re-created by terraform if the *latest* version changes. 
 
 ### Deploy an application to the platform
 This repo assumes that your application is made up of 1 or more services that may be owned by multiple teams.
@@ -131,7 +133,7 @@ spec:
    hosts:
    - "nginxservice.endpoints.$PROJECT_ID.cloud.goog"
 ```
-
+Run the nginx deploy pipeline:
    ```bash
    
    cd $HOME
@@ -161,14 +163,37 @@ spec:
    hosts:
    - "whereami.endpoints.$PROJECT_ID.cloud.goog"
 ```
+Run the whereami deploy pipeline:
 
 ```bash
    
    cd $HOME
    ./deploy.sh --app whereami
    ```
-   This will kick of a script that first creates the necessary infrastructure for the two services using terraform. 
+   This will kick of a script that first creates the necessary infrastructure for the two services using terraform and deploy the services using cloud-deploy.
    The whereami frontend will be reachable at *http://whereami.endpoints.${PROJECT_ID}.cloud.goog/*
+
+### Deploy `shop`.
+
+The **shop** application is a 10-service application. Each service in the application may use a different archetype. In this example, by default the *frontend* uses the *Global* archetype. You can change the archetypes of all the 10 services by editing the */examples/shop/ci.yaml* file.
+
+**NOTE**:
+1. Make sure you update the virtual service file found in */examples/shop/frontend/app-repo/k8s/base/vs.yaml* to point to the endpoint for your application's frontend.
+```
+spec:
+   hosts:
+   - "shop-frontend.endpoints.$PROJECT_ID.cloud.goog"
+```
+2. Since the shop ci pipeline builds and pushes the container images for all the services into the artifact registry in this project, you will need to update the registry address for all the services in shop. You can do this by editing the */examples/shop/SERVICE-NAME/app-repo/k8s/overlays/workload-clusters/kustomization.yaml* file. Replace the **PROJECT_ID** in *newName: us-central1-docker.pkg.dev/PROJECT_ID/shop-frontend/service* with the appropriate value.
+
+Run the shop deploy pipeline:
+```bash
+   
+   cd $HOME
+   ./deploy.sh --app shop
+   ```
+   This will kick of a script that first creates the necessary infrastructure for the services using terraform and  deploy the services using cloud-deploy. This can take about 20-30 minutes to complete.
+   The shop frontend will be reachable at *http://shop-frontend.endpoints.${PROJECT_ID}.cloud.goog/*
    
 ## Deploy an example application from an external repo
 
@@ -205,3 +230,19 @@ This module creates 2 SLOs per service deployed.
 1. A latency SLO with alerting policies. 
 1. An availability SLO with alerting policies. 
 
+### Cleanup
+To destroy the application infrastructure run
+
+```sh
+./deploy.sh --destroy --app <app-name>
+```
+This destroys the app infrastructure and the deployment pipelines. This doesn't remove the application resources on the clusters. At this point of time, that needs to be done manually by running this command for all the app namespaces in all of the clusters.
+```sh
+kubectl delete all --all -n <namespace>
+kubectl delete ns <namespace>
+```
+After destroying the infrastructure of all the applications running on platform you can destroy the platform by running the following command:
+
+```sh
+./build.sh --destroy
+```

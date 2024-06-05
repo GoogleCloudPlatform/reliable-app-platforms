@@ -17,7 +17,7 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _INFRA: "true"
   _DEPLOY_APP: "true"
-  _CREATE_SLO: "false"
+  _CREATE_SLO: "true"
 
 tags:
   - infra-main-terraform

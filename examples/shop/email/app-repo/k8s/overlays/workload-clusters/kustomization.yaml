@@ -18,5 +18,5 @@ patches:
     kind: Service
 images:
 - name: emailservice
-  newName: us-central1-docker.pkg.dev/arch001/shop-email/service
+  newName: us-central1-docker.pkg.dev/<project-id>/shop-email/service
   newTag: latest

@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: adservice
-  newName: us-central1-docker.pkg.dev/arch001/shop-ad/service
+  newName: us-central1-docker.pkg.dev/<project-id>/shop-ad/service
   newTag: latest

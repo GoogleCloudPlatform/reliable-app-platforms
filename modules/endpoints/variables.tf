@@ -4,5 +4,5 @@ variable "project_id" {
 
 variable "service_name" {
   description = "Service name"
-  default = "Unnamed"
+  default     = "Unnamed"
 }

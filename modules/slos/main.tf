@@ -31,7 +31,7 @@ module "slo_latency" {
     method            = "latency"
     latency_threshold = "${var.latency_threshold}s"
   }
-  depends_on = [ google_monitoring_service.service ]
+  depends_on = [google_monitoring_service.service]
 }
 
 
@@ -61,7 +61,7 @@ module "slo_availability" {
     type            = "basic_sli"
     method          = "availability"
   }
-    depends_on = [ google_monitoring_service.service ]
+  depends_on = [google_monitoring_service.service]
 }
 
 

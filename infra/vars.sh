@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# KCC
-export KCC_REGION=us-central1
+
 # Prod clusters
 export GKE_PROD_REGION_1=us-central1
 export GKE_PROD_REGION_2=us-west2

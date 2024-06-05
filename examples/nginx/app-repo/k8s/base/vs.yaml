@@ -5,7 +5,7 @@ metadata:
     namespace: nginx
 spec:
     hosts:
-    - "nginxservice.endpoints.<project-id>.cloud.goog"
+    - "nginxservice.endpoints.<project_id>.cloud.goog"
     gateways:
     - asm-ingress-gw/asm-ingressgateway
     http:

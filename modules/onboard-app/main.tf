@@ -18,8 +18,8 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
-locals{
-  repo_name = split("/",github_repository.infra_repo.full_name)[1]
+locals {
+  repo_name = split("/", github_repository.infra_repo.full_name)[1]
 }
 
 //Create infra repo
@@ -61,13 +61,13 @@ resource "google_secret_manager_secret" "wh_sec" {
   project   = var.project_id
   secret_id = "${var.app_name}-infra-webhook-secret"
   replication {
-    auto{}
+    auto {}
   }
 }
 
 resource "google_secret_manager_secret_version" "wh_secv" {
   secret      = google_secret_manager_secret.wh_sec.id
-  secret_data = "${random_password.pass_webhook.result}"
+  secret_data = random_password.pass_webhook.result
 }
 
 data "google_iam_policy" "wh-secv-access" {
@@ -107,11 +107,11 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
       secret_env = [
         "GITHUB_USER",
         "GITHUB_TOKEN",
-        "GITHUB_ORG"]
+      "GITHUB_ORG"]
     }
     step {
-      name       = "hashicorp/terraform:1.8.2"
-      id         = "create-app-infra"
+      name = "hashicorp/terraform:1.8.2"
+      id   = "create-app-infra"
       #dir        =  "terraform"
       entrypoint = "sh"
       args = [
@@ -135,39 +135,39 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
     available_secrets {
       secret_manager {
         version_name = "projects/${var.project_id}/secrets/github-user/versions/latest"
-        env = "GITHUB_USER"
+        env          = "GITHUB_USER"
       }
       secret_manager {
         version_name = "projects/${var.project_id}/secrets/github-token/versions/latest"
-        env = "GITHUB_TOKEN"
+        env          = "GITHUB_TOKEN"
       }
       secret_manager {
         version_name = "projects/${var.project_id}/secrets/github-org/versions/latest"
-        env = "GITHUB_ORG"
+        env          = "GITHUB_ORG"
       }
-//      secret_manager {
-//        version_name = "projects/${var.project_id}/secrets/github-email/versions/latest"
-//        env = "GITHUB_EMAIL"
-//      }
+      //      secret_manager {
+      //        version_name = "projects/${var.project_id}/secrets/github-email/versions/latest"
+      //        env = "GITHUB_EMAIL"
+      //      }
 
     }
 
   }
   substitutions = {
-    _REPO       = local.repo_name
-    _REF        = "${"$"}(body.ref)"
-    _COMMIT_MSG = "${"$"}(body.head_commit.message)"
-    _BUILD      = "true"
-    _PROJECT_ID = var.project_id
-    _APP_NAME   = var.app_name
-    _SERVICE    = var.app_name
+    _REPO              = local.repo_name
+    _REF               = "${"$"}(body.ref)"
+    _COMMIT_MSG        = "${"$"}(body.head_commit.message)"
+    _BUILD             = "true"
+    _PROJECT_ID        = var.project_id
+    _APP_NAME          = var.app_name
+    _SERVICE           = var.app_name
     _PIPELINE_LOCATION = "us-central1"
-    _ARCHETYPE = "APZ"
-    _ZONE_INDEX = "[0,1]"
-    _REGION_INDEX = "[0,1]"
+    _ARCHETYPE         = "APZ"
+    _ZONE_INDEX        = "[0,1]"
+    _REGION_INDEX      = "[0,1]"
   }
-  filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
-  depends_on      = [google_secret_manager_secret_version.wh_secv]
+  filter     = "(!_COMMIT_MSG.matches('IGNORE'))"
+  depends_on = [google_secret_manager_secret_version.wh_secv]
 
 
 }

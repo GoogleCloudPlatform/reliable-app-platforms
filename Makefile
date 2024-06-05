@@ -6,6 +6,8 @@
 # These are not standard makefile recipes, so treat them as phony.
 .-PHONY: *
 
+lint: tf-format update-tf-docs
+
 # Update the documentation embedded in the READMEs of the terraform modules
 # This uses the following tool: https://terraform-docs.io/user-guide/installation/
 # it can be installed with go install github.com/terraform-docs/terraform-docs@v0.17.0
@@ -15,3 +17,10 @@ update-tf-docs:
 	terraform-docs markdown table modules/endpoints --output-file README.md --hide modules
 	terraform-docs markdown table modules/onboard-app --output-file README.md --hide modules,header
 	terraform-docs markdown table modules/slos --output-file README.md --hide modules
+	terraform-docs markdown table modules/http-loadbalancer-global --output-file README.md --hide modules
+	terraform-docs markdown table modules/cloudbuild-github-deploy --output-file README.md --hide modules
+
+# Format all terraform directories
+tf-format:
+	terraform fmt --recursive ./modules
+	terraform fmt --recursive ./infra

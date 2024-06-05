@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: currencyservice
-  newName: us-central1-docker.pkg.dev/arch001/shop-currency/service
+  newName: us-central1-docker.pkg.dev/<project-id>/shop-currency/service
   newTag: latest

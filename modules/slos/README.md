@@ -27,7 +27,7 @@ more details
 |------|------|
 | [google_monitoring_alert_policy.availability_alert_policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/monitoring_alert_policy) | resource |
 | [google_monitoring_alert_policy.latency_alert_policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/monitoring_alert_policy) | resource |
-| [google_monitoring_istio_canonical_service.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/monitoring_istio_canonical_service) | data source |
+| [google_monitoring_service.service](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/monitoring_service) | resource |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
 ## Inputs

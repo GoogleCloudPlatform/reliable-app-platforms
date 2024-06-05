@@ -3,21 +3,21 @@ data "google_project" "project" {
 }
 
 resource "google_monitoring_service" "service" {
-  project = var.project_id
-  service_id = "${var.service_name}"
+  project      = var.project_id
+  service_id   = var.service_name
   display_name = var.service_name
 
   basic_service {
-          service_type = "ISTIO_CANONICAL_SERVICE"
-          service_labels = {
-            mesh_uid = "proj-${data.google_project.project.number}"
-            canonical_service_namespace = var.service_name 
-            canonical_service = var.service_name
-          }
-      }
+    service_type = "ISTIO_CANONICAL_SERVICE"
+    service_labels = {
+      mesh_uid                    = "proj-${data.google_project.project.number}"
+      canonical_service_namespace = var.service_name
+      canonical_service           = var.service_name
+    }
+  }
 }
 
-  
+
 module "slo_latency" {
   source = "terraform-google-modules/slo/google//modules/slo-native"
   config = {
@@ -31,11 +31,12 @@ module "slo_latency" {
     method            = "latency"
     latency_threshold = "${var.latency_threshold}s"
   }
+  depends_on = [google_monitoring_service.service]
 }
 
 
 resource "google_monitoring_alert_policy" "latency_alert_policy" {
-  project = var.project_id
+  project      = var.project_id
   display_name = "${var.service_name}-latency-alert"
   combiner     = "OR"
   conditions {
@@ -51,20 +52,21 @@ resource "google_monitoring_alert_policy" "latency_alert_policy" {
 module "slo_availability" {
   source = "terraform-google-modules/slo/google//modules/slo-native"
   config = {
-    project_id        = var.project_id
-    service           = var.service_name
-    slo_id            = "${var.service_name}-availability-slo"
-    display_name      = "Availability - ${var.availability_goal} - Calendar ${var.availability_calendar_period} Day"
-    goal              = var.availability_goal
-    calendar_period   = var.availability_calendar_period
-    type              = "basic_sli"
-    method            = "availability"
+    project_id      = var.project_id
+    service         = var.service_name
+    slo_id          = "${var.service_name}-availability-slo"
+    display_name    = "Availability - ${var.availability_goal} - Calendar ${var.availability_calendar_period} Day"
+    goal            = var.availability_goal
+    calendar_period = var.availability_calendar_period
+    type            = "basic_sli"
+    method          = "availability"
   }
+  depends_on = [google_monitoring_service.service]
 }
 
 
 resource "google_monitoring_alert_policy" "availability_alert_policy" {
-  project = var.project_id
+  project      = var.project_id
   display_name = "${var.service_name}-availability-alert"
   combiner     = "OR"
   conditions {

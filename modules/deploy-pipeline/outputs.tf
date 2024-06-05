@@ -3,10 +3,10 @@ output "pipeline_id" {
 }
 
 output "targets" {
-  value = local.targets 
+  value = local.targets
 }
 
 output "other_targets" {
-  value = local.remaining_targets 
+  value = local.remaining_targets
 }
 

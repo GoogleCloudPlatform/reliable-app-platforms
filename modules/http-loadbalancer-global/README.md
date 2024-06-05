@@ -1,6 +1,4 @@
 <!-- BEGIN_TF_DOCS -->
-# Module `http-loadbalancer-global`
-
 This module creates a global loadbalancer, backed by a kubernetes service.
 The service can be present in multiple clusters in any number of regions.
 
@@ -22,10 +20,6 @@ multiple kubernetes providers, using provider aliases.
 | <a name="provider_google"></a> [google](#provider\_google) | ~> 5.27 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
-## Modules
-
-No modules.
-
 ## Resources
 
 | Name | Type |
@@ -43,12 +37,13 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_backends"></a> [backends](#input\_backends) | backends for the load balancer. all fields are needed to identify a kubernetes service. | <pre>map(object({<br>    service_obj = any<br>    # location = string<br>    # cluster = string<br>    # service_namespace = string<br>    # service_name = string<br>    # provider_alias = any<br>  }))</pre> | `{}` | no |
+| <a name="input_backends"></a> [backends](#input\_backends) | backends for the load balancer. Service\_obj is a kubernetes\_service terraform object. | <pre>map(object({<br>    service_obj = any<br>  }))</pre> | `{}` | no |
 | <a name="input_lb_name"></a> [lb\_name](#input\_lb\_name) | name prefix for generated loadbalancer objects | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
+| <a name="output_backends"></a> [backends](#output\_backends) | n/a |
 | <a name="output_loadbalancer_url"></a> [loadbalancer\_url](#output\_loadbalancer\_url) | n/a |
 <!-- END_TF_DOCS -->

@@ -22,8 +22,8 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   dir: "./app-repo/src"
   args: [ 'build', 
-  '-t', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_APP_NAME}-${_SERVICE}/service:${_SHORT_SHA}', 
-  '-t', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_APP_NAME}-${_SERVICE}/service:latest', 
-  '.', '-f', './Dockerfile' ]
+    '-t', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_APP_NAME}-${_SERVICE}/service:${_SHORT_SHA}', 
+    '-t', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_APP_NAME}-${_SERVICE}/service:latest', 
+    '.', '-f', './Dockerfile' ]
 images:
 - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_APP_NAME}-${_SERVICE}/service'

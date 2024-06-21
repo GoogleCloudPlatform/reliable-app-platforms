@@ -47,12 +47,3 @@ steps:
       - |
         [[ "${_APP}" == "false" ]] && exit 0
         exec gcloud builds submit --config ./app-repo/deploy-app.yaml --substitutions=_ARCHETYPE=${_ARCHETYPE},_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "create-app-slos"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        [[ "${_SLO}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./infra-repo/create-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
-  

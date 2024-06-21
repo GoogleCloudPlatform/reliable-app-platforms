@@ -14,12 +14,12 @@
 
 timeout: 7200s # 2hr
 tags:
-  - app-cicd-shop-frontend
+  - app-cicd-shop-loadgenerator
 substitutions:
   _PROJECT_ID: ${_PROJECT_ID}
   _REGION: us-central1
   _APP_NAME: "shop"
-  _SERVICE: "frontend"
+  _SERVICE: "loadgenerator"
 steps:
   # Create release in Google Cloud Deploy for App Clusters
   - name: gcr.io/cloud-builders/gcloud

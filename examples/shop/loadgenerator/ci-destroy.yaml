@@ -26,10 +26,3 @@ steps:
       - -c
       - |
         exec gcloud builds submit --config ./infra-repo/delete-platform-infra.yaml --substitutions=_ARCHETYPE=${_ARCHETYPE},_PROJECT_ID=${_PROJECT_ID},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "delete-app-slos"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        exec gcloud builds submit --config ./infra-repo/delete-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_APP_NAME=${_APP_NAME},_SERVICE=${_SERVICE}

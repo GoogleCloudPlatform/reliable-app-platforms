@@ -19,7 +19,7 @@ _Figure: An Archetype: Global Anycast with regional isolated stacks and global d
 _Figure: An Architecture: The same archetype as deployed on Google Cloud._
 
 
-This is derived from the whitepaper: [Deployment Archetypes for Cloud Applcations](https://arxiv.org/pdf/2105.00560.pdf)
+This is derived from the whitepaper: [Deployment Archetypes for Cloud Applications](https://arxiv.org/pdf/2105.00560.pdf)
 
 Also explained here: <https://cloud.google.com/architecture/deployment-archetypes>
 

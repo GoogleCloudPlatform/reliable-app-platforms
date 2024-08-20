@@ -14,7 +14,7 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-delete-cicd-shop-currency
+  - infra-create-cicd-shop-currency
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _BUILD: "true"

@@ -2,6 +2,10 @@
 
 _Last tested on 04/30/2024 by @stevemcghee
 
+Some context and motivation here: https://www.youtube.com/watch?v=2p3LDdvbO30
+[![Watch the video](https://img.youtube.com/vi/2p3LDdvbO30/sd2.jpg)](https://youtu.be/2p3LDdvbO30)
+
+
 Watch the video of our talk from Google Cloud Next 2024: https://youtu.be/FkIqA9Pt7Hc
 
 Slides are also available as a [pdf](docs/DEV227-Next24.pdf)

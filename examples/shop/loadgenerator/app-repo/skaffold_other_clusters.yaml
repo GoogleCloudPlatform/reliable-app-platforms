@@ -1,7 +1,7 @@
 apiVersion: skaffold/v4beta6
 kind: Config
 metadata:
-  name: shop-frontend-vs
+  name: shop-loadgenerator-vs
 manifests:
     kustomize:
       paths:

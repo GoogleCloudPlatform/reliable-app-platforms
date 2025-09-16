@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
       - uses: hashicorp/setup-terraform@v3
       - run: go install github.com/terraform-docs/terraform-docs@v0.18.0
       - run: make lint

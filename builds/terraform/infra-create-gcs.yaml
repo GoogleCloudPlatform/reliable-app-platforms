@@ -25,7 +25,7 @@ steps:
   args:
     - -c
     - |
-      ([[ $(gsutil ls | grep "gs://${_PROJECT_ID}/") ]] || \
-      gsutil mb -p ${PROJECT_ID} gs://${_PROJECT_ID}) && \
-      ([[ $(gsutil versioning get gs://${_PROJECT_ID} | grep Enabled) ]] || \
-      gsutil versioning set on gs://${_PROJECT_ID})
+      ([[ $(gcloud storage ls | grep "gs://${_PROJECT_ID}/") ]] || \
+      gcloud storage buckets create --project=${PROJECT_ID} gs://${_PROJECT_ID}) && \
+      ([[ $(gcloud storage buckets describe gs://${_PROJECT_ID} --format="default(versioning)" | grep Enabled) ]] || \
+      gcloud storage buckets update --versioning gs://${_PROJECT_ID})

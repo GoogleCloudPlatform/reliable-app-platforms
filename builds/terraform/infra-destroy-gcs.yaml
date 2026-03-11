@@ -25,6 +25,6 @@ steps:
   args:
     - -c
     - |
-      ([[ $(gsutil ls | grep "gs://${_PROJECT_ID}/") ]] && \
-      gsutil rm -r -f ${_PROJECT_ID} gs://${_PROJECT_ID})
+      ([[ $(gcloud storage ls | grep "gs://${_PROJECT_ID}/") ]] && \
+      gcloud storage rm --recursive --continue-on-error ${_PROJECT_ID} gs://${_PROJECT_ID})
       

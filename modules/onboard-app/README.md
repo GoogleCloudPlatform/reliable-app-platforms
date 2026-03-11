@@ -60,15 +60,15 @@ This runs:
 | Name | Version |
 |------|---------|
 | <a name="requirement_github"></a> [github](#requirement\_github) | >= 4.3.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.27 |
-| <a name="requirement_google-beta"></a> [google-beta](#requirement\_google-beta) | ~> 5.27 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
+| <a name="requirement_google-beta"></a> [google-beta](#requirement\_google-beta) | ~> 7.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_github"></a> [github](#provider\_github) | >= 4.3.0 |
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.27 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 7.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 | <a name="provider_random"></a> [random](#provider\_random) | n/a |
 

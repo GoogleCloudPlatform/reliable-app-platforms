@@ -1,6 +1,6 @@
 module github.com/GoogleCloudPlatform/microservices-demo/src/productcatalogservice
 
-go 1.19
+go 1.25.0
 
 require (
 	cloud.google.com/go/profiler v0.3.1
@@ -11,14 +11,13 @@ require (
 	go.opentelemetry.io/otel v1.20.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.17.0
 	go.opentelemetry.io/otel/sdk v1.17.0
-	golang.org/x/net v0.21.0
+	golang.org/x/net v0.51.0
 	google.golang.org/grpc v1.59.0
 )
 
 require (
 	cloud.google.com/go v0.110.7 // indirect
-	cloud.google.com/go/compute v1.23.0 // indirect
-	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -33,11 +32,11 @@ require (
 	go.opentelemetry.io/otel/metric v1.20.0 // indirect
 	go.opentelemetry.io/otel/trace v1.20.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/oauth2 v0.11.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	google.golang.org/api v0.126.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230822172742-b8732ec3820d // indirect

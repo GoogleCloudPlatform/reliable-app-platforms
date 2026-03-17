@@ -40,6 +40,10 @@ venv.bak/
 
 # Go
 rapctl
+checkoutservice
+frontend
+productcatalogservice
+shippingservice
 *.exe
 *.exe~
 *.dll

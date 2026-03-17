@@ -111,6 +111,10 @@ func (s *server) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_Watc
 	return status.Errorf(codes.Unimplemented, "health check via Watch not implemented")
 }
 
+func (s *server) List(ctx context.Context, req *healthpb.HealthListRequest) (*healthpb.HealthListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "health check via List not implemented")
+}
+
 // GetQuote produces a shipping quote (cost) in USD.
 func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
 	log.Info("[GetQuote] received request")

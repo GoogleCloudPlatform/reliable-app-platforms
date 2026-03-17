@@ -1,6 +1,53 @@
 .* 
 !.gitignore
 
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Go
+rapctl
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
 #terraform
 
 **/.terraform/*

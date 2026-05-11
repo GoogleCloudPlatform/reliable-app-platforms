@@ -17,7 +17,7 @@
     "@opentelemetry/exporter-otlp-grpc": "0.26.0",
     "@opentelemetry/instrumentation-grpc": "0.45.0",
     "@opentelemetry/sdk-trace-base": "1.18.0",
-    "@opentelemetry/sdk-node": "0.45.0",
+    "@opentelemetry/sdk-node": "0.217.0",
     "pino": "8.15.1",
     "simple-card-validator": "^1.1.0",
     "uuid": "^9.0.0"

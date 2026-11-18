@@ -18,19 +18,36 @@ application_name=${1}
 github_org=${2}
 github_user=${3}
 github_email=${4}
-github_token=${5}
-github_repo="${6}"
-project_id=${7}
+github_repo="${5}"
+project_id=${6}
 template_repo="/tmp/reliable-app-platforms"
 template_path="${template_repo}/modules/onboard-app/templates"
 source_repo="/tmp/${github_repo}"
+
+: "${GITHUB_TOKEN:?GITHUB_TOKEN environment variable must be set}"
+
+askpass_script=$(mktemp)
+trap 'rm -f "${askpass_script}"' EXIT
+chmod 700 "${askpass_script}"
+cat <<'EOF' > "${askpass_script}"
+#!/bin/sh
+case "$1" in
+  *Username*|*username*) printf '%s\n' "${GITHUB_USER}" ;;
+  *Password*|*password*) printf '%s\n' "${GITHUB_TOKEN}" ;;
+esac
+EOF
+
+export GITHUB_USER="${github_user}"
+export GITHUB_TOKEN
+export GIT_ASKPASS="${askpass_script}"
+export GIT_TERMINAL_PROMPT=0
 
 #Copy the template from reliable-app-platforms
 #TODO: remove the branch in the below clone command once this is merged
 git clone -b modern-cicd-manual "https://github.com/GoogleCloudPlatform/reliable-app-platforms" "${template_repo}"
 
 #Now clone new application repo and copy the template into it
-git clone  https://${github_user}:${github_token}@github.com/${github_org}/${github_repo} ${source_repo}
+git clone "https://${github_user}@github.com/${github_org}/${github_repo}" "${source_repo}"
 if  [ "${application_name}" = "nginx" ]; then
   app_version="1.14.2"
 fi

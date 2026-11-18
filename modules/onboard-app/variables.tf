@@ -48,7 +48,8 @@ variable "github_email" {
 }
 
 variable "github_token" {
-  description = "GitHub user email."
+  description = "GitHub Personal Access Token."
+  sensitive   = true
 }
 
 variable "project_id" {

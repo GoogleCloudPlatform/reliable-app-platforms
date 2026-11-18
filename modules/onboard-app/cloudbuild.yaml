@@ -19,7 +19,6 @@ timeout: 14400s # 2hr
 #  _GITHUB_ORG: ${github_org}
 #  _GITHUB_USER: ${github_user}
 #  _GITHUB_EMAIL: ${github_email}
-#  _GITHUB_TOKEN: ${github_token}
 
 tags:
   - onboard-app
@@ -28,12 +27,18 @@ steps:
     id: "create-infra"
     entrypoint: "sh"
     dir: "modules/onboard-app/"
+    secretEnv:
+      - "TF_VAR_github_token"
     args:
-    - "-xe"
+    - "-e"
     - "-c"
     - |
       terraform init -backend-config="bucket=${_PROJECT_ID}"
       terraform apply -var="project_id=${_PROJECT_ID}" \
       -var="app_name=${_APP_NAME}" -var="github_org=${_GITHUB_ORG}" -var="github_user=${_GITHUB_USER}" \
-      -var="github_email=${_GITHUB_EMAIL}" -var="github_token=${_GITHUB_TOKEN}" \
+      -var="github_email=${_GITHUB_EMAIL}" \
       --auto-approve
+availableSecrets:
+  secretManager:
+    - versionName: projects/${_PROJECT_ID}/secrets/github-token/versions/latest
+      env: "TF_VAR_github_token"

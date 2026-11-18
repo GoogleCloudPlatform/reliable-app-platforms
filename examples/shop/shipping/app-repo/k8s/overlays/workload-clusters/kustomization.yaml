@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: shippingservice
-  newName: us-central1-docker.pkg.dev/<project-id>/shop-shipping/service
-  newTag: latest
+  newName: us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo/shippingservice
+  newTag: v0.10.7

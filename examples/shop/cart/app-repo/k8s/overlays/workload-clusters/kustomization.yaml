@@ -10,5 +10,5 @@ resources:
 - redis.yaml
 images:
 - name: cartservice
-  newName: us-central1-docker.pkg.dev/<project-id>/shop-cart/service
-  newTag: latest
+  newName: us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo/cartservice
+  newTag: v0.10.7

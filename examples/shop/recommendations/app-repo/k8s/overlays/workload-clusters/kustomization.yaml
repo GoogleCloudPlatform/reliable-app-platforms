@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: recommendationservice
-  newName: us-central1-docker.pkg.dev/<project-id>/shop-recommendations/service
-  newTag: latest
+  newName: us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo/recommendationservice
+  newTag: v0.10.7

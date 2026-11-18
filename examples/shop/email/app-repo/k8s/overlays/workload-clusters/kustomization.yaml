@@ -18,5 +18,5 @@ patches:
     kind: Service
 images:
 - name: emailservice
-  newName: us-central1-docker.pkg.dev/<project-id>/shop-email/service
-  newTag: latest
+  newName: us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo/emailservice
+  newTag: v0.10.7

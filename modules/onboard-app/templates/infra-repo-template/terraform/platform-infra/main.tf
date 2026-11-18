@@ -94,7 +94,10 @@ resource "null_resource" "set_repo" {
     id = github_repository.app_repo.id
   }
   provisioner "local-exec" {
-    command = "${path.cwd}/../../scripts/prep-app-repo.sh ${var.app_name} ${local.github_org} ${local.github_user} ${local.github_email} ${local.github_token} ${local.repo_name} ${var.project_id}"
+    command = "${path.cwd}/../../scripts/prep-app-repo.sh ${var.app_name} ${local.github_org} ${local.github_user} ${local.github_email} ${local.repo_name} ${var.project_id}"
+    environment = {
+      GITHUB_TOKEN = local.github_token
+    }
   }
   depends_on = [github_repository.app_repo]
 }

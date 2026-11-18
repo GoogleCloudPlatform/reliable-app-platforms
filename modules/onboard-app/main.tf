@@ -46,7 +46,10 @@ resource "null_resource" "set_repo" {
     id = github_repository.infra_repo.id
   }
   provisioner "local-exec" {
-    command = "${path.cwd}/prep-infra-repo.sh ${var.app_name} ${var.github_org} ${var.github_user} ${var.github_email} ${var.github_token} ${local.repo_name}"
+    command = "${path.cwd}/prep-infra-repo.sh ${var.app_name} ${var.github_org} ${var.github_user} ${var.github_email} ${local.repo_name}"
+    environment = {
+      GITHUB_TOKEN = var.github_token
+    }
   }
   depends_on = [github_repository.infra_repo]
 }

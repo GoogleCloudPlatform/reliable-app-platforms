@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: productcatalogservice
-  newName: us-central1-docker.pkg.dev/<project-id>/shop-productcatalog/service
-  newTag: latest
+  newName: us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo/productcatalogservice
+  newTag: v0.10.7

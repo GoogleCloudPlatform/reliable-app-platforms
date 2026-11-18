@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 14400s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _CART: "true"
@@ -37,7 +39,7 @@ steps:
       - -c
       - |
         [[ "${_FRONTEND}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="frontend",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="frontend",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "cart-deploy"
     entrypoint: bash
@@ -46,7 +48,7 @@ steps:
       - -c
       - |
         [[ "${_CART}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="cart",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="cart",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "ad-deploy"
     entrypoint: bash
@@ -55,7 +57,7 @@ steps:
       - -c
       - |
         [[ "${_AD}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="ad",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="ad",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "currency-deploy"
     entrypoint: bash
@@ -64,7 +66,7 @@ steps:
       - -c
       - |
         [[ "${_CURRENCY}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="currency",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="currency",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "email-deploy"
     dir: ./examples/shop/email
@@ -73,7 +75,7 @@ steps:
       - -c
       - |
         [[ "${_EMAIL}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="email",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="email",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "catalog-deploy"
     dir: ./examples/shop/productcatalog
@@ -82,7 +84,7 @@ steps:
       - -c
       - |
         [[ "${_CATALOG}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="productcatalog",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="productcatalog",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "shipping-deploy"
     dir: ./examples/shop/shipping
@@ -91,7 +93,7 @@ steps:
       - -c
       - |
         [[ "${_SHIPPING}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="shipping",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="shipping",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "payment-deploy"
     dir: ./examples/shop/payment
@@ -100,7 +102,7 @@ steps:
       - -c
       - |
         [[ "${_PAYMENT}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="payment",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="payment",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "recommendations-deploy"
     dir: ./examples/shop/recommendations
@@ -109,7 +111,7 @@ steps:
       - -c
       - |
         [[ "${_RECOMMENDATIONS}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="recommendations",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="recommendations",_SLO=true,_APP=true,_INFRA=true
   - name: "gcr.io/cloud-builders/gcloud"
     id: "checkout-deploy"
     dir: ./examples/shop/checkout
@@ -118,5 +120,5 @@ steps:
       - -c
       - |
         [[ "${_CHECKOUT}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="checkout",_SLO=true,_APP=true,_INFRA=true
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA},_APP_NAME="shop",_SERVICE="checkout",_SLO=true,_APP=true,_INFRA=true
  

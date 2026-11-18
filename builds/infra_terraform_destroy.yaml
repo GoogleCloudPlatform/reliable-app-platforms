@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 14400s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _DESTROY_STATE_BUCKET: "false"
@@ -27,7 +29,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/infra-destroy-features-mesh-gateways.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/infra-destroy-features-mesh-gateways.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
    #  Destroy GKE clusters
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-destroy-gke"
@@ -35,7 +37,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/terraform/infra-destroy-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-destroy-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   # Destroy VPC
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-destroy-vpc"
@@ -44,7 +46,7 @@ steps:
       - -c
       - |
         [[ "${_DESTROY_VPC}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/terraform/infra-destroy-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-destroy-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   # Destroy ACM Repo
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-destroy-acm-repo"
@@ -52,7 +54,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/terraform/infra-destroy-repos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-destroy-repos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   # Disable APIs
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-disable-apis"
@@ -60,7 +62,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/terraform/infra-disable-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-disable-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
 
   # Destroy GCS storage bucket for TF state, project files, vars.sh etc
   # This step deletes the GCS storage bucket in the project with the name of project ID.
@@ -71,4 +73,4 @@ steps:
       - -c
       - |
         [[ "${_DESTROY_STATE_BUCKET}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/terraform/infra-destroy-gcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-destroy-gcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}

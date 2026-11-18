@@ -61,20 +61,54 @@ done
 echo -e "\e[95mPROJECT_ID is set to ${PROJECT_ID}\e[0m"
 gcloud config set core/project ${PROJECT_ID}
 
-# Enable Cloudbuild API
-echo -e "\e[95mEnabling Cloudbuild API in ${PROJECT_ID}\e[0m"
-gcloud services enable cloudbuild.googleapis.com storage.googleapis.com serviceusage.googleapis.com cloudresourcemanager.googleapis.com
+# Enable Cloudbuild and IAM APIs
+echo -e "\e[95mEnabling Cloudbuild and IAM APIs in ${PROJECT_ID}\e[0m"
+gcloud services enable cloudbuild.googleapis.com storage.googleapis.com serviceusage.googleapis.com cloudresourcemanager.googleapis.com iam.googleapis.com
 
-# Make cloudbiuld SA roles/owner for PROJECT_ID
-# TODO: Make these permissions more granular to precisely what is required by cloudbuild
-echo -e "\e[95mAssigning Cloudbuild Service Account roles/owner in ${PROJECT_ID}\e[0m"
-export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format 'value(projectNumber)')
-gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/owner
+# Create dedicated platform builder service account with least-privilege platform roles
+PLATFORM_SA_NAME="rap-platform-builder"
+PLATFORM_SA_EMAIL="${PLATFORM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+PLATFORM_SA_RESOURCE="projects/${PROJECT_ID}/serviceAccounts/${PLATFORM_SA_EMAIL}"
+
+echo -e "\e[95mConfiguring dedicated Cloud Build service account ${PLATFORM_SA_EMAIL} in ${PROJECT_ID}\e[0m"
+if ! gcloud iam service-accounts describe "${PLATFORM_SA_EMAIL}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  gcloud iam service-accounts create "${PLATFORM_SA_NAME}" \
+    --project="${PROJECT_ID}" \
+    --display-name="Reliable App Platforms Builder"
+fi
+
+PLATFORM_ROLES=(
+  "roles/logging.logWriter"
+  "roles/cloudbuild.builds.editor"
+  "roles/storage.admin"
+  "roles/serviceusage.serviceUsageAdmin"
+  "roles/serviceusage.apiKeysAdmin"
+  "roles/source.admin"
+  "roles/compute.networkAdmin"
+  "roles/compute.securityAdmin"
+  "roles/container.admin"
+  "roles/gkehub.admin"
+  "roles/iam.serviceAccountAdmin"
+  "roles/iam.serviceAccountUser"
+  "roles/resourcemanager.projectIamAdmin"
+  "roles/artifactregistry.admin"
+  "roles/clouddeploy.admin"
+  "roles/servicemanagement.admin"
+  "roles/monitoring.admin"
+  "roles/secretmanager.admin"
+)
+for role in "${PLATFORM_ROLES[@]}"; do
+  gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+    --member="serviceAccount:${PLATFORM_SA_EMAIL}" \
+    --role="${role}" \
+    --condition=None \
+    --quiet >/dev/null
+done
 
 # Start main build
 [[ "${DESTROY}" != "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to CREATE infrastructure using terraform...\e[0m"
 [[ "${DESTROY}" == "true" ]] &&  echo -e "\e[95mStarting Cloudbuild to DELETE infrastructure using terraform...\e[0m"
 
-[[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_terraform.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_KUBE_VERSION=${K8SVERSION} --async
-[[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
+[[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_terraform.yaml --service-account="${PLATFORM_SA_RESOURCE}" --substitutions=_PROJECT_ID=${PROJECT_ID},_KUBE_VERSION=${K8SVERSION} --async
+[[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --service-account="${PLATFORM_SA_RESOURCE}" --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

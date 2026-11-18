@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 14400s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 tags:
@@ -24,12 +26,12 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config examples/nginx/infra-repo/destroy-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config examples/nginx/infra-repo/destroy-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   - name: "gcr.io/cloud-builders/gcloud"
     id: "slos-destroy"
     entrypoint: bash
     args:
       - -c
       - |
-        exec gcloud builds submit --config examples/nginx/infra-repo/destroy-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config examples/nginx/infra-repo/destroy-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   

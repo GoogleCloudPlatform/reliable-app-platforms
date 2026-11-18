@@ -17,6 +17,11 @@ repository](https://cloud.google.com/build/docs/automating-builds/github/connect
 which may require installing the [Google Cloud Build Github
 App](https://github.com/marketplace/google-cloud-build).
 
+The trigger executes using a dedicated least-privilege service account
+(`var.service_account`, or a newly created SA with `var.service_account_roles`).
+Target `cloudbuild.yaml` files must configure `options: { logging: CLOUD_LOGGING_ONLY }`
+or a custom `logsBucket` as required by Cloud Build for user-managed service accounts.
+
 # Module Details
 
 <!-- BEGIN_TF_DOCS -->
@@ -50,7 +55,9 @@ It handles the complexity of connecting cloud build and github together.
 | [github_repository_webhook.gh_webhook](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_webhook) | resource |
 | [google_apikeys_key.api_key](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apikeys_key) | resource |
 | [google_cloudbuild_trigger.deploy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuild_trigger) | resource |
+| [google_project_iam_member.trigger_sa_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_service_account.trigger_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_secret_manager_secret.gh_webhook](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
 | [google_secret_manager_secret_iam_policy.policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_policy) | resource |
 | [google_secret_manager_secret_version.wh_secv](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_version) | resource |
@@ -68,6 +75,8 @@ It handles the complexity of connecting cloud build and github together.
 | <a name="input_github_repo"></a> [github\_repo](#input\_github\_repo) | github repository as $owner/$repo\_name | `any` | n/a | yes |
 | <a name="input_github_token"></a> [github\_token](#input\_github\_token) | GitHub user access token. | `string` | `""` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID to use for Cloud Build execution | `any` | n/a | yes |
+| <a name="input_service_account"></a> [service\_account](#input\_service\_account) | Optional existing service account resource name (projects/PROJECT/serviceAccounts/EMAIL) for the trigger. If empty, a dedicated least-privilege service account is created. | `string` | `""` | no |
+| <a name="input_service_account_roles"></a> [service\_account\_roles](#input\_service\_account\_roles) | Project IAM roles to grant to the created trigger service account when var.service\_account is empty. | `list(string)` | <pre>[<br>  "roles/logging.logWriter"<br>]</pre> | no |
 | <a name="input_token_secret"></a> [token\_secret](#input\_token\_secret) | secret manager secret to use instead of github\_token | `string` | `""` | no |
 
 ## Outputs

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 14400s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 #substitutions:
 #  _PROJECT_ID: ${PROJECT_ID}
 #  _: ${}

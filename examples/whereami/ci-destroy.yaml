@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 14400s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
 
@@ -26,7 +28,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="whereami",_SERVICE="whereami-backend"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="whereami",_SERVICE="whereami-backend"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "frontend-destroy"
     entrypoint: bash
@@ -34,5 +36,5 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="whereami",_SERVICE="whereami-frontend"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="whereami",_SERVICE="whereami-frontend"
    

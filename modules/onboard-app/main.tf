@@ -19,7 +19,8 @@ data "google_project" "project" {
 }
 
 locals {
-  repo_name = split("/", github_repository.infra_repo.full_name)[1]
+  repo_name              = split("/", github_repository.infra_repo.full_name)[1]
+  deploy_infra_sa_prefix = trim(substr("cb-${lower(replace(var.app_name, "/[^a-zA-Z0-9-]/", "-"))}", 0, 24), "-")
 }
 
 //Create infra repo
@@ -88,14 +89,44 @@ resource "google_secret_manager_secret_iam_policy" "policy" {
   policy_data = data.google_iam_policy.wh-secv-access.policy_data
 }
 
+resource "google_service_account" "deploy_infra" {
+  project      = var.project_id
+  account_id   = "${local.deploy_infra_sa_prefix}-infra"
+  display_name = "Cloud Build Infra Trigger SA for ${var.app_name}"
+}
+
+resource "google_project_iam_member" "deploy_infra_roles" {
+  for_each = toset([
+    "roles/logging.logWriter",
+    "roles/storage.admin",
+    "roles/artifactregistry.admin",
+    "roles/clouddeploy.admin",
+    "roles/servicemanagement.admin",
+    "roles/monitoring.admin",
+    "roles/secretmanager.admin",
+    "roles/serviceusage.apiKeysAdmin",
+    "roles/cloudbuild.builds.editor",
+    "roles/iam.serviceAccountAdmin",
+    "roles/iam.serviceAccountUser",
+    "roles/resourcemanager.projectIamAdmin",
+  ])
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.deploy_infra.email}"
+}
+
 resource "google_cloudbuild_trigger" "deploy_infra" {
-  name        = "deploy-infra-${var.app_name}"
-  description = "Webhook to deploy the infra"
-  project     = var.project_id
+  name            = "deploy-infra-${var.app_name}"
+  description     = "Webhook to deploy the infra"
+  project         = var.project_id
+  service_account = google_service_account.deploy_infra.id
   webhook_config {
     secret = google_secret_manager_secret_version.wh_secv.id
   }
   build {
+    options {
+      logging = "CLOUD_LOGGING_ONLY"
+    }
     step {
       id         = "clone-infra-repo"
       name       = "gcr.io/cloud-builders/git"
@@ -169,8 +200,11 @@ resource "google_cloudbuild_trigger" "deploy_infra" {
     _ZONE_INDEX        = "[0,1]"
     _REGION_INDEX      = "[0,1]"
   }
-  filter     = "(!_COMMIT_MSG.matches('IGNORE'))"
-  depends_on = [google_secret_manager_secret_version.wh_secv]
+  filter = "(!_COMMIT_MSG.matches('IGNORE'))"
+  depends_on = [
+    google_secret_manager_secret_version.wh_secv,
+    google_project_iam_member.deploy_infra_roles,
+  ]
 
 
 }

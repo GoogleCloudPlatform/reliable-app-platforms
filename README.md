@@ -1,3 +1,12 @@
+> [!WARNING]
+> **This repository is archived and no longer maintained.**
+>
+> It was created as a 2024 reference demo for the Google Cloud Next '24 talk and the [Deployment Archetypes for Cloud Applications](https://cloud.google.com/architecture/deployment-archetypes) guide. Dependencies, Terraform modules, and GKE/Cloud Build configurations are no longer updated and may contain outdated patterns or unpatched vulnerabilities—**do not use this as-is in production**.
+>
+> For current guidance and maintained examples, see:
+> - [Google Cloud Architecture Center: Deployment Archetypes](https://cloud.google.com/architecture/deployment-archetypes)
+> - [GoogleCloudPlatform/microservices-demo](https://github.com/GoogleCloudPlatform/microservices-demo) (the upstream Online Boutique sample app)
+
 # Reliable App Platforms - on GCP
 
 _Last tested on 04/30/2024 by @stevemcghee

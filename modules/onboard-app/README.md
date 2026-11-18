@@ -95,7 +95,7 @@ This runs:
 | <a name="input_app_name"></a> [app\_name](#input\_app\_name) | Name of the application being created. | `any` | n/a | yes |
 | <a name="input_github_email"></a> [github\_email](#input\_github\_email) | GitHub user email. | `any` | n/a | yes |
 | <a name="input_github_org"></a> [github\_org](#input\_github\_org) | GitHub org. | `any` | n/a | yes |
-| <a name="input_github_token"></a> [github\_token](#input\_github\_token) | GitHub user email. | `any` | n/a | yes |
+| <a name="input_github_token"></a> [github\_token](#input\_github\_token) | GitHub Personal Access Token. | `any` | n/a | yes |
 | <a name="input_github_user"></a> [github\_user](#input\_github\_user) | GitHub username. | `any` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID | `any` | n/a | yes |
 

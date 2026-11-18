@@ -32,8 +32,10 @@ data "google_secret_manager_secret_version" "gh_access" {
 }
 
 locals {
-  repo_owner = split("/", var.github_repo)[0]
-  repo_name  = split("/", var.github_repo)[1]
+  repo_owner        = split("/", var.github_repo)[0]
+  repo_name         = split("/", var.github_repo)[1]
+  trigger_sa_prefix = trim(substr("cb-${lower(replace(var.app_name, "/[^a-zA-Z0-9-]/", "-"))}", 0, 23), "-")
+  trigger_sa_id     = var.service_account != "" ? var.service_account : google_service_account.trigger_sa[0].id
 }
 
 resource "google_project_service" "required_apis" {
@@ -72,10 +74,25 @@ resource "google_secret_manager_secret_iam_policy" "policy" {
   policy_data = data.google_iam_policy.wh-secv-access.policy_data
 }
 
+resource "google_service_account" "trigger_sa" {
+  count        = var.service_account == "" ? 1 : 0
+  project      = var.project_id
+  account_id   = "${local.trigger_sa_prefix}-deploy"
+  display_name = "Cloud Build Trigger SA for ${var.app_name}"
+}
+
+resource "google_project_iam_member" "trigger_sa_roles" {
+  for_each = var.service_account == "" ? toset(var.service_account_roles) : toset([])
+  project  = var.project_id
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.trigger_sa[0].email}"
+}
+
 resource "google_cloudbuild_trigger" "deploy" {
-  name        = "deploy-${var.app_name}"
-  description = "Webhook to deploy from ${var.github_repo}"
-  project     = var.project_id
+  name            = "deploy-${var.app_name}"
+  description     = "Webhook to deploy from ${var.github_repo}"
+  project         = var.project_id
+  service_account = local.trigger_sa_id
   webhook_config {
     secret = google_secret_manager_secret_version.wh_secv.id
   }
@@ -92,9 +109,10 @@ resource "google_cloudbuild_trigger" "deploy" {
     _APP_NAME   = var.app_name
   }
   # filter          = "(!_COMMIT_MSG.matches('IGNORE'))"
-  depends_on = [google_secret_manager_secret_version.wh_secv]
-
-
+  depends_on = [
+    google_secret_manager_secret_version.wh_secv,
+    google_project_iam_member.trigger_sa_roles,
+  ]
 }
 
 resource "google_apikeys_key" "api_key" {

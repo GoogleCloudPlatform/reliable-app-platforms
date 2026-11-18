@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 7200s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 tags:
   - infra-delete-cicd-shop-email
 substitutions:

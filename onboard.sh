@@ -83,6 +83,6 @@ if [[ ${ORG_SECRET} != "true" ]]; then
     printf '%s' "${GITHUB_ORG}" | gcloud secrets create github-org --data-file=- > /dev/null
 fi
 
-[[ ${APPLICATION} == "nginx" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=modules/onboard-app/cloudbuild.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_APP_NAME=${APPLICATION},_GITHUB_ORG=${GITHUB_ORG},_GITHUB_EMAIL=${GITHUB_EMAIL},_GITHUB_USER=${GITHUB_USER} --async
+[[ ${APPLICATION} == "nginx" ]] && echo -e "\e[95mStarting to deploy application ${APPLICATION}...\e[0m" && gcloud builds submit --config=modules/onboard-app/cloudbuild.yaml --service-account="projects/${PROJECT_ID}/serviceAccounts/rap-platform-builder@${PROJECT_ID}.iam.gserviceaccount.com" --substitutions=_PROJECT_ID=${PROJECT_ID},_APP_NAME=${APPLICATION},_GITHUB_ORG=${GITHUB_ORG},_GITHUB_EMAIL=${GITHUB_EMAIL},_GITHUB_USER=${GITHUB_USER} --async
 
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

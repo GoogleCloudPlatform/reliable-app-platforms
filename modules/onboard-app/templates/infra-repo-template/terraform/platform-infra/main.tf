@@ -35,11 +35,12 @@ data "google_secret_manager_secret_version" "github_org" {
   project = var.project_id
 }
 locals {
-  repo_name    = split("/", github_repository.app_repo.full_name)[1]
-  github_user  = data.google_secret_manager_secret_version.github_user.secret_data
-  github_email = data.google_secret_manager_secret_version.github_email.secret_data
-  github_org   = data.google_secret_manager_secret_version.github_org.secret_data
-  github_token = data.google_secret_manager_secret_version.github_token.secret_data
+  repo_name            = split("/", github_repository.app_repo.full_name)[1]
+  github_user          = data.google_secret_manager_secret_version.github_user.secret_data
+  github_email         = data.google_secret_manager_secret_version.github_email.secret_data
+  github_org           = data.google_secret_manager_secret_version.github_org.secret_data
+  github_token         = data.google_secret_manager_secret_version.github_token.secret_data
+  deploy_app_sa_prefix = trim(substr("cb-${lower(replace(var.app_name, "/[^a-zA-Z0-9-]/", "-"))}", 0, 26), "-")
 }
 
 //resource "random_string" "random" {
@@ -136,14 +137,70 @@ resource "google_secret_manager_secret_iam_policy" "policy" {
   policy_data = data.google_iam_policy.wh_secv_access.policy_data
 }
 
+resource "google_service_account" "deploy_app" {
+  project      = var.project_id
+  account_id   = "${local.deploy_app_sa_prefix}-app"
+  display_name = "Cloud Build App Trigger SA for ${var.app_name}"
+}
+
+resource "google_project_iam_member" "deploy_app_roles" {
+  for_each = toset([
+    "roles/logging.logWriter",
+    "roles/clouddeploy.releaser",
+  ])
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.deploy_app.email}"
+}
+
+resource "google_service_account_iam_member" "deploy_app_act_as_clouddeploy" {
+  service_account_id = "projects/${var.project_id}/serviceAccounts/clouddeploy-${var.service_name}@${var.project_id}.iam.gserviceaccount.com"
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.deploy_app.email}"
+  depends_on         = [module.deploy-pipeline]
+}
+
+resource "google_storage_bucket" "deploy_staging" {
+  name                        = "${var.project_id}-${lower(replace(var.app_name, "/[^a-zA-Z0-9-]/", "-"))}-deploy-staging"
+  location                    = upper(var.pipeline_location)
+  project                     = var.project_id
+  uniform_bucket_level_access = true
+  force_destroy               = true
+}
+
+resource "google_storage_bucket_iam_member" "deploy_app_staging" {
+  bucket = google_storage_bucket.deploy_staging.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.deploy_app.email}"
+}
+
+resource "google_storage_bucket_iam_member" "clouddeploy_staging_reader" {
+  bucket     = google_storage_bucket.deploy_staging.name
+  role       = "roles/storage.objectViewer"
+  member     = "serviceAccount:clouddeploy-${var.service_name}@${var.project_id}.iam.gserviceaccount.com"
+  depends_on = [module.deploy-pipeline]
+}
+
+resource "google_secret_manager_secret_iam_member" "deploy_app_github_secrets" {
+  for_each  = toset(["github-user", "github-token", "github-org"])
+  project   = var.project_id
+  secret_id = each.value
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.deploy_app.email}"
+}
+
 resource "google_cloudbuild_trigger" "deploy_app" {
-  name        = "deploy-app-${var.app_name}"
-  description = "Webhook to deploy the application"
-  project     = var.project_id
+  name            = "deploy-app-${var.app_name}"
+  description     = "Webhook to deploy the application"
+  project         = var.project_id
+  service_account = google_service_account.deploy_app.id
   webhook_config {
     secret = google_secret_manager_secret_version.wh_secv.id
   }
   build {
+    options {
+      logging = "CLOUD_LOGGING_ONLY"
+    }
     step {
       id         = "clone-app-repo"
       name       = "gcr.io/cloud-builders/git"
@@ -173,7 +230,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
       echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
       echo -e "_SERVICE is ${"$"}{_SERVICE}"
       cd ${"$"}{_REPO}
-      gcloud deploy releases create "rel-$(date '+%Y%m%d%H%M%S')" --delivery-pipeline ${"$"}{_SERVICE}-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_workload_clusters.yaml
+      gcloud deploy releases create "rel-$(date '+%Y%m%d%H%M%S')" --delivery-pipeline ${"$"}{_SERVICE}-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_workload_clusters.yaml --gcs-source-staging-dir="gs://${google_storage_bucket.deploy_staging.name}/source"
 
   EOF
       ]
@@ -192,7 +249,7 @@ resource "google_cloudbuild_trigger" "deploy_app" {
       echo -e "_APP_NAME is ${"$"}{_APP_NAME}"
       echo -e "_SERVICE is ${"$"}{_SERVICE}"
       cd ${"$"}{_REPO}
-      gcloud deploy releases create "rel-$(date '+%Y%m%d%H%M%S')" --delivery-pipeline ${"$"}{_SERVICE}-vs-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_other_clusters.yaml
+      gcloud deploy releases create "rel-$(date '+%Y%m%d%H%M%S')" --delivery-pipeline ${"$"}{_SERVICE}-vs-pipeline --region ${"$"}{_REGION} --skaffold-file=./skaffold_other_clusters.yaml --gcs-source-staging-dir="gs://${google_storage_bucket.deploy_staging.name}/source"
 
   EOF
       ]
@@ -250,8 +307,15 @@ resource "google_cloudbuild_trigger" "deploy_app" {
     _REGION = "us-central1"
     #_SHORT_SHA = random_string.random.result
   }
-  filter     = "(!_COMMIT_MSG.matches('IGNORE'))"
-  depends_on = [google_secret_manager_secret_version.wh_secv]
+  filter = "(!_COMMIT_MSG.matches('IGNORE'))"
+  depends_on = [
+    google_secret_manager_secret_version.wh_secv,
+    google_project_iam_member.deploy_app_roles,
+    google_service_account_iam_member.deploy_app_act_as_clouddeploy,
+    google_storage_bucket_iam_member.deploy_app_staging,
+    google_storage_bucket_iam_member.clouddeploy_staging_reader,
+    google_secret_manager_secret_iam_member.deploy_app_github_secrets,
+  ]
 
 
 }

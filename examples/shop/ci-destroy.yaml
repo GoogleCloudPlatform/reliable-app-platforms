@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 14400s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _CART: "true"
@@ -37,7 +39,7 @@ steps:
       - -c
       - |
         [[ "${_FRONTEND}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="frontend"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="frontend"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "cart-destroy"
     entrypoint: bash
@@ -46,7 +48,7 @@ steps:
       - -c
       - |
         [[ "${_CART}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="cart"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="cart"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "ad-destroy"
     entrypoint: bash
@@ -55,7 +57,7 @@ steps:
       - -c
       - |
         [[ "${_AD}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="ad"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="ad"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "currency-destroy"
     entrypoint: bash
@@ -64,7 +66,7 @@ steps:
       - -c
       - |
         [[ "${_CURRENCY}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="currency"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="currency"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "email-destroy"
     dir: ./examples/shop/email
@@ -73,7 +75,7 @@ steps:
       - -c
       - |
         [[ "${_EMAIL}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="email"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="email"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "catalog-destroy"
     dir: ./examples/shop/productcatalog
@@ -82,7 +84,7 @@ steps:
       - -c
       - |
         [[ "${_CATALOG}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="productcatalog"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="G",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="productcatalog"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "shipping-destroy"
     dir: ./examples/shop/shipping
@@ -91,7 +93,7 @@ steps:
       - -c
       - |
         [[ "${_SHIPPING}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="shipping"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="shipping"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "payment-destroy"
     dir: ./examples/shop/payment
@@ -100,7 +102,7 @@ steps:
       - -c
       - |
         [[ "${_PAYMENT}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="payment"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="payment"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "recommendations-destroy"
     dir: ./examples/shop/recommendations
@@ -109,7 +111,7 @@ steps:
       - -c
       - |
         [[ "${_RECOMMENDATIONS}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="recommendations"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="SZ",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="recommendations"
   - name: "gcr.io/cloud-builders/gcloud"
     id: "checkout-destroy"
     dir: ./examples/shop/checkout
@@ -118,5 +120,5 @@ steps:
       - -c
       - |
         [[ "${_CHECKOUT}" == "false" ]] && exit 0
-        exec gcloud builds submit --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="checkout"
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config ./ci-destroy.yaml --substitutions=_ARCHETYPE="APR",_PROJECT_ID=${_PROJECT_ID},_APP_NAME="shop",_SERVICE="checkout"
  

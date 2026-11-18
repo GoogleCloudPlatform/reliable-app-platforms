@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 14400s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _DEBUG_SKIP_INFRA: "false" # used to skip infra portions while testing asm and gateway deployments only
@@ -32,7 +34,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/terraform/infra-create-gcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-create-gcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   # Enable APIs
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-enable-apis"
@@ -41,7 +43,7 @@ steps:
       - -c
       - |
         [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
-        exec gcloud builds submit --config builds/terraform/infra-enable-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-enable-apis.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  # Create CloudSource repos, artifact registries and triggers
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-create-repos"
@@ -50,7 +52,7 @@ steps:
       - -c
       - |
         [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
-        exec gcloud builds submit --config builds/terraform/infra-create-repos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-create-repos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
 
   # Create VPC
   - name: "gcr.io/cloud-builders/gcloud"
@@ -61,7 +63,7 @@ steps:
       - |
         [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
         [[ "${_VPC}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/terraform/infra-create-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-create-vpc.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  # Create GKE clusters
   - name: "gcr.io/cloud-builders/gcloud"
     id: "infra-create-gke"
@@ -71,7 +73,7 @@ steps:
       - |
         [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
         [[ "${_GKE}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/terraform/infra-create-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_KUBE_VERSION=${_KUBE_VERSION}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/terraform/infra-create-gke.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_KUBE_VERSION=${_KUBE_VERSION}
   # Confirm Mesh on GKE
   # This step confirms that ASM managed control plane (MCP) is successfully Provisioned on prod GKE clusters.
   - name: "gcr.io/cloud-builders/gcloud"
@@ -81,7 +83,7 @@ steps:
       - -c
       - |
         [[ "${_DEBUG_SKIP_INFRA}" == "true" ]] && exit 0
-        exec gcloud builds submit --config builds/infra-features-gke-prod-mesh-confirm.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/infra-features-gke-prod-mesh-confirm.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
 
   # Configure Mesh (multicluster and telemetry) on GKE
   # This step configures multicluster service discovery and access logging/tracing on the GKE clusters.
@@ -94,7 +96,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/infra-features-gke-prod-mesh-config.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/infra-features-gke-prod-mesh-config.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
 # Configure Mesh Gateways via ACM ConfigSync
   # This step deploys ASM ingress gateways on all apps clusters.
   # This step creates the following resources:
@@ -106,7 +108,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/infra-features-gke-mesh-gateways.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   # Confirm Mesh gateways on GKE - prod
   # This step confirms that the ASM ingress gateway and the multicluster gateway are up and running on the prod GKE clusters.
   - name: "gcr.io/cloud-builders/gcloud"
@@ -115,7 +117,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/infra-features-gke-mesh-gateways-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/infra-features-gke-mesh-gateways-prod.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   
   # Deploy MC Gateway to Config cluster
   - name: "gcr.io/cloud-builders/gcloud"
@@ -124,7 +126,7 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/infra-features-gke-gateway.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/infra-features-gke-gateway.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
  
   # Give the MCI service account the necessary roles
   - name: "gcr.io/cloud-builders/gcloud"
@@ -133,5 +135,5 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/infra-sa-gke-mci-roles.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config builds/infra-sa-gke-mci-roles.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   

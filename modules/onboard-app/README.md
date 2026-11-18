@@ -80,9 +80,11 @@ This runs:
 | [github_repository_webhook.gh_webhook](https://registry.terraform.io/providers/hashicorp/github/latest/docs/resources/repository_webhook) | resource |
 | [google_apikeys_key.api_key](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apikeys_key) | resource |
 | [google_cloudbuild_trigger.deploy_infra](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuild_trigger) | resource |
+| [google_project_iam_member.deploy_infra_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_secret_manager_secret.wh_sec](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
 | [google_secret_manager_secret_iam_policy.policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_policy) | resource |
 | [google_secret_manager_secret_version.wh_secv](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_version) | resource |
+| [google_service_account.deploy_infra](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [null_resource.set_repo](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_password.pass_webhook](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [google_iam_policy.wh-secv-access](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iam_policy) | data source |

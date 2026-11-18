@@ -13,6 +13,8 @@
 # limitations under the License.
 
 timeout: 14400s # 2hr
+options:
+  logging: CLOUD_LOGGING_ONLY
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _INFRA: "true"
@@ -29,7 +31,7 @@ steps:
       - -c
       - |
         [[ "${_INFRA}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/nginx/infra-repo/create-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config examples/nginx/infra-repo/create-platform-infra.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   - name: "gcr.io/cloud-builders/gcloud"
     id: "deploy-to-gke"
     entrypoint: bash
@@ -37,7 +39,7 @@ steps:
       - -c
       - |
         [[ "${_DEPLOY_APP}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/nginx/app-repo/deploy-app.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config examples/nginx/app-repo/deploy-app.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_SHORT_SHA=${_SHORT_SHA}
   - name: "gcr.io/cloud-builders/gcloud"
     id: "slos-create"
     entrypoint: bash
@@ -45,5 +47,5 @@ steps:
       - -c
       - |
         [[ "${_CREATE_SLO}" == "false" ]] && exit 0
-        exec gcloud builds submit --config examples/nginx/infra-repo/create-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID} 
+        exec gcloud builds submit --service-account="projects/${_PROJECT_ID}/serviceAccounts/rap-platform-builder@${_PROJECT_ID}.iam.gserviceaccount.com" --config examples/nginx/infra-repo/create-slos.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
   

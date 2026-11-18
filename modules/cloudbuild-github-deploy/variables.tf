@@ -39,3 +39,15 @@ variable "cloudbuild_file" {
   description = "relative path from repo root to a cloudbuild.yaml file to run on push to main"
   default     = "cloudbuild.yaml"
 }
+
+variable "service_account" {
+  description = "Optional existing service account resource name (projects/PROJECT/serviceAccounts/EMAIL) for the trigger. If empty, a dedicated least-privilege service account is created."
+  type        = string
+  default     = ""
+}
+
+variable "service_account_roles" {
+  description = "Project IAM roles to grant to the created trigger service account when var.service_account is empty."
+  type        = list(string)
+  default     = ["roles/logging.logWriter"]
+}
